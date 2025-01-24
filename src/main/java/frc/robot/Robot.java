@@ -61,16 +61,25 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
+    if(Xbox.getLeftTriggerAxis()>0){
+      RobotContainer.SpeedMultiplier = 0.25;
+  }else if (Xbox.getRightTriggerAxis()>0) {
+      RobotContainer.SpeedMultiplier = 0.5;
+  }else{
+      RobotContainer.SpeedMultiplier = 1;
+  }
 
-    m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();
-    m_robotContainer.SpeedMultiplier += 0.1 * Xbox.getRightTriggerAxis();
 
-    if(m_robotContainer.SpeedMultiplier >= 1){
-      m_robotContainer.SpeedMultiplier = 1;
-    }
-    if(m_robotContainer.SpeedMultiplier <= 0.01){
-      m_robotContainer.SpeedMultiplier = 0.01;
-    }
+
+    // m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();
+    // m_robotContainer.SpeedMultiplier += 0.1 * Xbox.getRightTriggerAxis();
+
+    // if(m_robotContainer.SpeedMultiplier >= 1){
+    //   m_robotContainer.SpeedMultiplier = 1;
+    // }
+    // if(m_robotContainer.SpeedMultiplier <= 0.01){
+    //   m_robotContainer.SpeedMultiplier = 0.01;
+    // }
   }
 
   @Override

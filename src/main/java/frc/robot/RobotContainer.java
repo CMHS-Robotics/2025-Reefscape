@@ -6,7 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -24,8 +24,7 @@ public class RobotContainer {
 
     
 
-    private final SendableChooser<String> autoChooser = new SendableChooser<>();
-
+    private final SendableChooser<Command> autoChooser;
     public static double SpeedMultiplier = 1;
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -44,12 +43,12 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.updateValues();
+        SmartDashboard.putData("Auto Mode", autoChooser);
+
+
         configureBindings();
-
-        autoChooser.addOption("bruuh", "bruuh");
-        SmartDashboard.putData("Auto Selector", autoChooser);
-
-
         
     }
 
@@ -87,6 +86,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("bruuh.auto");
+        return autoChooser.getSelected();
     }
 }

@@ -49,6 +49,7 @@ public class TunerConstants {
     public static final double KPDrive = 0.1;
     public static final double KIDrive = 0;
     public static final double KDDrive = 0;
+    public static final double kVoltMagnitude = 4.48;
 
     private static final Slot0Configs steerGains = new Slot0Configs()
         .withKP(KPSteer).withKI(KISteer).withKD(KDSteer)
@@ -101,7 +102,7 @@ public class TunerConstants {
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
-    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(4.48);//4.48
+    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(kVoltMagnitude);
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot

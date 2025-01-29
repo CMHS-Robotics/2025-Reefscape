@@ -18,33 +18,48 @@ public class Elevator implements Subsystem {
     private static final int elevatorMotorRightId = 14;
 
     TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
+    TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
     XboxController Manipulator;
 
     public Elevator(XboxController bruh){
         
+        //Stuff to set up a motor to be able to spin - replace elevatorLeft with motor name
+
         ElevatorLeft.getConfigurator().apply(new TalonFXConfiguration());
 
         Manipulator = bruh;
+
+        
         var currentConfiguration = new CurrentLimitsConfigs();
         currentConfiguration.StatorCurrentLimit = 80;
         currentConfiguration.StatorCurrentLimitEnable = true;
         ElevatorLeft.getConfigurator().refresh(currentConfiguration);
         ElevatorLeft.getConfigurator().apply(currentConfiguration);
         ElevatorLeft.setNeutralMode(NeutralModeValue.Brake);
+    
+        ElevatorRight.getConfigurator().refresh(currentConfiguration);
+        ElevatorRight.getConfigurator().apply(currentConfiguration);
+        ElevatorRight.setNeutralMode(NeutralModeValue.Brake);
     }   
 
 
 
 
 public void checkInput(){
-    if(Manipulator.getPOV() > 0){
+    if(Manipulator.getPOV() > -1){
         if(Manipulator.getPOV() == 0){
             
             ElevatorLeft.set(1);
+            ElevatorRight.set(1);
         }else if(Manipulator.getPOV() == 180){
 
             ElevatorLeft.set(-1);
+            ElevatorRight.set(1);
         }
+        }else{
+            ElevatorLeft.set(0);
+            ElevatorRight.set(1);
+
         }
     }
 }

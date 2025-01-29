@@ -3,12 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 
 
@@ -17,9 +16,10 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
   
-  CommandXboxController Driver = new CommandXboxController(0);
+  XboxController Driver = new XboxController(0);
   XboxController Manipulator = new XboxController(1);
   Elevator Elevator = new Elevator(Manipulator);
+  DriveAugments Augment = new DriveAugments(Driver);
 
 
   public Robot() {
@@ -64,13 +64,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if(Driver.getLeftTriggerAxis()>0){
-      RobotContainer.SpeedMultiplier = 0.25;
-  }else if (Driver.getRightTriggerAxis()>0) {
-      RobotContainer.SpeedMultiplier = 0.5;
-  }else{
-      RobotContainer.SpeedMultiplier = 1;
-  }
+  Augment.checkInput();
 
   Elevator.checkInput();
 

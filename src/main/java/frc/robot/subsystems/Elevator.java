@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.commands.MoveElevator;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -43,6 +44,11 @@ public class Elevator implements Subsystem {
     }   
 
 
+MoveElevator bluh = new MoveElevator(Manipulator,ElevatorLeft,ElevatorRight);
+
+public void initDefaultCommand(){
+    setDefaultCommand(bluh);
+}
 
 
 public void checkInput(){

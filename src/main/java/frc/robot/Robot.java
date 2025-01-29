@@ -20,7 +20,6 @@ public class Robot extends TimedRobot {
   XboxController Manipulator = new XboxController(1);
   Elevator Elevator = new Elevator(Manipulator);
   DriveAugments Augment = new DriveAugments(Driver);
-  
 
 
   public Robot() {
@@ -67,7 +66,7 @@ public class Robot extends TimedRobot {
 
   Augment.checkInput();
 
-  Elevator.checkInput();
+  //Elevator.checkInput();
 
 
     // m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();

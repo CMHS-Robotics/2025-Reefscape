@@ -14,15 +14,17 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  */
 public class Elevator implements Subsystem {
     
-    int manipId;
     private static final int elevatorMotorLeftId = 13;
     private static final int elevatorMotorRightId = 14;
 
     TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
+    XboxController Manipulator;
 
-    public Elevator(int manipId){
-        this.manipId = manipId;
+    public Elevator(XboxController bruh){
+        
         ElevatorLeft.getConfigurator().apply(new TalonFXConfiguration());
+
+        Manipulator = bruh;
         var currentConfiguration = new CurrentLimitsConfigs();
         currentConfiguration.StatorCurrentLimit = 80;
         currentConfiguration.StatorCurrentLimitEnable = true;
@@ -32,7 +34,6 @@ public class Elevator implements Subsystem {
     }   
 
 
-XboxController Manipulator = new XboxController(manipId);
 
 
 public void checkInput(){

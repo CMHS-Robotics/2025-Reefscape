@@ -5,10 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
+import frc.robot.subsystems.Elevator;
 
 
 public class Robot extends TimedRobot {
@@ -16,7 +17,10 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
   
-  CommandXboxController Xbox = new CommandXboxController(0);
+  CommandXboxController Driver = new CommandXboxController(0);
+  XboxController Manipulator = new XboxController(1);
+  Elevator Elevator = new Elevator(Manipulator);
+
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -60,14 +64,15 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if(Xbox.getLeftTriggerAxis()>0){
+    if(Driver.getLeftTriggerAxis()>0){
       RobotContainer.SpeedMultiplier = 0.25;
-  }else if (Xbox.getRightTriggerAxis()>0) {
+  }else if (Driver.getRightTriggerAxis()>0) {
       RobotContainer.SpeedMultiplier = 0.5;
   }else{
       RobotContainer.SpeedMultiplier = 1;
   }
 
+  Elevator.checkInput();
 
 
     // m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();

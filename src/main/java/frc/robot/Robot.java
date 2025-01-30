@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
 
   Augment.checkInput();
 
-  //Elevator.checkInput();
+  Elevator.checkInput();
 
 
     // m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();

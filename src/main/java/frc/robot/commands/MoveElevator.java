@@ -10,6 +10,7 @@ public class MoveElevator extends Command {
     TalonFX ElevatorRight;  
     XboxController Manipulator;
 
+
     public MoveElevator(XboxController M, TalonFX L, TalonFX R){
         Manipulator = M;
         ElevatorLeft = L;
@@ -35,5 +36,10 @@ public class MoveElevator extends Command {
     
             }
         }
+
+    @Override
+    public boolean isFinished() {
+       return false;
+    }
 
     }

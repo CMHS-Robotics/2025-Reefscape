@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 
 /**
@@ -9,25 +12,36 @@ import frc.robot.RobotContainer;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class DriveAugments implements Subsystem {
-    XboxController Driver;
+    CommandXboxController Driver;
+    Trigger leftTrigger = Driver.leftTrigger();
+    Trigger rightTrigger = Driver.rightTrigger();
 
-    public DriveAugments(XboxController bruh){
+    
 
+    public DriveAugments(CommandXboxController bruh){
         Driver = bruh;
+        leftTrigger.whileTrue(slowMoCommand());
+        rightTrigger.whileTrue(ultraSlowMoCommand());
     }   
 
 
 
+    public final Command slowMoCommand(){
 
-public void checkInput(){
-    if(Driver.getLeftTriggerAxis()>0){
-      RobotContainer.SpeedMultiplier = 0.25;
-  }else if (Driver.getRightTriggerAxis()>0) {
-      RobotContainer.SpeedMultiplier = 0.5;
-  }else{
-      RobotContainer.SpeedMultiplier = 1;
-  }
-    }
+        return Commands.run(() -> 
+        {   
+          RobotContainer.SpeedMultiplier = 0.5;
+        }
+        );
+        }
+    public final Command ultraSlowMoCommand(){
+
+        return Commands.run(() -> 
+        {   
+            RobotContainer.SpeedMultiplier = 0.25;
+        }
+        );
+        }
 }
 
 

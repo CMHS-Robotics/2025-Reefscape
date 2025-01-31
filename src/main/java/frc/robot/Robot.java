@@ -4,9 +4,9 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 
@@ -16,8 +16,8 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
   
-  XboxController Driver = new XboxController(0);
-  XboxController Manipulator = new XboxController(1);
+  CommandXboxController Driver = new CommandXboxController(0);
+  CommandXboxController Manipulator = new CommandXboxController(1);
   Elevator Elevator = new Elevator(Manipulator);
   DriveAugments Augment = new DriveAugments(Driver);
 
@@ -64,9 +64,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-  Augment.checkInput();
+  //Augment.checkInput();
 
-  Elevator.checkInput();
+  //Elevator.checkInput();
 
 
     // m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();

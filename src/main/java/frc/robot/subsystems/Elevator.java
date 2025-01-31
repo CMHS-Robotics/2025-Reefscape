@@ -98,6 +98,62 @@ public class Elevator implements Subsystem {
 
     }
 
+    public Angle cmToDegrees(int Cm){
+        Cm *= 50;
+        Angle bruh = Angle.ofBaseUnits(Cm, Units.Degrees);
+
+       bruh.times(10);
+        
+        return bruh;
+    }
+
+    public final Command stage1Command(){
+        return Commands.runOnce(
+        () -> {
+
+            ElevatorLeft.setControl(pos.withPosition(Stage1));
+            ElevatorRight.setControl(pos.withPosition(Stage1));
+
+        }
+
+        );
+    }
+
+    public final Command stage2Command(){
+        return Commands.runOnce(
+        () -> {
+
+            ElevatorLeft.setControl(pos.withPosition(Stage2));
+            ElevatorRight.setControl(pos.withPosition(Stage2));
+
+        }
+
+        );
+    }
+
+    public final Command stage3Command(){
+        return Commands.runOnce(
+        () -> {
+
+            ElevatorLeft.setControl(pos.withPosition(Stage3));
+            ElevatorRight.setControl(pos.withPosition(Stage3));
+
+        }
+
+        );
+    }
+
+    public final Command intakeStageCommand(){
+        return Commands.runOnce(
+        () -> {
+
+            ElevatorLeft.setControl(pos.withPosition(IntakeStage));
+            ElevatorRight.setControl(pos.withPosition(IntakeStage));
+
+        }
+
+        );
+    }
 
 
     // public void checkInput(){
@@ -110,60 +166,6 @@ public class Elevator implements Subsystem {
     //     }
 
     // }
-
-
-    public Angle cmToDegrees(int Cm){
-        Angle bruh = Angle.ofBaseUnits(Cm, Units.Degrees);
-
-       bruh.times(10);
-        
-        return bruh;
-    }
-
-    public Command stage1Command(){
-        return Commands.runOnce(
-        () -> {
-
-            ElevatorLeft.setControl(pos.withPosition(Stage1));
-            ElevatorRight.setControl(pos.withPosition(Stage1));
-
-        }
-
-        );
-    }
-    public Command stage2Command(){
-        return Commands.runOnce(
-        () -> {
-
-            ElevatorLeft.setControl(pos.withPosition(Stage2));
-            ElevatorRight.setControl(pos.withPosition(Stage2));
-
-        }
-
-        );
-    }
-    public Command stage3Command(){
-        return Commands.runOnce(
-        () -> {
-
-            ElevatorLeft.setControl(pos.withPosition(Stage3));
-            ElevatorRight.setControl(pos.withPosition(Stage3));
-
-        }
-
-        );
-    }
-    public Command intakeStageCommand(){
-        return Commands.runOnce(
-        () -> {
-
-            ElevatorLeft.setControl(pos.withPosition(IntakeStage));
-            ElevatorRight.setControl(pos.withPosition(IntakeStage));
-
-        }
-
-        );
-    }
 
     // public void levels(){
     //     if(Manipulator.getPOV() == 270){

@@ -4,7 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.units.Units;
+import static edu.wpi.first.units.Units.Radian;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorFreeMoveCommand;
 import frc.robot.commands.ElevatorToStageCommand;
-import frc.robot.elevatorconversiontemp;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -24,20 +23,20 @@ public class Elevator implements Subsystem {
     private final int elevatorMotorLeftId = 13;
     private final int elevatorMotorRightId = 14;
 
-    Angle Stage1 = elevatorconversiontemp.distanceToMotorRot(30);
-    Angle Stage2 = elevatorconversiontemp.distanceToMotorRot(30);
-    Angle Stage3 = elevatorconversiontemp.distanceToMotorRot(30);
-    Angle IntakeStage = elevatorconversiontemp.distanceToMotorRot(0);
+    Angle Stage1 = distanceToMotorRot(30);
+    Angle Stage2 = distanceToMotorRot(30);
+    Angle Stage3 = distanceToMotorRot(30);
+    Angle IntakeStage = distanceToMotorRot(0);
 
     private int stageLevel = 0;
 
     Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
 
     
-    ElevatorToStageCommand Stage1Command;
-    ElevatorToStageCommand Stage2Command;
-    ElevatorToStageCommand Stage3Command;
-    ElevatorToStageCommand IntakeStageCommand;
+    ElevatorToStageCommand Stage1Command = new ElevatorToStageCommand(this,Stage1);
+    ElevatorToStageCommand Stage2Command = new ElevatorToStageCommand(this,Stage2);
+    ElevatorToStageCommand Stage3Command = new ElevatorToStageCommand(this,Stage3);
+    ElevatorToStageCommand IntakeStageCommand = new ElevatorToStageCommand(this,IntakeStage);
 
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
@@ -84,13 +83,22 @@ public class Elevator implements Subsystem {
         Trigger povRight = Manipulator.povRight();
         Trigger povDown = Manipulator.povDown();
 
-        povLeft.onTrue(stage1Command());
-        povUp.onTrue(stage2Command());
-        povRight.onTrue(stage3Command());
-        povDown.onTrue(intakeStageCommand());
-
+        povLeft.onTrue(Stage1Command);
+        povUp.onTrue(Stage2Command);
+        povRight.onTrue(Stage3Command);
+        povDown.onTrue(IntakeStageCommand);
+    
     }
-
+        
+    public final Angle distanceToMotorRot(double distance){
+                double r2 = 0.289;
+                double r3 = 1.6;
+                double r5 = 1.2;
+        
+                double finalRad = distance / (2*Math.PI*r2*r5)/r3;
+        
+                return Radian.ofBaseUnits(finalRad);
+    }
     
     
     public final Command freeMove(){
@@ -111,14 +119,6 @@ public class Elevator implements Subsystem {
     @Override
     public void periodic(){
 
-    }
-
-    public Angle cmToDegrees(int Cm){
-        Angle bruh = Angle.ofBaseUnits(Cm, Units.Degrees);
-
-       bruh.times(10);
-        
-        return bruh;
     }
 
     public final Command stage1Command(){

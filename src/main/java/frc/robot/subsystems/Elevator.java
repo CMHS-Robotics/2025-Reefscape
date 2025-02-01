@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorFreeMoveCommand;
-
+import frc.robot.commands.ElevatorToStageCommand;
 import frc.robot.elevatorconversiontemp;
 
 /**
@@ -32,6 +32,12 @@ public class Elevator implements Subsystem {
     private int stageLevel = 0;
 
     Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
+
+    
+    ElevatorToStageCommand Stage1Command;
+    ElevatorToStageCommand Stage2Command;
+    ElevatorToStageCommand Stage3Command;
+    ElevatorToStageCommand IntakeStageCommand;
 
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   

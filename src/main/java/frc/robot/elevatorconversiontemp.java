@@ -1,6 +1,6 @@
-import static edu.wpi.first.units.Units.Radians;
+package frc.robot;
 
-import com.ctre.phoenix6.StatusSignal;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
 
@@ -10,6 +10,8 @@ public class elevatorconversiontemp {
         double r3 = 1.6;
         double r5 = 1.2;
 
-        double finalRad = (2*Math.PI*r2*r5)/r3;
+        double finalRad = distance * (2*Math.PI*r2*r5)/r3;
+
+        return Radian.ofBaseUnits(finalRad);
     }
 }

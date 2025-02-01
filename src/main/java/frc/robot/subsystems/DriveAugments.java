@@ -12,7 +12,7 @@ import frc.robot.commands.UltraSlowModeCommand;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class DriveAugments implements Subsystem {
-    CommandXboxController Driver;
+    public CommandXboxController Driver;
     SlowModeCommand slowMode;
     ResetSpeedMultiplierCommand resetSpeed;
     UltraSlowModeCommand ultraSlowMode;

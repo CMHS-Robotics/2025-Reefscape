@@ -1,14 +1,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.Radian;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,8 +21,8 @@ public class Elevator implements Subsystem {
     private final int elevatorMotorLeftId = 13;
     private final int elevatorMotorRightId = 14;
 
-    Angle Stage1 = distanceToMotorRot(30);
-    Angle Stage2 = distanceToMotorRot(30);
+    Angle Stage1 = distanceToMotorRot(10);
+    Angle Stage2 = distanceToMotorRot(20);
     Angle Stage3 = distanceToMotorRot(30);
     Angle IntakeStage = distanceToMotorRot(0);
 
@@ -33,15 +31,16 @@ public class Elevator implements Subsystem {
     Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
 
     
-    ElevatorToStageCommand Stage1Command = new ElevatorToStageCommand(this,Stage1);
-    ElevatorToStageCommand Stage2Command = new ElevatorToStageCommand(this,Stage2);
-    ElevatorToStageCommand Stage3Command = new ElevatorToStageCommand(this,Stage3);
-    ElevatorToStageCommand IntakeStageCommand = new ElevatorToStageCommand(this,IntakeStage);
+    ElevatorToStageCommand Stage1Command;
+    ElevatorToStageCommand Stage2Command;
+    ElevatorToStageCommand Stage3Command;
+    ElevatorToStageCommand IntakeStageCommand;
+    
 
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
     public CommandXboxController Manipulator;
-    //MotionMagicVoltage pos;
+    MotionMagicVoltage pos;
  
     ElevatorFreeMoveCommand freeMove;
 
@@ -52,6 +51,8 @@ public class Elevator implements Subsystem {
         ElevatorLeft.getConfigurator().apply(new TalonFXConfiguration());
 
         Manipulator = bruh;
+
+        
 
         
         var config = new TalonFXConfiguration();
@@ -65,16 +66,20 @@ public class Elevator implements Subsystem {
         motionMagicConfigs.MotionMagicAcceleration = 180;
         motionMagicConfigs.MotionMagicJerk = 0;
 
+
         ElevatorLeft.getConfigurator().refresh(config);
         ElevatorLeft.getConfigurator().apply(config);
-        ElevatorLeft.setPosition(0);
-    
+
         ElevatorRight.getConfigurator().refresh(config);
         ElevatorRight.getConfigurator().apply(config);
-        ElevatorRight.setPosition(0);
 
-        //pos = new MotionMagicVoltage(0);
-
+        pos = new MotionMagicVoltage(0);
+        
+        Stage1Command = new ElevatorToStageCommand(this, Stage1,pos);
+        Stage2Command = new ElevatorToStageCommand(this, Stage2,pos);
+        Stage3Command = new ElevatorToStageCommand(this, Stage3,pos);
+        IntakeStageCommand = new ElevatorToStageCommand(this, IntakeStage,pos);
+    
         this.setDefaultCommand(new ElevatorFreeMoveCommand(this));
 
 
@@ -97,139 +102,139 @@ public class Elevator implements Subsystem {
         
                 double finalRad = distance / (2*Math.PI*r2*r5)/r3;
         
-                return Radian.ofBaseUnits(finalRad);
-    }
-    
-    
-    public final Command freeMove(){
-
-        return freeMove;
-
-        // return Commands.run(() ->
-
-        //     {
-        //         ElevatorLeft.set(0.2 * Manipulator.getRightY());
-        //         ElevatorRight.set(0.2 * Manipulator.getRightY());
-
-        //     }
-        // );
-
+                return Radian.of(finalRad);
     }
     
     @Override
     public void periodic(){
-
     }
 
-    public final Command stage1Command(){
-        return Commands.run(
-        () -> {
-            Manipulator.setRumble(RumbleType.kBothRumble, 100);
-            //ElevatorLeft.setControl(pos.withPosition(Stage1));
-            //ElevatorRight.setControl(pos.withPosition(Stage1));
+    // public final Command freeMove(){
 
-        }
+    //     return freeMove;
 
-        );
-    }
+    //     // return Commands.run(() ->
 
-    public final Command stage2Command(){
-        return Commands.runOnce(
-        () -> {
+    //     //     {
+    //     //         ElevatorLeft.set(0.2 * Manipulator.getRightY());
+    //     //         ElevatorRight.set(0.2 * Manipulator.getRightY());
 
-            //ElevatorLeft.setControl(pos.withPosition(Stage2));
-            //ElevatorRight.setControl(pos.withPosition(Stage2));
-
-        }
-
-        );
-    }
-
-    public final Command stage3Command(){
-        return Commands.runOnce(
-        () -> {
-
-            //ElevatorLeft.setControl(pos.withPosition(Stage3));
-            //ElevatorRight.setControl(pos.withPosition(Stage3));
-
-        }
-
-        );
-    }
-
-    public final Command intakeStageCommand(){
-        return Commands.runOnce(
-        () -> {
-
-            //ElevatorLeft.setControl(pos.withPosition(IntakeStage));
-            //ElevatorRight.setControl(pos.withPosition(IntakeStage));
-
-        }
-
-        );
-    }
-
-
-    // public void checkInput(){
-    
-    
-    //     if (Manipulator.a().getAsBoolean()) {   
-    //     worseLevels();
-    //     }else{
-    //     levels();
-    //     }
+    //     //     }
+    //     // );
 
     // }
+    
 
-    // public void levels(){
-    //     if(Manipulator.getPOV() == 270){
-    //         ElevatorLeft.setControl(pos.withPosition(Stage1));
-    //         ElevatorRight.setControl(pos.withPosition(Stage1));
-    //     }
-    //     if(Manipulator.getPOV() == 0){
-    //         ElevatorLeft.setControl(pos.withPosition(Stage2));
-    //         ElevatorRight.setControl(pos.withPosition(Stage2));
-    //     }
-    //     if(Manipulator.getPOV() == 90){
-    //         ElevatorLeft.setControl(pos.withPosition(Stage3));
-    //         ElevatorRight.setControl(pos.withPosition(Stage3));
-    //     }
-    //     if(Manipulator.getPOV() == 180){
-    //         ElevatorLeft.setControl(pos.withPosition(IntakeStage));
-    //         ElevatorRight.setControl(pos.withPosition(IntakeStage));
-    //     }
+    
+//     public final Command stage1Command(){
+//         return Commands.run(
+//         () -> {
+//             Manipulator.setRumble(RumbleType.kBothRumble, 100);
+//             //ElevatorLeft.setControl(pos.withPosition(Stage1));
+//             //ElevatorRight.setControl(pos.withPosition(Stage1));
+
+//         }
+
+//         );
+//     }
+
+//     public final Command stage2Command(){
+//         return Commands.runOnce(
+//         () -> {
+
+//             //ElevatorLeft.setControl(pos.withPosition(Stage2));
+//             //ElevatorRight.setControl(pos.withPosition(Stage2));
+
+//         }
+
+//         );
+//     }
+
+//     public final Command stage3Command(){
+//         return Commands.runOnce(
+//         () -> {
+
+//             //ElevatorLeft.setControl(pos.withPosition(Stage3));
+//             //ElevatorRight.setControl(pos.withPosition(Stage3));
+
+//         }
+
+//         );
+//     }
+
+//     public final Command intakeStageCommand(){
+//         return Commands.runOnce(
+//         () -> {
+
+//             //ElevatorLeft.setControl(pos.withPosition(IntakeStage));
+//             //ElevatorRight.setControl(pos.withPosition(IntakeStage));
+
+//         }
+
+//         );
+//     }
 
 
-    // }
+//     // public void checkInput(){
+    
+    
+//     //     if (Manipulator.a().getAsBoolean()) {   
+//     //     worseLevels();
+//     //     }else{
+//     //     levels();
+//     //     }
 
-    // public void worseLevels(){
-    //     if(Manipulator.getPOV() == 270){
-    //         stageLevel = 1;
-    //         ElevatorLeft.setPosition(Stage1);
-    //     }
-    //     if(Manipulator.getPOV() == 0){
-    //         stageLevel = 2;
-    //         ElevatorLeft.setPosition(Stage2);
-    //     }
-    //     if(Manipulator.getPOV() == 90){
-    //         stageLevel = 3;
-    //         ElevatorLeft.setPosition(Stage3);
-    //     }
-    //     if(Manipulator.getPOV() == 180){
-    //         stageLevel = 0;
-    //         ElevatorLeft.setPosition(IntakeStage);
-    //     }
+//     // }
 
-    //     if(ElevatorLeft.getPosition() != stages[stageLevel]){
+//     // public void levels(){
+//     //     if(Manipulator.getPOV() == 270){
+//     //         ElevatorLeft.setControl(pos.withPosition(Stage1));
+//     //         ElevatorRight.setControl(pos.withPosition(Stage1));
+//     //     }
+//     //     if(Manipulator.getPOV() == 0){
+//     //         ElevatorLeft.setControl(pos.withPosition(Stage2));
+//     //         ElevatorRight.setControl(pos.withPosition(Stage2));
+//     //     }
+//     //     if(Manipulator.getPOV() == 90){
+//     //         ElevatorLeft.setControl(pos.withPosition(Stage3));
+//     //         ElevatorRight.setControl(pos.withPosition(Stage3));
+//     //     }
+//     //     if(Manipulator.getPOV() == 180){
+//     //         ElevatorLeft.setControl(pos.withPosition(IntakeStage));
+//     //         ElevatorRight.setControl(pos.withPosition(IntakeStage));
+//     //     }
+
+
+//     // }
+
+//     // public void worseLevels(){
+//     //     if(Manipulator.getPOV() == 270){
+//     //         stageLevel = 1;
+//     //         ElevatorLeft.setPosition(Stage1);
+//     //     }
+//     //     if(Manipulator.getPOV() == 0){
+//     //         stageLevel = 2;
+//     //         ElevatorLeft.setPosition(Stage2);
+//     //     }
+//     //     if(Manipulator.getPOV() == 90){
+//     //         stageLevel = 3;
+//     //         ElevatorLeft.setPosition(Stage3);
+//     //     }
+//     //     if(Manipulator.getPOV() == 180){
+//     //         stageLevel = 0;
+//     //         ElevatorLeft.setPosition(IntakeStage);
+//     //     }
+
+//     //     if(ElevatorLeft.getPosition() != stages[stageLevel]){
             
-    //     }
+//     //     }
 
 
 
-    // }
+//     // }
 
 
-}
+ }
 
 
 

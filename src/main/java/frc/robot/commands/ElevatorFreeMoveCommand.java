@@ -14,10 +14,10 @@ public class ElevatorFreeMoveCommand extends Command {
 
     public ElevatorFreeMoveCommand(Elevator e){
     Elevator = e;
-    ElevatorLeft = e.ElevatorLeft;
-    ElevatorRight = e.ElevatorRight;
-    Manipulator = e.Manipulator;
-    addRequirements(e);
+    ElevatorLeft = Elevator.ElevatorLeft;
+    ElevatorRight = Elevator.ElevatorRight;
+    Manipulator = Elevator.Manipulator;
+    addRequirements(Elevator);
       
    }
 

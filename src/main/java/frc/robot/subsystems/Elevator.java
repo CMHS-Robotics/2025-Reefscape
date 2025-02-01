@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import frc.robot.elevatorconversiontemp;
+
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
@@ -21,10 +23,10 @@ public class Elevator implements Subsystem {
     private final int elevatorMotorLeftId = 13;
     private final int elevatorMotorRightId = 14;
 
-    Angle Stage1 = cmToDegrees(30);
-    Angle Stage2 = cmToDegrees(30);
-    Angle Stage3 = cmToDegrees(30);
-    Angle IntakeStage = cmToDegrees(0);
+    Angle Stage1 = elevatorconversiontemp.distanceToMotorRot(30);
+    Angle Stage2 = elevatorconversiontemp.distanceToMotorRot(30);
+    Angle Stage3 = elevatorconversiontemp.distanceToMotorRot(30);
+    Angle IntakeStage = elevatorconversiontemp.distanceToMotorRot(0);
 
     private int stageLevel = 0;
 
@@ -99,7 +101,6 @@ public class Elevator implements Subsystem {
     }
 
     public Angle cmToDegrees(int Cm){
-        Cm *= 50;
         Angle bruh = Angle.ofBaseUnits(Cm, Units.Degrees);
 
        bruh.times(10);

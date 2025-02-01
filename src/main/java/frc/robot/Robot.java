@@ -6,22 +6,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.DriveAugments;
-import frc.robot.subsystems.Elevator;
-
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
-  
-  CommandXboxController Driver = new CommandXboxController(0);
-  CommandXboxController Manipulator = new CommandXboxController(1);
-  Elevator Elevator = new Elevator(Manipulator);
-  DriveAugments Augment = new DriveAugments(Driver);
-
-
   public Robot() {
     m_robotContainer = new RobotContainer();
   }

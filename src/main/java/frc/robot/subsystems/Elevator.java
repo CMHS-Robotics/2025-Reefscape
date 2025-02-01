@@ -1,17 +1,18 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ElevatorFreeMoveCommand;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -30,16 +31,12 @@ public class Elevator implements Subsystem {
 
     Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
 
-    TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
-    TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
-    CommandXboxController Manipulator;
-    MotionMagicVoltage pos;
-    Trigger povUp = Manipulator.povUp();
-    Trigger povLeft = Manipulator.povLeft();
-    Trigger povRight = Manipulator.povRight();
-    Trigger povDown = Manipulator.povDown();
-
-    
+    public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
+    public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
+    public CommandXboxController Manipulator;
+    //MotionMagicVoltage pos;
+ 
+    ElevatorFreeMoveCommand freeMove;
 
     public Elevator(CommandXboxController bruh){
         
@@ -69,9 +66,15 @@ public class Elevator implements Subsystem {
         ElevatorRight.getConfigurator().apply(config);
         ElevatorRight.setPosition(0);
 
-        pos = new MotionMagicVoltage(0);
+        //pos = new MotionMagicVoltage(0);
 
-        this.setDefaultCommand(freeMove());
+        this.setDefaultCommand(new ElevatorFreeMoveCommand(this));
+
+
+        Trigger povUp = Manipulator.povUp();
+        Trigger povLeft = Manipulator.povLeft();
+        Trigger povRight = Manipulator.povRight();
+        Trigger povDown = Manipulator.povDown();
 
         povLeft.onTrue(stage1Command());
         povUp.onTrue(stage2Command());
@@ -79,17 +82,21 @@ public class Elevator implements Subsystem {
         povDown.onTrue(intakeStageCommand());
 
     }
+
+    
     
     public final Command freeMove(){
 
-        return Commands.run(() ->
+        return freeMove;
 
-            {
-                ElevatorLeft.set(0.2 * Manipulator.getRightY());
-                ElevatorRight.set(0.2 * Manipulator.getRightY());
+        // return Commands.run(() ->
 
-            }
-        );
+        //     {
+        //         ElevatorLeft.set(0.2 * Manipulator.getRightY());
+        //         ElevatorRight.set(0.2 * Manipulator.getRightY());
+
+        //     }
+        // );
 
     }
     
@@ -108,11 +115,11 @@ public class Elevator implements Subsystem {
     }
 
     public final Command stage1Command(){
-        return Commands.runOnce(
+        return Commands.run(
         () -> {
-
-            ElevatorLeft.setControl(pos.withPosition(Stage1));
-            ElevatorRight.setControl(pos.withPosition(Stage1));
+            Manipulator.setRumble(RumbleType.kBothRumble, 100);
+            //ElevatorLeft.setControl(pos.withPosition(Stage1));
+            //ElevatorRight.setControl(pos.withPosition(Stage1));
 
         }
 
@@ -123,8 +130,8 @@ public class Elevator implements Subsystem {
         return Commands.runOnce(
         () -> {
 
-            ElevatorLeft.setControl(pos.withPosition(Stage2));
-            ElevatorRight.setControl(pos.withPosition(Stage2));
+            //ElevatorLeft.setControl(pos.withPosition(Stage2));
+            //ElevatorRight.setControl(pos.withPosition(Stage2));
 
         }
 
@@ -135,8 +142,8 @@ public class Elevator implements Subsystem {
         return Commands.runOnce(
         () -> {
 
-            ElevatorLeft.setControl(pos.withPosition(Stage3));
-            ElevatorRight.setControl(pos.withPosition(Stage3));
+            //ElevatorLeft.setControl(pos.withPosition(Stage3));
+            //ElevatorRight.setControl(pos.withPosition(Stage3));
 
         }
 
@@ -147,8 +154,8 @@ public class Elevator implements Subsystem {
         return Commands.runOnce(
         () -> {
 
-            ElevatorLeft.setControl(pos.withPosition(IntakeStage));
-            ElevatorRight.setControl(pos.withPosition(IntakeStage));
+            //ElevatorLeft.setControl(pos.withPosition(IntakeStage));
+            //ElevatorRight.setControl(pos.withPosition(IntakeStage));
 
         }
 

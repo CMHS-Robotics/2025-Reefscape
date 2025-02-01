@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.RobotContainer;
+import frc.robot.commands.ResetSpeedMultiplierCommand;
+import frc.robot.commands.SlowModeCommand;
+import frc.robot.commands.UltraSlowModeCommand;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -13,35 +13,45 @@ import frc.robot.RobotContainer;
  */
 public class DriveAugments implements Subsystem {
     CommandXboxController Driver;
-    Trigger leftTrigger = Driver.leftTrigger();
-    Trigger rightTrigger = Driver.rightTrigger();
-
-    
+    SlowModeCommand slowMode;
+    ResetSpeedMultiplierCommand resetSpeed;
+    UltraSlowModeCommand ultraSlowMode;
 
     public DriveAugments(CommandXboxController bruh){
         Driver = bruh;
-        leftTrigger.whileTrue(slowMoCommand());
-        rightTrigger.whileTrue(ultraSlowMoCommand());
+        Trigger leftTrigger = Driver.leftTrigger();
+        Trigger rightTrigger = Driver.rightTrigger();
+        slowMode = new SlowModeCommand(this);
+        ultraSlowMode = new UltraSlowModeCommand(this);
+        leftTrigger.whileTrue(slowMode);
+        rightTrigger.whileTrue(ultraSlowMode);
+        resetSpeed = new ResetSpeedMultiplierCommand(this);
+
+        this.setDefaultCommand(resetSpeed);
     }   
 
+    @Override
+    public void periodic(){
+    
+    }
 
+    // public final Command slowMoCommand(){
 
-    public final Command slowMoCommand(){
+    //     return Commands.run(() -> 
+    //     {   
+    //       RobotContainer.SpeedMultiplier = 0.5;
+    //     }
+    //     );
+    // }
 
-        return Commands.run(() -> 
-        {   
-          RobotContainer.SpeedMultiplier = 0.5;
-        }
-        );
-        }
-    public final Command ultraSlowMoCommand(){
+    // public final Command ultraSlowMoCommand(){
 
-        return Commands.run(() -> 
-        {   
-            RobotContainer.SpeedMultiplier = 0.25;
-        }
-        );
-        }
+    //     return Commands.run(() -> 
+    //     {   
+    //         RobotContainer.SpeedMultiplier = 0.25;
+    //     }
+    //     );
+    // }
 }
 
 

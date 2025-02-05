@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.Angle;
@@ -15,19 +14,19 @@ public class ElevatorToStageCommand extends Command {
    TalonFX ElevatorLeft,ElevatorRight;
    CommandXboxController Manipulator;
    Angle position;
-   final PositionVoltage bruh;
-   MotionMagicVoltage pos;
+   final MotionMagicVoltage positionControl;
 
-    public ElevatorToStageCommand(Elevator e, Angle a, MotionMagicVoltage p){
+    public ElevatorToStageCommand(Elevator e, Angle a, int level){
     Elevator = e;
     ElevatorLeft = Elevator.ElevatorLeft;
     ElevatorRight = Elevator.ElevatorRight;
     Manipulator = Elevator.Manipulator;
     position = a;
-    pos = p;
-    bruh = new PositionVoltage(position).withSlot(0);
-
+    positionControl = new MotionMagicVoltage(position).withSlot(0);
+    Elevator.stageLevel = level;
     addRequirements(Elevator);
+
+    
       
    }
 
@@ -39,7 +38,7 @@ public class ElevatorToStageCommand extends Command {
     @Override
     public void execute(){
 
-      ElevatorLeft.setControl(bruh);
+      ElevatorLeft.setControl(positionControl);
 
       //ElevatorLeft.setControl(pos.withPosition(position));
       
@@ -50,13 +49,13 @@ public class ElevatorToStageCommand extends Command {
 
     @Override
     public boolean isFinished() {
-       return false;
+       return targetReached();
     }
 
     public boolean targetReached(){
-      boolean nuts = (Math.abs(ElevatorLeft.getPosition().getValueAsDouble() - position.baseUnitMagnitude()) < 0.1);
+      boolean target = (Math.abs(ElevatorLeft.getPosition().getValueAsDouble() - position.baseUnitMagnitude()) < 5);
       
       
-      return nuts;
+      return target;
     }
    }

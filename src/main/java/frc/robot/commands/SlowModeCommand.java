@@ -16,7 +16,7 @@ public class SlowModeCommand extends Command {
 
     @Override
     public void execute(){
-        RobotContainer.SpeedMultiplier = 0.5;
+        RobotContainer.SpeedMultiplier = 0.35;
         Augments.Driver.setRumble(RumbleType.kBothRumble,0.3);
     }
     

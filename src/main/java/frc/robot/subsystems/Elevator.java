@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -11,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorFreeMoveCommand;
+import frc.robot.commands.ElevatorHoldPositionCommand;
 import frc.robot.commands.ElevatorToStageCommand;
 
 /**
@@ -21,36 +21,35 @@ public class Elevator implements Subsystem {
     private final int elevatorMotorLeftId = 13;
     private final int elevatorMotorRightId = 14;
 
-    Angle Stage1 = distanceToMotorRot(10);
-    Angle Stage2 = distanceToMotorRot(20);
-    Angle Stage3 = distanceToMotorRot(30);
-    Angle IntakeStage = distanceToMotorRot(0);
+    public Angle Stage1 = distanceToMotorRot(10);
+    public Angle Stage2 = distanceToMotorRot(20);
+    public Angle Stage3 = distanceToMotorRot(30);
+    public Angle IntakeStage = distanceToMotorRot(0);
 
-    private int stageLevel = 0;
+    public int stageLevel = 0;
 
-    Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
+    public Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
 
     
-    ElevatorToStageCommand Stage1Command;
-    ElevatorToStageCommand Stage2Command;
-    ElevatorToStageCommand Stage3Command;
-    ElevatorToStageCommand IntakeStageCommand;
+    // ElevatorToStageCommand Stage1Command;
+    // ElevatorToStageCommand Stage2Command;
+    // ElevatorToStageCommand Stage3Command;
+    // ElevatorToStageCommand IntakeStageCommand;
     
 
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
     public CommandXboxController Manipulator;
-    MotionMagicVoltage pos;
  
-    ElevatorFreeMoveCommand freeMove;
+    //ElevatorFreeMoveCommand freeMove;
 
-    public Elevator(CommandXboxController bruh){
+    public Elevator(CommandXboxController x){
         
         //Stuff to set up a motor to be able to spin - replace elevatorLeft with motor name
 
         ElevatorLeft.getConfigurator().apply(new TalonFXConfiguration());
 
-        Manipulator = bruh;
+        Manipulator = x;
 
         
 
@@ -58,7 +57,7 @@ public class Elevator implements Subsystem {
         var config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         var slot0configs = config.Slot0;
-        slot0configs.kP = 1;
+        slot0configs.kP = 20;
         slot0configs.kI = 0;
         slot0configs.kD = 0.1;
         var motionMagicConfigs = config.MotionMagic;
@@ -66,21 +65,20 @@ public class Elevator implements Subsystem {
         motionMagicConfigs.MotionMagicAcceleration = 180;
         motionMagicConfigs.MotionMagicJerk = 0;
 
-
         ElevatorLeft.getConfigurator().refresh(config);
         ElevatorLeft.getConfigurator().apply(config);
+        ElevatorLeft.setPosition(0);
 
         ElevatorRight.getConfigurator().refresh(config);
         ElevatorRight.getConfigurator().apply(config);
-
-        pos = new MotionMagicVoltage(0);
+        ElevatorRight.setPosition(0);
         
-        Stage1Command = new ElevatorToStageCommand(this, Stage1,pos);
-        Stage2Command = new ElevatorToStageCommand(this, Stage2,pos);
-        Stage3Command = new ElevatorToStageCommand(this, Stage3,pos);
-        IntakeStageCommand = new ElevatorToStageCommand(this, IntakeStage,pos);
+        // Stage1Command = new ElevatorToStageCommand(this, Stage1);
+        // Stage2Command = new ElevatorToStageCommand(this, Stage2);
+        // Stage3Command = new ElevatorToStageCommand(this, Stage3);
+        // IntakeStageCommand = new ElevatorToStageCommand(this, IntakeStage);
     
-        this.setDefaultCommand(new ElevatorFreeMoveCommand(this));
+        this.setDefaultCommand(new ElevatorHoldPositionCommand(this));
 
 
         Trigger povUp = Manipulator.povUp();
@@ -88,10 +86,14 @@ public class Elevator implements Subsystem {
         Trigger povRight = Manipulator.povRight();
         Trigger povDown = Manipulator.povDown();
 
-        povLeft.onTrue(Stage1Command);
-        povUp.onTrue(Stage2Command);
-        povRight.onTrue(Stage3Command);
-        povDown.onTrue(IntakeStageCommand);
+        Trigger rightStick = Manipulator.rightStick();
+
+        povLeft.onTrue(new ElevatorToStageCommand(this, Stage1,1));
+        povUp.onTrue(new ElevatorToStageCommand(this, Stage2,2));
+        povRight.onTrue(new ElevatorToStageCommand(this, Stage3,3));
+        povDown.onTrue(new ElevatorToStageCommand(this, IntakeStage,0));
+
+        rightStick.whileTrue(new ElevatorFreeMoveCommand(this));
     
     }
         
@@ -100,7 +102,7 @@ public class Elevator implements Subsystem {
                 double r3 = 1.6;
                 double r5 = 1.2;
         
-                double finalRad = distance / (2*Math.PI*r2*r5)/r3;
+                double finalRad = 100 * distance / (2*Math.PI*r2*r5)/r3;
         
                 return Radian.of(finalRad);
     }
@@ -142,7 +144,10 @@ public class Elevator implements Subsystem {
 //         return Commands.runOnce(
 //         () -> {
 
-//             //ElevatorLeft.setControl(pos.withPosition(Stage2));
+
+
+
+             //ElevatorLeft.setControl(pos.withPosition(Stage2));
 //             //ElevatorRight.setControl(pos.withPosition(Stage2));
 
 //         }

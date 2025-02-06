@@ -13,7 +13,8 @@ public class UltraSlowModeCommand extends Command {
 
     @Override
     public void execute(){
-        RobotContainer.SpeedMultiplier = 0.1;
+        RobotContainer.SpeedMultiplier = 0.15;
+        RobotContainer.RotationSpeedMultiplier = 0.25;
     }
     
     @Override

@@ -16,6 +16,7 @@ public class ResetSpeedMultiplierCommand extends Command {
     @Override
     public void execute(){
         RobotContainer.SpeedMultiplier = 1;
+        RobotContainer.RotationSpeedMultiplier = 1;
     }
     
     @Override

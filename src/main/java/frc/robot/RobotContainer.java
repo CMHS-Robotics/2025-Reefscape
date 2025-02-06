@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -15,9 +16,9 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.ElevatorFreeMoveCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DriveAugments;
@@ -30,6 +31,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
     public static double SpeedMultiplier = 1;
+    public static double RotationSpeedMultiplier = 1;
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -47,7 +49,7 @@ public class RobotContainer {
     Elevator Elevator = new Elevator(Manipulator);
     DriveAugments Augment = new DriveAugments(Driver);
     //commands
-    ElevatorFreeMoveCommand freeMove = new ElevatorFreeMoveCommand(Elevator);
+    // ElevatorFreeMoveCommand freeMove = new ElevatorFreeMoveCommand(Elevator);
 
 
 
@@ -58,18 +60,11 @@ public class RobotContainer {
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
         
-        
+        EventTrigger test = new EventTrigger("TestMarker");
+        test.whileTrue(Commands.run(() -> {
+            System.out.println("bruh");
+        }));
 
-        //CommandScheduler.getInstance().setDefaultCommand(Elevator,Elevator.freeMove());
-        //CommandScheduler.getInstance().setDefaultCommand(Augment,new RunCommand(() -> {
-        //    RobotContainer.SpeedMultiplier = 1;
-        //}));
-            
-
-        // Elevator.setDefaultCommand(Elevator.freeMove());
-        // Augment.setDefaultCommand(new RunCommand(() -> {
-        //     RobotContainer.SpeedMultiplier = 1;
-        // }));
 
         configureBindings();
         
@@ -84,13 +79,18 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
                     .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier) // Drive left with negative X (left)
-                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier) // Drive counterclockwise with negative X (left)
             )
             
         );
+        
+        Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier)));
+        Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier)));
+        Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier)));
+        Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier)));
 
-        Driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        Driver.b().whileTrue(drivetrain.applyRequest(() ->
+        Driver.b().whileTrue(drivetrain.applyRequest(() -> brake));
+        Driver.y().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Driver.getLeftY(), -Driver.getLeftX()))
         ));
 
@@ -104,7 +104,8 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        
+        
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

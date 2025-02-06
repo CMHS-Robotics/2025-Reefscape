@@ -7,24 +7,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Action0"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Action1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Action2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "Action3"
           }
         }

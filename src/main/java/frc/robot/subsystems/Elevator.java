@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.Radian;
@@ -10,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorFreeMoveCommand;
-import frc.robot.commands.ElevatorHoldPositionCommand;
 import frc.robot.commands.ElevatorToStageCommand;
 
 /**
@@ -35,6 +35,7 @@ public class Elevator implements Subsystem {
     // ElevatorToStageCommand Stage2Command;
     // ElevatorToStageCommand Stage3Command;
     // ElevatorToStageCommand IntakeStageCommand;
+    ElevatorFreeMoveCommand freeMoveCommand;
     
 
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
@@ -56,13 +57,14 @@ public class Elevator implements Subsystem {
         
         var config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         var slot0configs = config.Slot0;
-        slot0configs.kP = 20;
+        slot0configs.kP = 30;
         slot0configs.kI = 0;
-        slot0configs.kD = 0.1;
+        slot0configs.kD = 3;
         var motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = 60;
-        motionMagicConfigs.MotionMagicAcceleration = 180;
+        motionMagicConfigs.MotionMagicAcceleration = 20;
         motionMagicConfigs.MotionMagicJerk = 0;
 
         ElevatorLeft.getConfigurator().refresh(config);
@@ -78,7 +80,9 @@ public class Elevator implements Subsystem {
         // Stage3Command = new ElevatorToStageCommand(this, Stage3);
         // IntakeStageCommand = new ElevatorToStageCommand(this, IntakeStage);
     
-        this.setDefaultCommand(new ElevatorHoldPositionCommand(this));
+        freeMoveCommand = new ElevatorFreeMoveCommand(this);
+
+        this.setDefaultCommand(new ElevatorFreeMoveCommand(this));
 
 
         Trigger povUp = Manipulator.povUp();
@@ -93,7 +97,7 @@ public class Elevator implements Subsystem {
         povRight.onTrue(new ElevatorToStageCommand(this, Stage3,3));
         povDown.onTrue(new ElevatorToStageCommand(this, IntakeStage,0));
 
-        rightStick.whileTrue(new ElevatorFreeMoveCommand(this));
+        //rightStick.whileTrue(freeMoveCommand);
     
     }
         

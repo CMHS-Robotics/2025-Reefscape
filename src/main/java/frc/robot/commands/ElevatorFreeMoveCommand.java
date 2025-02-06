@@ -25,11 +25,7 @@ public class ElevatorFreeMoveCommand extends Command {
     public void execute(){
       ElevatorLeft.set(-0.2 * Manipulator.getRightY());
       ElevatorRight.set(-0.2 * Manipulator.getRightY());
-      if(ElevatorLeft.getPosition().getValueAsDouble() > 10){
-      }
-      else{
-
-      }
+      Elevator.motorPosition = ElevatorLeft.getPosition();
     }
     
     @Override

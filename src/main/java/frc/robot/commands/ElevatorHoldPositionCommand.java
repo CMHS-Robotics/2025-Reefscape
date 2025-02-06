@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -15,6 +16,7 @@ public class ElevatorHoldPositionCommand extends Command {
    CommandXboxController Manipulator;
    MotionMagicVoltage positionControl;
    Angle position;
+   Angle motPos;
 
     public ElevatorHoldPositionCommand(Elevator e){
     Elevator = e;
@@ -22,7 +24,8 @@ public class ElevatorHoldPositionCommand extends Command {
     ElevatorRight = Elevator.ElevatorRight;
     Manipulator = Elevator.Manipulator;
     position = Elevator.stages[Elevator.stageLevel];
-    positionControl = new MotionMagicVoltage(position).withSlot(0);
+    motPos = Elevator.motorPosition.getValue();
+    positionControl = new MotionMagicVoltage(motPos).withSlot(0);
     addRequirements(Elevator);
       
    }
@@ -33,7 +36,7 @@ public class ElevatorHoldPositionCommand extends Command {
       ElevatorLeft.set(0);
       ElevatorRight.set(0);
       ElevatorLeft.setControl(positionControl);
-      ElevatorRight.setControl(positionControl);      
+      ElevatorRight.setControl(positionControl);
 
     }
     

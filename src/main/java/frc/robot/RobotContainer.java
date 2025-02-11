@@ -60,6 +60,9 @@ public class RobotContainer {
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
         
+        Elevator.ElevatorRight.setPosition(0);
+        Elevator.ElevatorLeft.setPosition(0);
+
         EventTrigger test = new EventTrigger("TestMarker");
         test.whileTrue(Commands.run(() -> {
             System.out.println("bruh");

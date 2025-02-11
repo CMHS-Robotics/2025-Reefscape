@@ -4,6 +4,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
 
@@ -12,19 +13,18 @@ public class ElevatorToStageCommand extends Command {
 
    TalonFX ElevatorLeft,ElevatorRight;
    Angle position;
-   final MotionMagicVoltage positionControl;
-
-    public ElevatorToStageCommand(Elevator e, Angle a, int level){
-    Elevator = e;
-    ElevatorLeft = Elevator.ElevatorLeft;
-    ElevatorRight = Elevator.ElevatorRight;
-    position = a;
-    positionControl = new MotionMagicVoltage(position).withSlot(0);
-    Elevator.stageLevel = level;
-    addRequirements(Elevator);
-
-    
+   MotionMagicVoltage positionControl;
+   int level;
+  
+   public ElevatorToStageCommand(Elevator e, Angle a, int l){
+      Elevator = e;
+      ElevatorLeft = Elevator.ElevatorLeft;
+      ElevatorRight = Elevator.ElevatorRight;
+      position = a;
+      level = l;
+      positionControl = new MotionMagicVoltage(0);
       
+      addRequirements(Elevator);  
    }
 
     @Override
@@ -35,8 +35,11 @@ public class ElevatorToStageCommand extends Command {
     @Override
     public void execute(){
 
-      ElevatorLeft.setControl(positionControl);
-      ElevatorRight.setControl(positionControl);
+      SmartDashboard.putString("Command Running:","ToStage");
+      Elevator.motorPosition = position;
+      Elevator.stageLevel = level;
+      ElevatorLeft.setControl(positionControl.withPosition(position).withSlot(0));
+      ElevatorRight.setControl(positionControl.withPosition(position).withSlot(0));
       
     }
     

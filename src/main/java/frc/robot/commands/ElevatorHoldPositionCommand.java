@@ -3,6 +3,7 @@ package frc.robot.commands;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,10 @@ public class ElevatorHoldPositionCommand extends Command {
    @Override
    public void initialize(){
       motPos = Elevator.motorPosition;
+      positionControl = new MotionMagicVoltage(motPos).withSlot(0); 
+      ElevatorLeft.setControl(positionControl.withPosition(Rotations.of(0.05)).withSlot(0));
+      ElevatorRight.setControl(positionControl.withPosition(Rotations.of(0.05)).withSlot(0));
+
    }
 
 
@@ -39,11 +44,9 @@ public class ElevatorHoldPositionCommand extends Command {
       // ElevatorRight.set(0);
       SmartDashboard.putNumber("positionControl",motPos.magnitude());
       SmartDashboard.putString("Command Running:","HoldPosition");
-      SmartDashboard.putString("bruh",ElevatorLeft.toString());
+      SmartDashboard.putString("ElevatorLeftString",ElevatorLeft.toString());
       
-      ElevatorLeft.setControl(positionControl.withPosition(motPos).withSlot(0));
-      ElevatorRight.setControl(positionControl.withPosition(motPos).withSlot(0));
-
+     
     }
     
     @Override

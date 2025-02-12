@@ -65,27 +65,32 @@ public class Elevator implements Subsystem {
         
         var config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Feedback.SensorToMechanismRatio = 1;
         config.Voltage.PeakForwardVoltage = 3;
         config.Voltage.PeakReverseVoltage = 3;
 
+        var softwarelimit = config.SoftwareLimitSwitch;
+        softwarelimit.ForwardSoftLimitEnable = true;
+        softwarelimit.ReverseSoftLimitEnable = true;
+        softwarelimit.ReverseSoftLimitThreshold = 0;
+        softwarelimit.ForwardSoftLimitThreshold = 10;
+
         var slot0configs = config.Slot0;
         slot0configs.kP = 10;
         slot0configs.kI = 0;
         slot0configs.kD = 0.5;
-        slot0configs.kV = 1;
-        slot0configs.kS = 0.25;
+        slot0configs.kV = 0.1;
+        slot0configs.kS = 0.025;
         //slot0configs.kG = 1;
-        slot0configs.kA = 0.5;
+        slot0configs.kA = 0.05;
         //slot0configs.GravityType = GravityTypeValue.Elevator_Static;
 
         var motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 2;
-        motionMagicConfigs.MotionMagicAcceleration = 1;
-        motionMagicConfigs.MotionMagicJerk = 0.1;
-
+        motionMagicConfigs.MotionMagicCruiseVelocity = 1;
+        motionMagicConfigs.MotionMagicAcceleration = .1;
+        motionMagicConfigs.MotionMagicJerk = 0.01;
         ElevatorLeft.getConfigurator().apply(config);
         ElevatorLeft.setPosition(0);
 
@@ -96,8 +101,11 @@ public class Elevator implements Subsystem {
         ElevatorLeft.set(0);
         ElevatorRight.set(0);
 
+        SmartDashboard.putString("Initialize Config",
+        config.toString());
+        
 
-        motorPosition = ElevatorLeft.getPosition().getValue();
+        motorPosition = Rotations.of(0);
 
         // Stage1Command = new ElevatorToStageCommand(this, stages[1],1);
         // Stage2Command = new ElevatorToStageCommand(this, stages[2],2);
@@ -106,7 +114,7 @@ public class Elevator implements Subsystem {
     
         freeMoveCommand = new ElevatorFreeMoveCommand(this);
 
-        //holdPositionCommand = new ElevatorHoldPositionCommand(this);
+        holdPositionCommand = new ElevatorHoldPositionCommand(this);
 
         this.setDefaultCommand(holdPositionCommand);
 
@@ -116,7 +124,7 @@ public class Elevator implements Subsystem {
         Trigger povRight = Manipulator.povRight();
         Trigger povDown = Manipulator.povDown();
 
-        Trigger rightAxis = Manipulator.axisGreaterThan(1, 0.01).or(Manipulator.axisLessThan(1, -0.01));
+        Trigger rightAxis = Manipulator.rightTrigger();
 
         Trigger b = Manipulator.b();
 
@@ -130,6 +138,7 @@ public class Elevator implements Subsystem {
         b.onTrue(Commands.runOnce(()->{
                 ElevatorLeft.setPosition(Rotations.of(0));
                 ElevatorRight.setPosition(Rotations.of(0));
+                motorPosition = Rotations.of(0);
         },this));
         
         ElevatorRight.setPosition(0,1);
@@ -148,13 +157,13 @@ public class Elevator implements Subsystem {
     
     @Override
     public void periodic(){
-        SmartDashboard.updateValues();
         SmartDashboard.putNumber("Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Motor Pos var", motorPosition.baseUnitMagnitude());
         SmartDashboard.putNumber("Stage Level", stageLevel);
         SmartDashboard.putString("Motor Request",ElevatorLeft.getAppliedControl().toString());
         SmartDashboard.putString("Motor Config",ElevatorLeft.getConfigurator().toString());
         SmartDashboard.putString("Motor Description",ElevatorLeft.getDescription());
+        SmartDashboard.putNumber("Joystick???: ", Manipulator.getRightY());
 
 
     }

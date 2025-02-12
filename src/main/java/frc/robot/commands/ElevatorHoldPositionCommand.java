@@ -42,7 +42,7 @@ public class ElevatorHoldPositionCommand extends Command {
 
       // ElevatorLeft.set(0);
       // ElevatorRight.set(0);
-      SmartDashboard.putNumber("positionControl",motPos.magnitude());
+      SmartDashboard.putNumber("motPos",motPos.magnitude());
       SmartDashboard.putString("Command Running:","HoldPosition");
       SmartDashboard.putString("ElevatorLeftString",ElevatorLeft.toString());
       

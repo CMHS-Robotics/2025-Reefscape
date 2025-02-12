@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -9,7 +10,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -74,11 +74,11 @@ public class Elevator implements Subsystem {
         var softwarelimit = config.SoftwareLimitSwitch;
         softwarelimit.ForwardSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitEnable = true;
-        softwarelimit.ReverseSoftLimitThreshold = 0;
-        softwarelimit.ForwardSoftLimitThreshold = 10;
+        softwarelimit.ReverseSoftLimitThreshold = 1;
+        softwarelimit.ForwardSoftLimitThreshold = 17;
 
         var slot0configs = config.Slot0;
-        slot0configs.kP = 10;
+        slot0configs.kP = 1;
         slot0configs.kI = 0;
         slot0configs.kD = 0.5;
         slot0configs.kV = 0.1;
@@ -116,7 +116,22 @@ public class Elevator implements Subsystem {
 
         holdPositionCommand = new ElevatorHoldPositionCommand(this);
 
-        this.setDefaultCommand(holdPositionCommand);
+        //this.setDefaultCommand(holdPositionCommand);
+
+        PositionVoltage bruh = new PositionVoltage(Rotations.of(0));
+        bruh.Slot = 0;
+        bruh.Velocity = 1;
+
+        this.setDefaultCommand(Commands.run(()->
+        
+        {
+            bruh.Position = 0.3;
+            ElevatorLeft.setControl(bruh);
+            ElevatorRight.setControl(bruh);
+
+        }
+        
+        ,this)); 
 
 
         Trigger povUp = Manipulator.povUp();
@@ -163,7 +178,7 @@ public class Elevator implements Subsystem {
         SmartDashboard.putString("Motor Request",ElevatorLeft.getAppliedControl().toString());
         SmartDashboard.putString("Motor Config",ElevatorLeft.getConfigurator().toString());
         SmartDashboard.putString("Motor Description",ElevatorLeft.getDescription());
-        SmartDashboard.putNumber("Joystick???: ", Manipulator.getRightY());
+        SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
 
 
     }
@@ -182,56 +197,56 @@ public class Elevator implements Subsystem {
     
 
     
-    public final Command stage1Command(){
-        return Commands.run(
-        () -> {
-            //Manipulator.setRumble(RumbleType.kBothRumble, 100);
-            //ElevatorLeft.setControl(pos.withPosition(Stage1));
-            //ElevatorRight.setControl(pos.withPosition(Stage1));
+    // public final Command stage1Command(){
+    //     return Commands.run(
+    //     () -> {
+    //         //Manipulator.setRumble(RumbleType.kBothRumble, 100);
+    //         //ElevatorLeft.setControl(pos.withPosition(Stage1));
+    //         //ElevatorRight.setControl(pos.withPosition(Stage1));
 
-        }
+    //     }
 
-        );
-    }
+    //     );
+    // }
 
-    public final Command stage2Command(){
-        return Commands.runOnce(
-        () -> {
-
-
+    // public final Command stage2Command(){
+    //     return Commands.runOnce(
+    //     () -> {
 
 
-             //ElevatorLeft.setControl(pos.withPosition(Stage2));
-            //ElevatorRight.setControl(pos.withPosition(Stage2));
 
-        }
 
-        );
-    }
+    //          //ElevatorLeft.setControl(pos.withPosition(Stage2));
+    //         //ElevatorRight.setControl(pos.withPosition(Stage2));
 
-    public final Command stage3Command(){
-        return Commands.runOnce(
-        () -> {
+    //     }
 
-            //ElevatorLeft.setControl(pos.withPosition(Stage3));
-            //ElevatorRight.setControl(pos.withPosition(Stage3));
+    //     );
+    // }
 
-        }
+    // public final Command stage3Command(){
+    //     return Commands.runOnce(
+    //     () -> {
 
-        );
-    }
+    //         //ElevatorLeft.setControl(pos.withPosition(Stage3));
+    //         //ElevatorRight.setControl(pos.withPosition(Stage3));
 
-    public final Command intakeStageCommand(){
-        return Commands.runOnce(
-        () -> {
+    //     }
 
-            //ElevatorLeft.setControl(pos.withPosition(IntakeStage));
-            //ElevatorRight.setControl(pos.withPosition(IntakeStage));
+    //     );
+    // }
 
-        }
+    // public final Command intakeStageCommand(){
+    //     return Commands.runOnce(
+    //     () -> {
 
-        );
-    }
+    //         //ElevatorLeft.setControl(pos.withPosition(IntakeStage));
+    //         //ElevatorRight.setControl(pos.withPosition(IntakeStage));
+
+    //     }
+
+    //     );
+    // }
 
 
     // public void checkInput(){

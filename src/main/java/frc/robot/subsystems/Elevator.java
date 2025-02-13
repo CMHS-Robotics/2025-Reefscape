@@ -134,13 +134,16 @@ public class Elevator implements Subsystem {
 
         MotionMagicDutyCycle req = new MotionMagicDutyCycle(Rotations.of(0));
         req.Slot = 0;
+        
         this.setDefaultCommand(Commands.run(()->
         
         {
             SmartDashboard.putString("Command Running", "Default");
+            
+            pos = 3;
             if(Manipulator.a().getAsBoolean()){
-            ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
-            ElevatorRight.setControl(new Follower(13,false));
+                ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
+                ElevatorRight.setControl(new Follower(13,false));
             }
 
             
@@ -202,7 +205,7 @@ public class Elevator implements Subsystem {
     
     @Override
     public void periodic(){
-        pos = (-Manipulator.getLeftY() + 1.0) * 7.0;
+        //pos = (-Manipulator.getLeftY() + 1.0) * 7.0;
         SmartDashboard.putNumber("pos",pos);
         SmartDashboard.putNumber("Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Motor Pos var", motorPosition.magnitude());

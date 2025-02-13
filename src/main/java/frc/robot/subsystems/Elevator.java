@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -137,14 +138,14 @@ public class Elevator implements Subsystem {
         
         {
             SmartDashboard.putString("Command Running", "Default");
-            // if(Manipulator.a().getAsBoolean()){
-            // ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
-            // ElevatorRight.setControl(new Follower(13,false));
-            // }
+            if(Manipulator.a().getAsBoolean()){
+            ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
+            ElevatorRight.setControl(new Follower(13,false));
+            }
 
             
-            ElevatorLeft.set(0.05);
-            ElevatorRight.set(0.05);
+            // ElevatorLeft.set(0.05);
+            // ElevatorRight.set(0.05);
             //ElevatorRight.setControl(new Follower(13,false));
 
         //     if(Math.abs(ElevatorLeft.getPosition().getValueAsDouble() - targetPosition) <= 0.2){

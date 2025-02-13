@@ -63,7 +63,7 @@ public class Elevator implements Subsystem {
         
 
 
-        
+        //set stage levels
         Stage1 = Rotations.of(2);
         Stage2 = Rotations.of(5);
         Stage3 = Rotations.of(10);
@@ -73,6 +73,8 @@ public class Elevator implements Subsystem {
 
         //ElevatorRight.setControl(new Follower(13,false));
         //ElevatorRight.set(0);
+
+        //Make new config
         var config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -81,12 +83,14 @@ public class Elevator implements Subsystem {
         config.Voltage.PeakForwardVoltage = 3;
         config.Voltage.PeakReverseVoltage = 3;
 
+        //elevator limits
         var softwarelimit = config.SoftwareLimitSwitch;
         softwarelimit.ForwardSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitThreshold = 1;
         softwarelimit.ForwardSoftLimitThreshold = 18;
 
+        //pid gains
         var slot0configs = config.Slot0;
         slot0configs.kP = 20;
         slot0configs.kI = 0;
@@ -98,11 +102,13 @@ public class Elevator implements Subsystem {
         slot0configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         slot0configs.GravityType = GravityTypeValue.Elevator_Static;
 
+        //motion magic config
         var motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = 40;
         motionMagicConfigs.MotionMagicAcceleration = 80;
         motionMagicConfigs.MotionMagicJerk = 800;
 
+        //apply configs and reset motors
         ElevatorLeft.getConfigurator().apply(config);
         ElevatorLeft.setPosition(0);
 
@@ -114,39 +120,44 @@ public class Elevator implements Subsystem {
         motorPosition = Rotations.of(0);
 
         ElevatorLeft.set(0);
+        ElevatorRight.set(0);
 
         SmartDashboard.putString("Initialize Config",
         config.toString());
         
-
         motorPosition = Rotations.of(0);
+        
+        //define commands
 
         // Stage1Command = new ElevatorToStageCommand(this, stages[1],1);
         // Stage2Command = new ElevatorToStageCommand(this, stages[2],2);
         // Stage3Command = new ElevatorToStageCommand(this, stages[3],3);
         // IntakeStageCommand = new ElevatorToStageCommand(this, stages[0],0);
-    
+
         freeMoveCommand = new ElevatorFreeMoveCommand(this);
 
         holdPositionCommand = new ElevatorHoldPositionCommand(this);
 
         //this.setDefaultCommand(holdPositionCommand);
 
+
+        //testing out motion magic with new default command
         MotionMagicDutyCycle req = new MotionMagicDutyCycle(Rotations.of(0));
         req.Slot = 0;
-        
+
         this.setDefaultCommand(Commands.run(()->
         
         {
             SmartDashboard.putString("Command Running", "Default");
             
-            pos = 3;
+            pos = 10;
             if(Manipulator.a().getAsBoolean()){
                 ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
                 ElevatorRight.setControl(new Follower(13,false));
             }
 
             
+            //scuffed solution for holding
             // ElevatorLeft.set(0.05);
             // ElevatorRight.set(0.05);
             //ElevatorRight.setControl(new Follower(13,false));
@@ -167,28 +178,32 @@ public class Elevator implements Subsystem {
         ,this)); 
 
 
+        //define triggers
         Trigger povUp = Manipulator.povUp();
         Trigger povLeft = Manipulator.povLeft();
         Trigger povRight = Manipulator.povRight();
         Trigger povDown = Manipulator.povDown();
 
-        Trigger rightAxis = Manipulator.rightTrigger();
+        Trigger rightTrigger = Manipulator.rightTrigger();
 
         Trigger b = Manipulator.b();
 
+        //bind commands to triggers
         povLeft.onTrue(new ElevatorToStageCommand(this, Stage1,1));
         povUp.onTrue(new ElevatorToStageCommand(this, Stage2,2));
         povRight.onTrue(new ElevatorToStageCommand(this, Stage3,3));
         povDown.onTrue(new ElevatorToStageCommand(this, IntakeStage,0));
 
-        rightAxis.whileTrue(freeMoveCommand);
+        rightTrigger.whileTrue(freeMoveCommand);
 
+        //reset motor position
         b.onTrue(Commands.runOnce(()->{
                 ElevatorLeft.setPosition(Rotations.of(0));
                 ElevatorRight.setPosition(Rotations.of(0));
                 motorPosition = Rotations.of(0);
         },this));
         
+        //resetting motors again just to bet sure
         ElevatorRight.setPosition(0,1);
         ElevatorLeft.setPosition(0,1);
     }

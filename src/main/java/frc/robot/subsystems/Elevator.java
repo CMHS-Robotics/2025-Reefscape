@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
@@ -36,6 +38,8 @@ public class Elevator implements Subsystem {
     public Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
 
     public Angle motorPosition;
+
+    public double targetPosition = 0;
     
     // ElevatorToStageCommand Stage1Command;
     // ElevatorToStageCommand Stage2Command;
@@ -49,20 +53,25 @@ public class Elevator implements Subsystem {
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
     public CommandXboxController Manipulator;
 
- 
+    double pos = 8;
+
     //ElevatorFreeMoveCommand freeMove;
 
     public Elevator(CommandXboxController x){
         
+        
+
 
         
         Stage1 = Rotations.of(2);
-        Stage2 = Rotations.of(4);
-        Stage3 = Rotations.of(6);
+        Stage2 = Rotations.of(5);
+        Stage3 = Rotations.of(10);
         IntakeStage = Rotations.of(0);
 
         Manipulator = x;
-        
+
+        //ElevatorRight.setControl(new Follower(13,false));
+        //ElevatorRight.set(0);
         var config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -75,31 +84,35 @@ public class Elevator implements Subsystem {
         softwarelimit.ForwardSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitThreshold = 1;
-        softwarelimit.ForwardSoftLimitThreshold = 17;
+        softwarelimit.ForwardSoftLimitThreshold = 18;
 
         var slot0configs = config.Slot0;
-        slot0configs.kP = 1;
+        slot0configs.kP = 20;
         slot0configs.kI = 0;
-        slot0configs.kD = 0.5;
-        slot0configs.kV = 0.1;
-        slot0configs.kS = 0.025;
-        //slot0configs.kG = 1;
-        slot0configs.kA = 0.05;
-        //slot0configs.GravityType = GravityTypeValue.Elevator_Static;
+        slot0configs.kD = 10;
+        slot0configs.kV = 3;
+        slot0configs.kS = 2;
+        slot0configs.kG = 10;
+        slot0configs.kA = 1;
+        slot0configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+        slot0configs.GravityType = GravityTypeValue.Elevator_Static;
 
         var motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 1;
-        motionMagicConfigs.MotionMagicAcceleration = .1;
-        motionMagicConfigs.MotionMagicJerk = 0.01;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 40;
+        motionMagicConfigs.MotionMagicAcceleration = 80;
+        motionMagicConfigs.MotionMagicJerk = 800;
+
         ElevatorLeft.getConfigurator().apply(config);
         ElevatorLeft.setPosition(0);
 
         ElevatorRight.getConfigurator().apply(config);
         ElevatorRight.setPosition(0);
         
-        
+        ElevatorLeft.setPosition(Rotations.of(0));
+        ElevatorRight.setPosition(Rotations.of(0));
+        motorPosition = Rotations.of(0);
+
         ElevatorLeft.set(0);
-        ElevatorRight.set(0);
 
         SmartDashboard.putString("Initialize Config",
         config.toString());
@@ -118,17 +131,33 @@ public class Elevator implements Subsystem {
 
         //this.setDefaultCommand(holdPositionCommand);
 
-        PositionVoltage bruh = new PositionVoltage(Rotations.of(0));
-        bruh.Slot = 0;
-        bruh.Velocity = 1;
-
+        MotionMagicDutyCycle req = new MotionMagicDutyCycle(Rotations.of(0));
+        req.Slot = 0;
         this.setDefaultCommand(Commands.run(()->
         
         {
-            bruh.Position = 0.3;
-            ElevatorLeft.setControl(bruh);
-            ElevatorRight.setControl(bruh);
+            SmartDashboard.putString("Command Running", "Default");
+            // if(Manipulator.a().getAsBoolean()){
+            // ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
+            // ElevatorRight.setControl(new Follower(13,false));
+            // }
 
+            
+            ElevatorLeft.set(0.05);
+            ElevatorRight.set(0.05);
+            //ElevatorRight.setControl(new Follower(13,false));
+
+        //     if(Math.abs(ElevatorLeft.getPosition().getValueAsDouble() - targetPosition) <= 0.2){
+        //         ElevatorLeft.set(0.05);
+        //         ElevatorRight.setControl(new Follower(13,false));
+        
+        //     }else{
+        //         ElevatorLeft.set((motorPosition.magnitude() - ElevatorLeft.getPosition().getValueAsDouble())/4);
+        //         ElevatorRight.setControl(new Follower(13,false));
+        
+        // }
+
+            
         }
         
         ,this)); 
@@ -172,14 +201,21 @@ public class Elevator implements Subsystem {
     
     @Override
     public void periodic(){
+        pos = (-Manipulator.getLeftY() + 1.0) * 7.0;
+        SmartDashboard.putNumber("pos",pos);
         SmartDashboard.putNumber("Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Motor Pos var", motorPosition.baseUnitMagnitude());
+        SmartDashboard.putNumber("Motor Pos var", motorPosition.magnitude());
+        SmartDashboard.putNumber("Target Position",targetPosition);
         SmartDashboard.putNumber("Stage Level", stageLevel);
-        SmartDashboard.putString("Motor Request",ElevatorLeft.getAppliedControl().toString());
-        SmartDashboard.putString("Motor Config",ElevatorLeft.getConfigurator().toString());
+        SmartDashboard.putString("Left Motor Request",ElevatorLeft.getAppliedControl().toString());
+        SmartDashboard.putString("Right Motor Request",ElevatorRight.getAppliedControl().toString());
+        SmartDashboard.putString("Left Motor Config",ElevatorLeft.getConfigurator().toString());
         SmartDashboard.putString("Motor Description",ElevatorLeft.getDescription());
         SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
-
+        SmartDashboard.putString("Left closed loop reference", ElevatorLeft.getClosedLoopReference().toString());
+        SmartDashboard.putString("Left closed loop reference slope ", ElevatorLeft.getClosedLoopReferenceSlope().toString());
+    
+        SmartDashboard.updateValues();
 
     }
 

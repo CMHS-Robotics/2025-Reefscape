@@ -37,9 +37,10 @@ public class ElevatorToStageCommand extends Command {
 
       SmartDashboard.putString("Command Running:","ToStage");
       Elevator.motorPosition = position;
+      Elevator.targetPosition = position.magnitude();
       Elevator.stageLevel = level;
-      ElevatorLeft.setControl(positionControl.withPosition(position).withSlot(0));
-      ElevatorRight.setControl(positionControl.withPosition(position).withSlot(0));
+      // ElevatorLeft.setControl(positionControl.withPosition(position).withSlot(0));
+      // ElevatorRight.setControl(positionControl.withPosition(position).withSlot(0));
       
     }
     

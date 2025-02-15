@@ -23,7 +23,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
-
+import frc.robot.subsystems.CoralIntake;
+import frc.robot.subsystems.AlgaeIntake;;
 
 public class RobotContainer {   
 
@@ -48,6 +49,8 @@ public class RobotContainer {
     //subsystems
     Elevator Elevator = new Elevator(Manipulator);
     DriveAugments Augment = new DriveAugments(Driver);
+    CoralIntake CoralIntake = new CoralIntake(Manipulator);
+    AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
     //commands
     // ElevatorFreeMoveCommand freeMove = new ElevatorFreeMoveCommand(Elevator);
 

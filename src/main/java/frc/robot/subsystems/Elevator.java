@@ -95,6 +95,7 @@ public class Elevator implements Subsystem {
         softwarelimit.ReverseSoftLimitThreshold = 1;
         softwarelimit.ForwardSoftLimitThreshold = 18;
 
+        
         //pid gains
         var slot0configs = config.Slot0;
         slot0configs.kP = 1;

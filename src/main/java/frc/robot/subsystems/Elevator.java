@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -19,8 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorFreeMoveCommand;
 import frc.robot.commands.ElevatorHoldPositionCommand;
-import frc.robot.commands.ElevatorToStageCommand;
-
+import frc.robot.tools.PID;
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
@@ -41,6 +39,8 @@ public class Elevator implements Subsystem {
     public Angle motorPosition;
 
     public double targetPosition = 0;
+
+    private PID elevatorPID;
     
     // ElevatorToStageCommand Stage1Command;
     // ElevatorToStageCommand Stage2Command;
@@ -60,7 +60,12 @@ public class Elevator implements Subsystem {
 
     public Elevator(CommandXboxController x){
         
-        
+        //set PID
+        elevatorPID = new PID(0.5,0,3);
+
+        elevatorPID.setMaxOutput(5);
+
+
 
 
         //set stage levels
@@ -92,13 +97,13 @@ public class Elevator implements Subsystem {
 
         //pid gains
         var slot0configs = config.Slot0;
-        slot0configs.kP = 20;
+        slot0configs.kP = 1;
         slot0configs.kI = 0;
-        slot0configs.kD = 10;
-        slot0configs.kV = 3;
-        slot0configs.kS = 2;
-        slot0configs.kG = 10;
-        slot0configs.kA = 1;
+        slot0configs.kD = 0;
+        slot0configs.kV = 0;
+        slot0configs.kS = 0;
+        slot0configs.kG = 0;
+        slot0configs.kA = 0;
         slot0configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         slot0configs.GravityType = GravityTypeValue.Elevator_Static;
 
@@ -134,29 +139,45 @@ public class Elevator implements Subsystem {
         // Stage3Command = new ElevatorToStageCommand(this, stages[3],3);
         // IntakeStageCommand = new ElevatorToStageCommand(this, stages[0],0);
 
-        freeMoveCommand = new ElevatorFreeMoveCommand(this);
+        // freeMoveCommand = new ElevatorFreeMoveCommand(this);
 
-        holdPositionCommand = new ElevatorHoldPositionCommand(this);
+        // holdPositionCommand = new ElevatorHoldPositionCommand(this);
 
         //this.setDefaultCommand(holdPositionCommand);
 
 
         //testing out motion magic with new default command
-        MotionMagicDutyCycle req = new MotionMagicDutyCycle(Rotations.of(0));
-        req.Slot = 0;
+        // MotionMagicDutyCycle req = new MotionMagicDutyCycle(Rotations.of(0));
+        // req.Slot = 0;
 
         this.setDefaultCommand(Commands.run(()->
         
         {
-            SmartDashboard.putString("Command Running", "Default");
+            SmartDashboard.putString("Command Running", "pid target");
             
-            pos = 10;
-            if(Manipulator.a().getAsBoolean()){
-                ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
-                ElevatorRight.setControl(new Follower(13,false));
+            // pos = 10;
+            // if(Manipulator.a().getAsBoolean()){
+            //     ElevatorLeft.setControl(req.withSlot(0).withPosition(Rotations.of(pos)));
+            //     ElevatorRight.setControl(new Follower(13,false));
+            // }
+            elevatorPID.setSetPoint(targetPosition);
+
+            ElevatorLeft.set(elevatorPID.updatePID(ElevatorLeft.getPosition().getValueAsDouble()));
+            ElevatorRight.setControl(new Follower(13,false));
+            
+            if(Math.abs(Manipulator.getLeftTriggerAxis()) > 0.1){
+
+                targetPosition += Manipulator.getLeftTriggerAxis() * 0.05;
+
             }
 
-            
+            if(targetPosition > 17){
+                targetPosition = 17;
+            }
+            if(targetPosition < 1){
+                targetPosition = 1;
+            }
+
             //scuffed solution for holding
             // ElevatorLeft.set(0.05);
             // ElevatorRight.set(0.05);
@@ -189,20 +210,46 @@ public class Elevator implements Subsystem {
         Trigger b = Manipulator.b();
 
         //bind commands to triggers
-        povLeft.onTrue(new ElevatorToStageCommand(this, Stage1,1));
-        povUp.onTrue(new ElevatorToStageCommand(this, Stage2,2));
-        povRight.onTrue(new ElevatorToStageCommand(this, Stage3,3));
-        povDown.onTrue(new ElevatorToStageCommand(this, IntakeStage,0));
+        // povLeft.onTrue(new ElevatorToStageCommand(this, Stage1,1));
+        // povUp.onTrue(new ElevatorToStageCommand(this, Stage2,2));
+        // povRight.onTrue(new ElevatorToStageCommand(this, Stage3,3));
+        // povDown.onTrue(new ElevatorToStageCommand(this, IntakeStage,0));
+
+
+        povLeft.onTrue(Commands.runOnce(()->{
+
+            targetPosition = stages[1].magnitude();
+            stageLevel = 1;
+
+        }));
+        povUp.onTrue(Commands.runOnce(()->{
+
+            targetPosition = stages[2].magnitude();
+            stageLevel = 2;
+
+        }));
+        povRight.onTrue(Commands.runOnce(()->{
+
+            targetPosition = stages[3].magnitude();
+            stageLevel = 3;
+
+        }));
+        povDown.onTrue(Commands.runOnce(()->{
+
+            targetPosition = stages[0].magnitude();
+            stageLevel = 0;
+
+        }));
 
         rightTrigger.whileTrue(freeMoveCommand);
 
         //reset motor position
         b.onTrue(Commands.runOnce(()->{
-                ElevatorLeft.setPosition(Rotations.of(0));
-                ElevatorRight.setPosition(Rotations.of(0));
-                motorPosition = Rotations.of(0);
-        },this));
-        
+            ElevatorLeft.setPosition(Rotations.of(0));
+            ElevatorRight.setPosition(Rotations.of(0));
+            motorPosition = Rotations.of(0);
+    },this));
+
         //resetting motors again just to bet sure
         ElevatorRight.setPosition(0,1);
         ElevatorLeft.setPosition(0,1);

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -35,6 +34,7 @@ public class Elevator implements Subsystem {
     public int stageLevel = 0;
 
     public Angle[] stages = {IntakeStage,Stage1,Stage2,Stage3};
+    public double[] stagesDouble = new double[4];
 
     public Angle motorPosition;
 
@@ -54,18 +54,22 @@ public class Elevator implements Subsystem {
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
     public CommandXboxController Manipulator;
 
-    double pos = 8;
 
     //ElevatorFreeMoveCommand freeMove;
 
     public Elevator(CommandXboxController x){
         
         //set PID
-        elevatorPID = new PID(0.5,0,3);
+        elevatorPID = new PID(0.1,0,0.3);
 
-        elevatorPID.setMaxOutput(5);
+        elevatorPID.setMaxOutput(0.2);
+        elevatorPID.setMinOutput(-0.2);
+        elevatorPID.setGravity(0.035);
 
-
+        stagesDouble[0]= 0;
+        stagesDouble[1]= 7;
+        stagesDouble[2]= 12;
+        stagesDouble[3]= 15;
 
 
         //set stage levels
@@ -73,6 +77,7 @@ public class Elevator implements Subsystem {
         Stage2 = Rotations.of(5);
         Stage3 = Rotations.of(10);
         IntakeStage = Rotations.of(0);
+
 
         Manipulator = x;
 
@@ -140,7 +145,7 @@ public class Elevator implements Subsystem {
         // Stage3Command = new ElevatorToStageCommand(this, stages[3],3);
         // IntakeStageCommand = new ElevatorToStageCommand(this, stages[0],0);
 
-        // freeMoveCommand = new ElevatorFreeMoveCommand(this);
+        freeMoveCommand = new ElevatorFreeMoveCommand(this);
 
         // holdPositionCommand = new ElevatorHoldPositionCommand(this);
 
@@ -162,13 +167,16 @@ public class Elevator implements Subsystem {
             //     ElevatorRight.setControl(new Follower(13,false));
             // }
             elevatorPID.setSetPoint(targetPosition);
-
+            if(targetPosition <= 1 && ElevatorLeft.getPosition().getValueAsDouble() <= 1){
+                ElevatorLeft.set(0);
+                ElevatorRight.set(0);
+            }else{
             ElevatorLeft.set(elevatorPID.updatePID(ElevatorLeft.getPosition().getValueAsDouble()));
-            ElevatorRight.setControl(new Follower(13,false));
-            
+            ElevatorRight.set(ElevatorLeft.get());
+            }
             if(Math.abs(Manipulator.getLeftTriggerAxis()) > 0.1){
 
-                targetPosition += Manipulator.getLeftTriggerAxis() * 0.05;
+                targetPosition += -Manipulator.getLeftTriggerAxis() * 0.05;
 
             }
 
@@ -219,25 +227,25 @@ public class Elevator implements Subsystem {
 
         povLeft.onTrue(Commands.runOnce(()->{
 
-            targetPosition = stages[1].magnitude();
+            targetPosition = stagesDouble[1];
             stageLevel = 1;
 
         }));
         povUp.onTrue(Commands.runOnce(()->{
 
-            targetPosition = stages[2].magnitude();
+            targetPosition = stagesDouble[2];
             stageLevel = 2;
 
         }));
         povRight.onTrue(Commands.runOnce(()->{
 
-            targetPosition = stages[3].magnitude();
+            targetPosition = stagesDouble[3];
             stageLevel = 3;
 
         }));
         povDown.onTrue(Commands.runOnce(()->{
 
-            targetPosition = stages[0].magnitude();
+            targetPosition = stagesDouble[0];
             stageLevel = 0;
 
         }));
@@ -249,7 +257,7 @@ public class Elevator implements Subsystem {
             ElevatorLeft.setPosition(Rotations.of(0));
             ElevatorRight.setPosition(Rotations.of(0));
             motorPosition = Rotations.of(0);
-    },this));
+    }));
 
         //resetting motors again just to bet sure
         ElevatorRight.setPosition(0,1);
@@ -269,19 +277,15 @@ public class Elevator implements Subsystem {
     @Override
     public void periodic(){
         //pos = (-Manipulator.getLeftY() + 1.0) * 7.0;
-        SmartDashboard.putNumber("pos",pos);
-        SmartDashboard.putNumber("Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Motor Pos var", motorPosition.magnitude());
-        SmartDashboard.putNumber("Target Position",targetPosition);
+        SmartDashboard.putNumber("Left Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Right Motor Pos", ElevatorRight.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("PID Target Position",targetPosition);
         SmartDashboard.putNumber("Stage Level", stageLevel);
         SmartDashboard.putString("Left Motor Request",ElevatorLeft.getAppliedControl().toString());
         SmartDashboard.putString("Right Motor Request",ElevatorRight.getAppliedControl().toString());
-        SmartDashboard.putString("Left Motor Config",ElevatorLeft.getConfigurator().toString());
-        SmartDashboard.putString("Motor Description",ElevatorLeft.getDescription());
         SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
-        SmartDashboard.putString("Left closed loop reference", ElevatorLeft.getClosedLoopReference().toString());
-        SmartDashboard.putString("Left closed loop reference slope ", ElevatorLeft.getClosedLoopReferenceSlope().toString());
-    
+        SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getRightY());
+        SmartDashboard.putString("PID control",elevatorPID.toString());
         SmartDashboard.updateValues();
 
     }

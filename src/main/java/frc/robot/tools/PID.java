@@ -9,6 +9,8 @@ public class PID {
 	private double IValue;
 	private double DValue;
 
+	private double gravity;
+
 	// Dictates the inputs and outputs
 	private double maxInput;
 	private double minInput;
@@ -66,6 +68,7 @@ public class PID {
 		result = (PValue * error + IValue * totalError + DValue * (error - prevError));
 		prevError = error;
 		result = clamp(result);
+		result += gravity;
 		return result;
 	}
 
@@ -90,6 +93,15 @@ public class PID {
 		IValue = i;
 		DValue = d;
 	}
+
+
+	public void setGravity(double g){
+		gravity = g;
+	}
+	public double getGravity(){
+		return gravity;
+	}
+
 
 	/**
 	 * Retrieves the calculated output based on the PID algorithm.
@@ -229,5 +241,11 @@ public class PID {
 			return minOutput;
 		}
 		return input;
+	}
+
+	@Override
+	public String toString(){
+
+		return "Target Position:" + getSetPoint() + "      Set Value: " + getResult();
 	}
 }

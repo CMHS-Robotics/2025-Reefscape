@@ -1,11 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.jni.CANSparkJNI;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -26,9 +20,10 @@ public class CoralIntake implements Subsystem {
         Manipulator = x;
 
         var config = new SparkMaxConfig();
-        
         Trigger leftBumper = Manipulator.leftBumper();
         Trigger rightBumper = Manipulator.rightBumper();
+
+
         this.setDefaultCommand(Commands.run(()->{
 
             if(leftBumper.getAsBoolean()){

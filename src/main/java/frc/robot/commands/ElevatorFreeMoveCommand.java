@@ -27,8 +27,7 @@ public class ElevatorFreeMoveCommand extends Command {
     public void execute(){
       SmartDashboard.putString("Command Running:","FreeMove");
       ElevatorLeft.set(-0.2 * Manipulator.getRightY());
-      //ElevatorRight.set(-0.2 * Manipulator.getRightY());
-      Elevator.motorPosition = ElevatorLeft.getPosition().getValue();
+      ElevatorRight.set(-0.2 * Manipulator.getRightY());
       Elevator.targetPosition = ElevatorLeft.getPosition().getValueAsDouble();
       ElevatorLeft.setNeutralMode(Brake);
       ElevatorRight.setNeutralMode(Brake);

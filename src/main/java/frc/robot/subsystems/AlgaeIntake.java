@@ -33,16 +33,24 @@ public class AlgaeIntake implements Subsystem {
 
         Trigger leftBumper = Manipulator.leftBumper();
         Trigger rightBumper = Manipulator.rightBumper();
+
+
+        
         this.setDefaultCommand(Commands.run(()->{
 
-            if(leftBumper.getAsBoolean()){
-                AlgaeMotor.set(0.5);
-            }else if(rightBumper.getAsBoolean()){
-                AlgaeMotor.set(-0.5);
-            }else{
-                AlgaeMotor.set(0);
-            }
+
 
         },this));   
+
+         //spinning commands
+         leftBumper.whileTrue(Commands.run(()->{
+            AlgaeMotor.set(0.5);
+        }));
+        leftBumper.whileTrue(Commands.run(()->{
+                AlgaeMotor.set(-0.5);
+        }));
+        leftBumper.and(rightBumper.whileFalse(Commands.run(()->{
+            AlgaeMotor.set(0);
+        })));
     }
 }

@@ -47,12 +47,12 @@ public class Elevator implements Subsystem {
         //set PID
         elevatorPID = new PID(0.3,0,0.3);
 
-        elevatorPID.setMaxOutput(0.2);
-        elevatorPID.setMinOutput(-0.2);
+        elevatorPID.setMaxOutput(0.16);
+        elevatorPID.setMinOutput(-0.16);
         elevatorPID.setGravity(0.035);
         elevatorPID.setThresholdOn(true);
-        elevatorPID.setErrorThreshold(0.1);
-        elevatorPID.setThresholdValue(0.033);
+        elevatorPID.setErrorThreshold(0.3);
+        elevatorPID.setThresholdValue(0.036);
 
         //set stage levels
         stages[0]= 0;
@@ -76,7 +76,7 @@ public class Elevator implements Subsystem {
         softwarelimit.ForwardSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitThreshold = 1;
-        softwarelimit.ForwardSoftLimitThreshold = 18;
+        softwarelimit.ForwardSoftLimitThreshold = 20;
 
         //apply configs and reset motors
         ElevatorLeft.getConfigurator().apply(config);
@@ -180,7 +180,7 @@ public class Elevator implements Subsystem {
     public void setTargetPosition(int s){
         targetPosition = stages[s];
     }
-    public double getStageLevel(){
+    public int getStageLevel(){
         return stageLevel;
     }
     public void setStageLevel(int s){

@@ -4,17 +4,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveAugments;
 
-public class UltraSlowModeCommand extends Command {
+public class ChangeSpeedMultiplierCommand extends Command {
 
-    public UltraSlowModeCommand(DriveAugments d){
+    DriveAugments Augments;
+    double wheels;
+    double turn;
+
+    public ChangeSpeedMultiplierCommand(DriveAugments d,double w, double t){
+        Augments = d;
+        wheels = w;
+        turn = t;
+
         addRequirements(d);
-      
    }
 
     @Override
     public void execute(){
-        RobotContainer.SpeedMultiplier = 0.15;
-        RobotContainer.RotationSpeedMultiplier = 0.25;
+        RobotContainer.SpeedMultiplier = wheels;
+        RobotContainer.RotationSpeedMultiplier = turn;
     }
     
     @Override

@@ -3,9 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ResetSpeedMultiplierCommand;
-import frc.robot.commands.SlowModeCommand;
-import frc.robot.commands.UltraSlowModeCommand;
+import frc.robot.commands.ChangeSpeedMultiplierCommand;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -13,19 +11,23 @@ import frc.robot.commands.UltraSlowModeCommand;
  */
 public class DriveAugments implements Subsystem {
     public CommandXboxController Driver;
-    SlowModeCommand slowMode;
-    ResetSpeedMultiplierCommand resetSpeed;
-    UltraSlowModeCommand ultraSlowMode;
+    ChangeSpeedMultiplierCommand slowMode;
+    ChangeSpeedMultiplierCommand resetSpeed;
+    ChangeSpeedMultiplierCommand ultraSlowMode;
 
     public DriveAugments(CommandXboxController bruh){
         Driver = bruh;
         Trigger leftTrigger = Driver.leftTrigger();
         Trigger rightTrigger = Driver.rightTrigger();
-        slowMode = new SlowModeCommand(this);
-        ultraSlowMode = new UltraSlowModeCommand(this);
+        slowMode = new ChangeSpeedMultiplierCommand(this,0.35,0.5);
+        ultraSlowMode = new ChangeSpeedMultiplierCommand(this,0.15,0.25);
+
+
         leftTrigger.whileTrue(slowMode);
         rightTrigger.whileTrue(ultraSlowMode);
-        resetSpeed = new ResetSpeedMultiplierCommand(this);
+
+
+        resetSpeed = new ChangeSpeedMultiplierCommand(this,1,1);
 
         this.setDefaultCommand(resetSpeed);
     }   
@@ -34,24 +36,6 @@ public class DriveAugments implements Subsystem {
     public void periodic(){
     
     }
-
-    // public final Command slowMoCommand(){
-
-    //     return Commands.run(() -> 
-    //     {   
-    //       RobotContainer.SpeedMultiplier = 0.5;
-    //     }
-    //     );
-    // }
-
-    // public final Command ultraSlowMoCommand(){
-
-    //     return Commands.run(() -> 
-    //     {   
-    //         RobotContainer.SpeedMultiplier = 0.25;
-    //     }
-    //     );
-    // }
 }
 
 

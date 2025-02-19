@@ -18,45 +18,85 @@ public class CoralIntake implements Subsystem {
     SparkFlex CoralWrist = new SparkFlex(CoralWristMotorId,SparkFlex.MotorType.kBrushed);
     double wristTarget;
     PID coralWristPID;
+    Elevator elevator;
+    int elevatorStage = 0;
+    double[] wristPositions = new double[4];
+
     
 
-    public CoralIntake (CommandXboxController x){
-        Manipulator = x;
+    public CoralIntake (CommandXboxController c,Elevator e){
+        Manipulator = c;
+        elevator = e;
+
+        //set wrist positions
+        wristPositions[0] = 0;
+        wristPositions[1] = 0;
+        wristPositions[2] = 0;
+        wristPositions[3] = 0;
+
 
         //set pid
         coralWristPID = new PID(0.1,0,0.01);
-        coralWristPID.setMaxOutput(0.2);
-        coralWristPID.setMinOutput(-0.2);
+        coralWristPID.setContinuous(true);
+        coralWristPID.setMaxOutput(0.1);
+        coralWristPID.setMinOutput(-0.1);
 
 
 
         //motor configs
-        CoralWrist.getAbsoluteEncoder().getPosition();
+
 
 
         //triggers
         Trigger leftBumper = Manipulator.leftBumper();
         Trigger rightBumper = Manipulator.rightBumper();
         Trigger a = Manipulator.a();
+        Trigger b = Manipulator.b();
+        Trigger x = Manipulator.x();
 
 
+        //default command
         this.setDefaultCommand(Commands.run(()->{
 
+            elevatorStage = elevator.getStageLevel();
 
+            wristTarget = switch (elevatorStage) {
+                case 0 -> wristPositions[0];
+                case 1 -> wristPositions[0];
+                case 2 -> wristPositions[1];
+                case 3 -> wristPositions[1];
+                case 4 -> wristPositions[2];
+                default -> wristPositions[0];
+            };
 
+            coralWristPID.setSetPoint(wristTarget);
 
-            if(leftBumper.getAsBoolean()){
-                CoralSpin.set(0.5);
-            }else if(rightBumper.getAsBoolean()){
-                CoralSpin.set(-0.5);
+            if(a.getAsBoolean()){
+                CoralWrist.set(coralWristPID.updatePID(CoralWrist.getAbsoluteEncoder().getPosition()));                
             }else{
-                CoralSpin.set(0);
+                CoralWrist.set(0);
+            }
+            if(x.getAsBoolean()){
+                CoralWrist.set(-Manipulator.getRightTriggerAxis());
             }
 
-
-
-
         },this));   
+
+
+        //spinning commands
+        leftBumper.whileTrue(Commands.run(()->{
+            CoralSpin.set(0.5);
+        }));
+        leftBumper.whileTrue(Commands.run(()->{
+                CoralSpin.set(-0.5);
+        }));
+        leftBumper.and(rightBumper.whileFalse(Commands.run(()->{
+            CoralSpin.set(0);
+        })));
+        b.onTrue(Commands.run(()->{
+            
+        }));
+
     }
 
 

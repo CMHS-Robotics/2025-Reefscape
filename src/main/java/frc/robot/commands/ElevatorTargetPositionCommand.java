@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Elevator;
@@ -57,8 +56,6 @@ public class ElevatorTargetPositionCommand extends Command {
             if(target < 1){
                 target = 1;
             }
-      
-      SmartDashboard.putString("Command Running", "Default PID Target");
       
      
     }

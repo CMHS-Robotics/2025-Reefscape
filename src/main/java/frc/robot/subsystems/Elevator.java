@@ -41,16 +41,18 @@ public class Elevator implements Subsystem {
     public CommandXboxController Manipulator;
 
     public Elevator(CommandXboxController x){
-        
 
         Manipulator = x;
 
         //set PID
-        elevatorPID = new PID(0.1,0,0.3);
+        elevatorPID = new PID(0.3,0,0.3);
 
         elevatorPID.setMaxOutput(0.2);
         elevatorPID.setMinOutput(-0.2);
         elevatorPID.setGravity(0.035);
+        elevatorPID.setThresholdOn(true);
+        elevatorPID.setErrorThreshold(0.1);
+        elevatorPID.setThresholdValue(0.033);
 
         //set stage levels
         stages[0]= 0;
@@ -127,6 +129,7 @@ public class Elevator implements Subsystem {
         //resetting motors again just to bet sure
         ElevatorRight.setPosition(0,1);
         ElevatorLeft.setPosition(0,1);
+
     }
         
     public final double distanceToMotorRot(double distance){
@@ -140,7 +143,7 @@ public class Elevator implements Subsystem {
     }
     
 
-    public void initialize(){
+    private void SmartDashboard(){
         SmartDashboard.putNumber("Left Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Right Motor Pos", ElevatorRight.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("PID Target Position",targetPosition);
@@ -148,14 +151,23 @@ public class Elevator implements Subsystem {
         SmartDashboard.putString("Left Motor Request",ElevatorLeft.getAppliedControl().toString());
         SmartDashboard.putString("Right Motor Request",ElevatorRight.getAppliedControl().toString());
         SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
-        SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getRightY());
+        SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getLeftY());
         SmartDashboard.putString("PID control",elevatorPID.toString());
+
+        if(this.getCurrentCommand()!=null){
+            SmartDashboard.putString("Command Running:",this.getCurrentCommand().toString());
+        }else{
+            SmartDashboard.putString("Command Running:","null");
+
+        }
+
+        SmartDashboard.updateValues();
     }
 
 
     @Override
     public void periodic(){
-        SmartDashboard.updateValues();
+        SmartDashboard();
 
     }
 

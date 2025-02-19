@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
 
@@ -25,7 +24,6 @@ public class ElevatorSetStageCommand extends Command {
 
     @Override
     public void execute(){
-      SmartDashboard.putString("Command Running:","ToStage");
     }
     
     public void end(){
@@ -33,6 +31,6 @@ public class ElevatorSetStageCommand extends Command {
 
     @Override
     public boolean isFinished() {
-       return false;
+       return true;
     }
    }

@@ -21,6 +21,10 @@ public class PID {
 	private double setPoint; // this will be set continuously
 	private double result;
 
+	private boolean thresholdOn = false;
+	private double errorThreshold = 0;
+	private double thresholdValue = 0;
+
 	public PID(double kp, double ki, double kd) {
 		PValue = kp;
 		IValue = ki;
@@ -49,6 +53,12 @@ public class PID {
 	 */
 	public double updatePID(double value) {
 		error = setPoint - value;
+		if(thresholdOn){
+			if(Math.abs(error) <= errorThreshold){
+				return thresholdValue;
+			}
+		}
+
 		if (continuous) {
 			if (Math.abs(error) > (maxInput - minInput) / 2) {
 				if (error > 0) {
@@ -100,6 +110,24 @@ public class PID {
 	}
 	public double getGravity(){
 		return gravity;
+	}
+	public void setThresholdOn(boolean  g){
+		thresholdOn = g;
+	}
+	public boolean getThresholdOn(){
+		return thresholdOn;
+	}
+	public void setErrorThreshold(double g){
+		errorThreshold = g;
+	}
+	public double getErrorThreshold(){
+		return errorThreshold;
+	}
+	public void setThresholdValue(double g){
+		thresholdValue = g;
+	}
+	public double getThresholdValue(){
+		return thresholdValue;
 	}
 
 
@@ -246,6 +274,6 @@ public class PID {
 	@Override
 	public String toString(){
 
-		return "Target Position:" + getSetPoint() + "      Set Value: " + getResult();
+		return "Target Position:" + getSetPoint() + "  Set Value: " + getResult() + "  Error: " + error + "  Threshold: " + thresholdOn + ", " + errorThreshold + ", " + thresholdValue;
 	}
 }

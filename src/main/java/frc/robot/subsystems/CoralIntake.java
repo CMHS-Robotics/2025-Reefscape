@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -50,15 +50,30 @@ public class CoralIntake implements Subsystem {
 
 
         //motor configs
-        SparkMaxConfig config = new SparkMaxConfig();
-        config
+        SparkMaxConfig wristConfig = new SparkMaxConfig();
+        wristConfig
         .inverted(false)
         .idleMode(IdleMode.kBrake);
-        config.encoder
-        .countsPerRevolution()
-        .positionConversionFactor()
-        .velocityConversionFactor();
+        wristConfig.encoder
+        .positionConversionFactor(100)
+        .velocityConversionFactor(100);
+        wristConfig.closedLoop
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .pid(0.2,0,0.1);
 
+        SparkMaxConfig spinConfig = new SparkMaxConfig();
+        spinConfig
+        .inverted(false)
+        .idleMode(IdleMode.kCoast);
+        spinConfig.encoder
+        .positionConversionFactor(100)
+        .velocityConversionFactor(100);
+        spinConfig.closedLoop
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .pid(0.2,0,0.1);
+
+        CoralWrist.configure(wristConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        CoralSpin.configure(spinConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
 
 
         //triggers

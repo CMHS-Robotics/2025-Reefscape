@@ -50,7 +50,7 @@ public class Elevator implements Subsystem {
         elevatorPID.setMaxOutput(0.16);
         elevatorPID.setMinOutput(-0.16);
         elevatorPID.setGravity(0.035);
-        elevatorPID.setThresholdOn(true);
+        elevatorPID.setThresholdOn(false);
         elevatorPID.setErrorThreshold(0.3);
         elevatorPID.setThresholdValue(0.036);
 

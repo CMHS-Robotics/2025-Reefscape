@@ -25,11 +25,13 @@ public class Elevator implements Subsystem {
     private final int elevatorMotorLeftId = 13;
     private final int elevatorMotorRightId = 14;
 
-    public int stageLevel = 0;
+    private int stageLevel = 0;
 
-    public double[] stages = new double[5];
+    private double[] stages = new double[5];
 
-    public double targetPosition = 0;
+    private double targetPosition = 0;
+
+    private boolean reachedTarget = false;
 
     final private PID elevatorPID;
 
@@ -53,6 +55,7 @@ public class Elevator implements Subsystem {
         elevatorPID.setThresholdOn(false);
         elevatorPID.setErrorThreshold(0.3);
         elevatorPID.setThresholdValue(0.036);
+        elevatorPID.setReachedTargetErrorThreshold(0.5);
 
         //set stage levels
         stages[0]= 0;
@@ -60,7 +63,6 @@ public class Elevator implements Subsystem {
         stages[2]= 7;
         stages[3]= 12;
         stages[4]= 17;
-
 
         //Make new config
         var config = new TalonFXConfiguration();
@@ -107,8 +109,6 @@ public class Elevator implements Subsystem {
         Trigger rightTrigger = Manipulator.rightTrigger();
         Trigger rightStickClick = Manipulator.rightStick();
         Trigger b = Manipulator.b();
-
-        
 
         //bind commands to triggers
         povLeft.onTrue(new ElevatorSetStageCommand(this, 2));
@@ -185,6 +185,17 @@ public class Elevator implements Subsystem {
     }
     public void setStageLevel(int s){
         stageLevel = s;
+    }
+
+    public boolean hasReachedTarget(){
+        reachedTarget = (Math.abs(elevatorPID.getError()) < elevatorPID.getReachedTargetErrorThreshold());
+        return reachedTarget;
+    }
+    public boolean getReachedTarget(){
+        return reachedTarget;
+    }
+    public void setReachedTarget(boolean g){
+        reachedTarget = g;
     }
 
 

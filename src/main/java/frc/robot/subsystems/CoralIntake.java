@@ -1,6 +1,11 @@
 package frc.robot.subsystems;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,8 +19,9 @@ public class CoralIntake implements Subsystem {
     CommandXboxController Manipulator;
     int CoralSpinMotorId = 15;
     int CoralWristMotorId = 16;
-    Spark CoralSpin = new Spark(CoralSpinMotorId);
-    SparkFlex CoralWrist = new SparkFlex(CoralWristMotorId,SparkFlex.MotorType.kBrushed);
+    SparkMax CoralSpin = new SparkMax(CoralSpinMotorId,SparkMax.MotorType.kBrushless);
+    SparkMax CoralWrist = new SparkMax(CoralWristMotorId,SparkMax.MotorType.kBrushless);
+    SparkClosedLoopController pid = CoralWrist.getClosedLoopController();
     double wristTarget;
     PID coralWristPID;
     Elevator elevator;
@@ -44,6 +50,14 @@ public class CoralIntake implements Subsystem {
 
 
         //motor configs
+        SparkMaxConfig config = new SparkMaxConfig();
+        config
+        .inverted(false)
+        .idleMode(IdleMode.kBrake);
+        config.encoder
+        .countsPerRevolution()
+        .positionConversionFactor()
+        .velocityConversionFactor();
 
 
 
@@ -69,8 +83,9 @@ public class CoralIntake implements Subsystem {
                 default -> wristPositions[0];
             };
 
-            coralWristPID.setSetPoint(wristTarget);
-
+            if(elevator.hasReachedTarget()){
+                coralWristPID.setSetPoint(wristTarget);
+            }
             if(a.getAsBoolean()){
                 CoralWrist.set(coralWristPID.updatePID(CoralWrist.getAbsoluteEncoder().getPosition()));                
             }else{

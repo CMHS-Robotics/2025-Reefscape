@@ -24,6 +24,7 @@ public class PID {
 	private boolean thresholdOn = false;
 	private double errorThreshold = 0;
 	private double thresholdValue = 0;
+	private double reachedTargetErrorThreshold = 0;
 
 	public PID(double kp, double ki, double kd) {
 		PValue = kp;
@@ -105,6 +106,9 @@ public class PID {
 	}
 
 
+	public double getError(){
+		return error;
+	}
 	public void setGravity(double g){
 		gravity = g;
 	}
@@ -128,6 +132,12 @@ public class PID {
 	}
 	public double getThresholdValue(){
 		return thresholdValue;
+	}
+	public void setReachedTargetErrorThreshold(double g){
+		reachedTargetErrorThreshold = g;
+	}
+	public double getReachedTargetErrorThreshold(){
+		return reachedTargetErrorThreshold;
 	}
 
 

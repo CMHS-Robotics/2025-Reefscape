@@ -26,7 +26,7 @@ public class ElevatorFreeMoveCommand extends Command {
     public void execute(){
       ElevatorLeft.set(-0.2 * Manipulator.getRightY());
       ElevatorRight.set(-0.2 * Manipulator.getRightY());
-      Elevator.targetPosition = ElevatorLeft.getPosition().getValueAsDouble();
+      Elevator.setTargetPosition(ElevatorLeft.getPosition().getValueAsDouble());
       ElevatorLeft.setNeutralMode(Brake);
       ElevatorRight.setNeutralMode(Brake);
 

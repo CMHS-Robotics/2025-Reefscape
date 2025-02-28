@@ -27,7 +27,7 @@ public class Elevator implements Subsystem {
 
     private int stageLevel = 0;
 
-    private double[] stages = new double[5];
+    final private double[] stages = new double[5];
 
     private double targetPosition = 0;
 
@@ -47,22 +47,22 @@ public class Elevator implements Subsystem {
         Manipulator = x;
 
         //set PID
-        elevatorPID = new PID(0.3,0,0.3);
+        elevatorPID = new PID(0.4,0,0.5);
 
-        elevatorPID.setMaxOutput(0.16);
-        elevatorPID.setMinOutput(-0.16);
-        elevatorPID.setGravity(0.035);
+        elevatorPID.setMaxOutput(0.17);
+        elevatorPID.setMinOutput(-0.10);
+        elevatorPID.setGravity(0.023);
         elevatorPID.setThresholdOn(false);
-        elevatorPID.setErrorThreshold(0.3);
-        elevatorPID.setThresholdValue(0.036);
+        elevatorPID.setErrorThreshold(0.4);
+        elevatorPID.setThresholdValue(0.04);
         elevatorPID.setReachedTargetErrorThreshold(0.5);
 
         //set stage levels
         stages[0]= 0;
-        stages[1]= 3;
-        stages[2]= 7;
-        stages[3]= 12;
-        stages[4]= 17;
+        stages[1]=  8.1;
+        stages[2]= 10.6;
+        stages[3]= 16;
+        stages[4]= 23.8;
 
         //Make new config
         var config = new TalonFXConfiguration();
@@ -74,11 +74,12 @@ public class Elevator implements Subsystem {
         config.Voltage.PeakReverseVoltage = 3;
 
         //elevator limits
+
         var softwarelimit = config.SoftwareLimitSwitch;
         softwarelimit.ForwardSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitEnable = true;
         softwarelimit.ReverseSoftLimitThreshold = 1;
-        softwarelimit.ForwardSoftLimitThreshold = 20;
+        softwarelimit.ForwardSoftLimitThreshold = 24.2;
 
         //apply configs and reset motors
         ElevatorLeft.getConfigurator().apply(config);
@@ -147,7 +148,7 @@ public class Elevator implements Subsystem {
         SmartDashboard.putNumber("Left Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Right Motor Pos", ElevatorRight.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("PID Target Position",targetPosition);
-        SmartDashboard.putNumber("Stage Level", stageLevel);
+        SmartDashboard.putNumber("Stage Level", (int)stageLevel);
         SmartDashboard.putString("Left Motor Request",ElevatorLeft.getAppliedControl().toString());
         SmartDashboard.putString("Right Motor Request",ElevatorRight.getAppliedControl().toString());
         SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());

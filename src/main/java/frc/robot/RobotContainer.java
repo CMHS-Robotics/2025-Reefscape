@@ -16,11 +16,14 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.CoralSetSpinSpeedCommand;
+import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.CoralSpin;
+import frc.robot.subsystems.CoralWrist;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 ;
@@ -31,6 +34,8 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
     public static double SpeedMultiplier = 1;
+    public static double ElevatorMultiplier = 1;
+    public static double ElevatorRotationMultiplier = 1;
     public static double RotationSpeedMultiplier = 1;
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -42,16 +47,23 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+
     private final Telemetry logger = new Telemetry(MaxSpeed);
     CommandXboxController Driver = new CommandXboxController(0);
     CommandXboxController Manipulator = new CommandXboxController(1);
     //subsystems
     Elevator Elevator = new Elevator(Manipulator);
-    DriveAugments Augment = new DriveAugments(Driver);
-    //CoralIntake CoralIntake = new CoralIntake(Manipulator);
+    DriveAugments Augment = new DriveAugments(Driver,Elevator);
+    CoralWrist CoralWrist = new CoralWrist(Manipulator,Elevator);
+    CoralSpin CoralSpin = new CoralSpin(Manipulator);
     //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
     //commands
-    // ElevatorFreeMoveCommand freeMove = new ElevatorFreeMoveCommand(Elevator);
+    ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
+    ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,4);
+
+    CoralSetSpinSpeedCommand RunCoralIntakeIn = new CoralSetSpinSpeedCommand(CoralSpin,-0.3);
+    CoralSetSpinSpeedCommand RunCoralIntakeOut = new CoralSetSpinSpeedCommand(CoralSpin,0.3);
+
 
 
 
@@ -61,18 +73,74 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
-        
+
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);
 
-        EventTrigger test = new EventTrigger("TestMarker");
-        test.whileTrue(Commands.run(() -> {
-            System.out.println("bruh");
-        }));
+        EventTrigger TopStageEvent = new EventTrigger("TopStage");
+        TopStageEvent.onTrue(TopStage);
+        EventTrigger BottomStageEvent = new EventTrigger("BottomStage");
+        BottomStageEvent.onTrue(BottomStage);
+        EventTrigger RunCoralIntakeInEvent = new EventTrigger("CoralIn");
+        RunCoralIntakeInEvent.onTrue(RunCoralIntakeIn);
+        EventTrigger RunCoralIntakeOutEvent = new EventTrigger("CoralOut");
+        RunCoralIntakeOutEvent.onTrue(RunCoralIntakeOut);
 
 
         configureBindings();
+
+        //controls
+
+
+        /*
+          Driver:
+
+            d pad gives precise orthagonal and diagonal control
+            left stick is drive
+            right stick is turn
+            left bumper is reset field orientation
+            b is brake 
+            left trigger is slow
+            right trigger is super slow
+
+
         
+
+
+
+          
+         
+         */
+
+
+        /*Manipulator
+        
+
+        D-pad: elevator levels
+        down-intake stage
+        left-stage 1
+        up-stage 2
+        right-stage 3
+
+        b brings it back to the bottom
+
+
+
+        hold right trigger to engage manual elevator control with right stick
+        will update the pid target position, so after disengaging control, elevator will stay
+
+
+        hold left trigger to engage manual wrist control with left stick
+        will currently NOT update target pid, so after disengaging manual control, will snap back to the posiition correlating to the elevator level
+
+        click in right stick to reset elevator encoder to 0
+
+        click in left stick to reset wrist encoder to 0
+
+
+
+
+        */
     }
 
 
@@ -82,17 +150,22 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier) // Drive left with negative X (left)
-                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier * ElevatorMultiplier) // Drive forward with negative Y (forward)
+                    .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier * ElevatorMultiplier) // Drive left with negative X (left)
+                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier * ElevatorRotationMultiplier) // Drive counterclockwise with negative X (left)
             )
             
         );
         
-        Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier)));
-        Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier)));
-        Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier)));
-        Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier)));
+        Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+
+        Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(Math.sqrt(2)*MaxSpeed*SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(-Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
 
         Driver.b().whileTrue(drivetrain.applyRequest(() -> brake));
         Driver.y().whileTrue(drivetrain.applyRequest(() ->

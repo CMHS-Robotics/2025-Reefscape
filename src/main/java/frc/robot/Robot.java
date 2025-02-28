@@ -52,21 +52,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
-  //Augment.checkInput();
-
-  //Elevator.checkInput();
-
-
-    // m_robotContainer.SpeedMultiplier -= 0.1 * Xbox.getLeftTriggerAxis();
-    // m_robotContainer.SpeedMultiplier += 0.1 * Xbox.getRightTriggerAxis();
-
-    // if(m_robotContainer.SpeedMultiplier >= 1){
-    //   m_robotContainer.SpeedMultiplier = 1;
-    // }
-    // if(m_robotContainer.SpeedMultiplier <= 0.01){
-    //   m_robotContainer.SpeedMultiplier = 0.01;
-    // }
   }
 
   @Override

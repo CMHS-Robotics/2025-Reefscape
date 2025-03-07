@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,8 +35,6 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
     public static double SpeedMultiplier = 1;
-    public static double ElevatorMultiplier = 1;
-    public static double ElevatorRotationMultiplier = 1;
     public static double RotationSpeedMultiplier = 1;
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -61,9 +60,8 @@ public class RobotContainer {
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
     ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,4);
 
-    CoralSetSpinSpeedCommand RunCoralIntakeIn = new CoralSetSpinSpeedCommand(CoralSpin,-0.3);
-    CoralSetSpinSpeedCommand RunCoralIntakeOut = new CoralSetSpinSpeedCommand(CoralSpin,0.3);
-
+    CoralSetSpinSpeedCommand CoralIn = new CoralSetSpinSpeedCommand(CoralSpin,-0.3);
+    CoralSetSpinSpeedCommand CoralOut = new CoralSetSpinSpeedCommand(CoralSpin,0.3);
 
 
 
@@ -77,15 +75,17 @@ public class RobotContainer {
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);
 
-        EventTrigger TopStageEvent = new EventTrigger("TopStage");
-        TopStageEvent.onTrue(TopStage);
-        EventTrigger BottomStageEvent = new EventTrigger("BottomStage");
-        BottomStageEvent.onTrue(BottomStage);
-        EventTrigger RunCoralIntakeInEvent = new EventTrigger("CoralIn");
-        RunCoralIntakeInEvent.onTrue(RunCoralIntakeIn);
-        EventTrigger RunCoralIntakeOutEvent = new EventTrigger("CoralOut");
-        RunCoralIntakeOutEvent.onTrue(RunCoralIntakeOut);
+        NamedCommands.registerCommand("TopStage", TopStage);
+        NamedCommands.registerCommand("BottomStage", BottomStage);
+        NamedCommands.registerCommand("CoralIn", CoralIn);
+        NamedCommands.registerCommand("CoralOut", CoralOut);
 
+        new EventTrigger("TopStage").onTrue(TopStage);
+        new EventTrigger("BottomStage").onTrue(BottomStage);
+        new EventTrigger("CoralIn").whileTrue(CoralIn);
+        new EventTrigger("CoralOut").whileTrue(CoralOut);
+
+        
 
         configureBindings();
 
@@ -150,22 +150,22 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier * ElevatorMultiplier) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier * ElevatorMultiplier) // Drive left with negative X (left)
-                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier * ElevatorRotationMultiplier) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
+                    .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  ) // Drive left with negative X (left)
+                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier  ) // Drive counterclockwise with negative X (left)
             )
             
         );
         
-        Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
-        Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
-        Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
-        Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier  )));
+        Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier  )));
+        Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier  )));
+        Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier  )));
 
-        Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(Math.sqrt(2)*MaxSpeed*SpeedMultiplier * ElevatorMultiplier)));
-        Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(-Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
-        Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
-        Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier).withVelocityY(Math.sqrt(2) * MaxSpeed * SpeedMultiplier * ElevatorMultiplier)));
+        Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(Math.sqrt(2)*MaxSpeed*SpeedMultiplier  )));
+        Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
+        Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
+        Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
 
         Driver.b().whileTrue(drivetrain.applyRequest(() -> brake));
         Driver.y().whileTrue(drivetrain.applyRequest(() ->

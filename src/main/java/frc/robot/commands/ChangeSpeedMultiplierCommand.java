@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveAugments;
 
@@ -18,12 +19,24 @@ public class ChangeSpeedMultiplierCommand extends Command {
         addRequirements(d);
    }
 
+   public ChangeSpeedMultiplierCommand(DriveAugments d){
+    Augments = d;
+    addRequirements(d);
+    }
+
     @Override
     public void execute(){
         RobotContainer.SpeedMultiplier = wheels;
         RobotContainer.RotationSpeedMultiplier = turn;
     }
     
+    public Command run(double speed,double rotspeed){
+        return Commands.run(()->{
+        RobotContainer.SpeedMultiplier = speed;
+        RobotContainer.RotationSpeedMultiplier = rotspeed;
+        },Augments);
+    }
+
     @Override
     public void initialize(){
     }

@@ -13,46 +13,35 @@ import frc.robot.commands.ChangeSpeedMultiplierCommand;
  */
 public class DriveAugments implements Subsystem {
     public CommandXboxController Driver;
-    ChangeSpeedMultiplierCommand slowMode;
-    ChangeSpeedMultiplierCommand resetSpeed;
-    ChangeSpeedMultiplierCommand ultraSlowMode;
+    ChangeSpeedMultiplierCommand speedMod;
     Elevator elevator;
+    int elevatorStage;
+    double[][] speedsAtLevels = {//array 1, elevator stage //array 2, (basetranslationspeed,baserotationspeed,slowtranslationspeed,slowrotationspeed,superslowtranslationspeed,superslowrotationspeed)
+    {1,1,0.35,0.5,0.15,0.25},
+    {0.7,0.75,0.3,0.40,0.13,0.22},
+    {0.45,0.6,0.23,0.35,0.11,0.20},
+    {0.25,0.35,0.15,0.25,0.09,0.18},
+    {0.15,0.25,0.1,0.2,0.08,0.15}};
 
     public DriveAugments(CommandXboxController bruh,Elevator e){
         Driver = bruh;
         elevator = e;
+        elevatorStage = elevator.getStageLevel();
         Trigger leftTrigger = Driver.leftTrigger();
         Trigger rightTrigger = Driver.rightTrigger();
-        slowMode = new ChangeSpeedMultiplierCommand(this,0.35,0.5);
-        ultraSlowMode = new ChangeSpeedMultiplierCommand(this,0.15,0.25);
+        speedMod = new ChangeSpeedMultiplierCommand(this);
 
 
-        leftTrigger.whileTrue(slowMode);
-        rightTrigger.whileTrue(ultraSlowMode);
+        leftTrigger.whileTrue(speedMod.run(speedsAtLevels[elevatorStage][2],speedsAtLevels[elevatorStage][3]));
+        rightTrigger.whileTrue(speedMod.run(speedsAtLevels[elevatorStage][4],speedsAtLevels[elevatorStage][5]));
 
-
-        resetSpeed = new ChangeSpeedMultiplierCommand(this,1,1);
-
-        this.setDefaultCommand(resetSpeed);
+        this.setDefaultCommand(speedMod.run(speedsAtLevels[elevatorStage][0],speedsAtLevels[elevatorStage][1]));
     }   
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Speed Multiplier",RobotContainer.ElevatorMultiplier * RobotContainer.SpeedMultiplier);
-        switch(elevator.getStageLevel()){
-            case 0 -> {RobotContainer.ElevatorMultiplier = 1;
-                RobotContainer.ElevatorRotationMultiplier = 1;}
-            case 1 -> {RobotContainer.ElevatorMultiplier = 0.7;
-                RobotContainer.ElevatorRotationMultiplier = 0.75;}
-            case 2 -> {RobotContainer.ElevatorMultiplier = 0.45;
-                RobotContainer.ElevatorRotationMultiplier = 0.6;}
-            case 3 -> {RobotContainer.ElevatorMultiplier = 0.25;
-                RobotContainer.ElevatorRotationMultiplier = 0.35;}
-            case 4 -> {RobotContainer.ElevatorMultiplier = 0.15;
-                RobotContainer.ElevatorRotationMultiplier = 0.25;}
-            default -> {RobotContainer.ElevatorMultiplier = 1;
-                RobotContainer.ElevatorRotationMultiplier = 1;}
-        }
+        elevatorStage = elevator.getStageLevel();
+        SmartDashboard.putNumber("Speed Multiplier",RobotContainer.SpeedMultiplier);
     }
 }
 

@@ -14,19 +14,22 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.CoralSetSpinSpeedCommand;
+import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.CoralSpin;
-import frc.robot.subsystems.CoralWrist;
+import frc.robot.subsystems.CoralSpinV2;
+import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
+import frc.robot.tools.ShuffleboardSuite;
 ;
 
 public class RobotContainer {   
@@ -53,39 +56,48 @@ public class RobotContainer {
     //subsystems
     Elevator Elevator = new Elevator(Manipulator);
     DriveAugments Augment = new DriveAugments(Driver,Elevator);
-    CoralWrist CoralWrist = new CoralWrist(Manipulator,Elevator);
-    CoralSpin CoralSpin = new CoralSpin(Manipulator);
+    CoralWristV2 CoralWrist = new CoralWristV2(Manipulator,Elevator);
+    CoralSpinV2 CoralSpin = new CoralSpinV2(Manipulator);
     //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
     //commands
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
     ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,4);
 
-    CoralSetSpinSpeedCommand CoralIn = new CoralSetSpinSpeedCommand(CoralSpin,-0.3);
-    CoralSetSpinSpeedCommand CoralOut = new CoralSetSpinSpeedCommand(CoralSpin,0.3);
+    CoralSetSpinSpeedCommandV2 CoralIn = new CoralSetSpinSpeedCommandV2(CoralSpin,-0.3);
+    CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
 
+    //shuffleboard
+    ShuffleboardSuite ShuffleboardSuite = new ShuffleboardSuite(Elevator, CoralSpin, CoralWrist);
 
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser();
+        boolean filterAuto = false;
+
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+            (stream) -> filterAuto 
+
+        ? stream.filter(auto -> auto.getName().startsWith("!"))
+        : stream
+            
+
+        );
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
+        Shuffleboard.getTab("Commands").add(autoChooser).withPosition(5,0);
 
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);
 
+        //auto commands and events
         NamedCommands.registerCommand("TopStage", TopStage);
         NamedCommands.registerCommand("BottomStage", BottomStage);
         NamedCommands.registerCommand("CoralIn", CoralIn);
-        NamedCommands.registerCommand("CoralOut", CoralOut);
+        NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
 
-        new EventTrigger("TopStage").onTrue(TopStage);
-        new EventTrigger("BottomStage").onTrue(BottomStage);
-        new EventTrigger("CoralIn").whileTrue(CoralIn);
-        new EventTrigger("CoralOut").whileTrue(CoralOut);
+        new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
 
-        
 
         configureBindings();
 
@@ -101,14 +113,7 @@ public class RobotContainer {
             left bumper is reset field orientation
             b is brake 
             left trigger is slow
-            right trigger is super slow
-
-
-        
-
-
-
-          
+            right trigger is super slow          
          
          */
 
@@ -156,7 +161,7 @@ public class RobotContainer {
             )
             
         );
-        
+        //d pad precise positioning
         Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier  )));

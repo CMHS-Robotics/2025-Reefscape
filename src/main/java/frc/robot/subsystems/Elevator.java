@@ -33,7 +33,7 @@ public class Elevator implements Subsystem {
 
     private boolean reachedTarget = false;
 
-    final private PID elevatorPID;
+    final public PID elevatorPID;
 
     ElevatorFreeMoveCommand freeMoveCommand;
     ElevatorTargetPositionCommand targetPositionCommand;
@@ -43,7 +43,6 @@ public class Elevator implements Subsystem {
     public CommandXboxController Manipulator;
 
     public Elevator(CommandXboxController x){
-
         Manipulator = x;
 
         //set PID
@@ -154,6 +153,7 @@ public class Elevator implements Subsystem {
         SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
         SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getLeftY());
         SmartDashboard.putString("PID control",elevatorPID.toString());
+        SmartDashboard.putData("motorrrrr",ElevatorLeft);
 
         if(this.getCurrentCommand()!=null){
             SmartDashboard.putString("Command Running:",this.getCurrentCommand().toString());
@@ -178,7 +178,7 @@ public class Elevator implements Subsystem {
     public void setTargetPosition(double t){
         targetPosition = t;
     }
-    public void setTargetPosition(int s){
+    public void setTargetStage(int s){
         targetPosition = stages[s];
     }
     public int getStageLevel(){
@@ -190,9 +190,6 @@ public class Elevator implements Subsystem {
 
     public boolean hasReachedTarget(){
         reachedTarget = (Math.abs(elevatorPID.getError()) < elevatorPID.getReachedTargetErrorThreshold());
-        return reachedTarget;
-    }
-    public boolean getReachedTarget(){
         return reachedTarget;
     }
     public void setReachedTarget(boolean g){

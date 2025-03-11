@@ -26,11 +26,12 @@ public class ElevatorSetStageCommand extends Command {
     public void execute(){
     }
     
-    public void end(){
+    public boolean end(){
+      return Elevator.hasReachedTarget();
     }
 
     @Override
     public boolean isFinished() {
-       return true;
+       return end();
     }
    }

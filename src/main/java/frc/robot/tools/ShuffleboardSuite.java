@@ -2,6 +2,8 @@ package frc.robot.tools;
 
 import java.util.Map;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSpinV2;
@@ -34,16 +37,20 @@ public class ShuffleboardSuite implements Subsystem{
     GenericEntry elevatorPID;
     GenericEntry coralWristPID;
     GenericEntry coralWristPosition;
+    GenericEntry coralSpin;
+    GenericEntry coralWristSetPosManual;
+    GenericEntry coralWristManual;
 
     //shuffleboard tabs
     ShuffleboardTab DataTab = Shuffleboard.getTab("Data");
     ShuffleboardTab CommandsTab = Shuffleboard.getTab("Commands");
 
     //layouts
-    ShuffleboardLayout ElevatorCommands = CommandsTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(2,2).withPosition(0,0);
-    ShuffleboardLayout Subsystems = CommandsTab.getLayout("Subsystems",BuiltInLayouts.kList).withSize(2,2).withPosition(4,0);
-    ShuffleboardLayout ElevatorData = DataTab.getLayout("Data",BuiltInLayouts.kList).withSize(2,4).withPosition(0,0);
-    ShuffleboardLayout CoralData = DataTab.getLayout("Data",BuiltInLayouts.kList).withSize(2,4).withPosition(2,0);
+    ShuffleboardLayout ElevatorCommands = CommandsTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(2,10).withPosition(0,0);
+    ShuffleboardLayout CoralCommands = CommandsTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(2,10).withPosition(2,0);
+    ShuffleboardLayout Subsystems = CommandsTab.getLayout("Subsystems",BuiltInLayouts.kList).withSize(2,10).withPosition(4,0);
+    ShuffleboardLayout ElevatorData = DataTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(2,10).withPosition(0,0);
+    ShuffleboardLayout CoralData = DataTab.getLayout("Coral",BuiltInLayouts.kList).withSize(2,10).withPosition(2,0);
 
     public ShuffleboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w){
         Elevator = e;
@@ -51,6 +58,8 @@ public class ShuffleboardSuite implements Subsystem{
         CoralWrist = w;     
         
         DataTab.add("Motor",Elevator.ElevatorLeft);
+
+        DataTab.add("Pigeon",new Pigeon2(0));
 
         //elevator data
         leftMotorPos = ElevatorData.add("Elevator Left Motor Position",0).getEntry();
@@ -62,6 +71,9 @@ public class ShuffleboardSuite implements Subsystem{
         //coral data
         coralWristPosition = CoralData.add("Coral Wrist Position",0).getEntry();
         coralWristPID = CoralData.add("Coral PID",0).getEntry();
+        coralSpin = CoralData.add("Coral Spin Value",0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+        coralWristManual = CoralData.add("Manual PID setting",false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        coralWristSetPosManual = CoralData.add("PID Bar",0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("Bottom",-500,"Top",500)).getEntry();
 
 
          //subsystems
@@ -83,6 +95,9 @@ public class ShuffleboardSuite implements Subsystem{
         ElevatorCommands.add("Elevator Intake",new ElevatorSetStageCommand(Elevator,1));
         ElevatorCommands.add("Elevator Bottom",new ElevatorSetStageCommand(Elevator,0));
 
+        CoralCommands.add("Run Coral at x", new CoralSetSpinSpeedCommandV2(CoralSpin,coralSpin.getDouble(0)));
+
+
 
          this.setDefaultCommand(Commands.run(()-> update(),this));
     }
@@ -103,6 +118,8 @@ public class ShuffleboardSuite implements Subsystem{
         elevatorLevel.setInteger(Elevator.getStageLevel());
         elevatorPID.setString(Elevator.elevatorPID.toString());
         
+        CoralWrist.setShuffleboardManualControl(coralWristManual.getBoolean(false));
+        CoralWrist.setShuffleboardManualControlValue(coralWristSetPosManual.getDouble(0.0));
 
         //coral
         coralWristPID.setString(CoralWrist.coralWristPID.toString());

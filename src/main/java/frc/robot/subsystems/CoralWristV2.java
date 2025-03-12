@@ -22,7 +22,8 @@ public class CoralWristV2 implements Subsystem {
     int elevatorStage = 0;
     double gravity = 0;
     double[] wristPositions = new double[4];
-
+    boolean shuffleboardManualControl = false;
+    double shuffleboardManualControlValue = 0.0;
     
 
     public CoralWristV2 (CommandXboxController c,Elevator e){
@@ -65,7 +66,7 @@ public class CoralWristV2 implements Subsystem {
 
             
                 elevatorStage = elevator.getStageLevel();
-                
+                if(!shuffleboardManualControl){
                 wristTarget = switch (elevatorStage) {
                     case 0 -> wristPositions[0];
                     case 1 -> wristPositions[1];
@@ -74,7 +75,9 @@ public class CoralWristV2 implements Subsystem {
                     case 4 -> wristPositions[3];
                     default -> wristPositions[0];
                 };
-
+                }else{
+                    wristTarget = getShuffleboardManualControlValue();
+                }
                 //coralWristPID.setGravity(getGravity());
                 coralWristPID.setSetPoint(wristTarget);
 
@@ -96,6 +99,22 @@ public class CoralWristV2 implements Subsystem {
         },this));
 
 
+    }
+
+    public void setShuffleboardManualControl(boolean s){
+        shuffleboardManualControl = s;
+    }
+    
+    public boolean getShuffleboardManualControl(){
+        return shuffleboardManualControl;
+    }
+
+    public void setShuffleboardManualControlValue(double s){
+        shuffleboardManualControlValue = s;
+    }
+    
+    public double getShuffleboardManualControlValue(){
+        return shuffleboardManualControlValue;
     }
 
 

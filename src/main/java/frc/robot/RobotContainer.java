@@ -73,7 +73,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
-        boolean filterAuto = false;
+        boolean filterAuto = true;
 
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
             (stream) -> filterAuto 
@@ -85,7 +85,7 @@ public class RobotContainer {
         );
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
-        Shuffleboard.getTab("Commands").add(autoChooser).withPosition(5,0);
+        Shuffleboard.getTab("Commands").add(autoChooser).withPosition(8,0);
 
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);

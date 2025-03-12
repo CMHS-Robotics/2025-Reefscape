@@ -1,10 +1,8 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.RobotContainer;
 import frc.robot.commands.ChangeSpeedMultiplierCommand;
 
 /**
@@ -21,7 +19,8 @@ public class DriveAugments implements Subsystem {
     {0.7,0.75,0.3,0.40,0.13,0.22},
     {0.45,0.6,0.23,0.35,0.11,0.20},
     {0.25,0.35,0.15,0.25,0.09,0.18},
-    {0.15,0.25,0.1,0.2,0.08,0.15}};
+    {0.15,0.25,0.1,0.2,0.08,0.15}
+    };
 
     public DriveAugments(CommandXboxController bruh,Elevator e){
         Driver = bruh;
@@ -41,7 +40,6 @@ public class DriveAugments implements Subsystem {
     @Override
     public void periodic(){
         elevatorStage = elevator.getStageLevel();
-        SmartDashboard.putNumber("Speed Multiplier",RobotContainer.SpeedMultiplier);
     }
 }
 

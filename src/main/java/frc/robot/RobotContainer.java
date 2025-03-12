@@ -78,7 +78,7 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
             (stream) -> filterAuto 
 
-        ? stream.filter(auto -> auto.getName().startsWith("!"))
+        ? stream.filter(auto -> auto.getName().contains("filter"))
         : stream
             
 

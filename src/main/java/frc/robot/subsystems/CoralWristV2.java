@@ -17,7 +17,7 @@ public class CoralWristV2 implements Subsystem {
     int CoralWristMotorId = 15;
     public TalonFX CoralWrist = new TalonFX(CoralWristMotorId);
     double wristTarget;
-    PID coralWristPID;
+    public final PID coralWristPID;
     Elevator elevator;
     int elevatorStage = 0;
     double gravity = 0;
@@ -100,11 +100,11 @@ public class CoralWristV2 implements Subsystem {
 
 
     public void smartDashboard(){
-        SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
-        SmartDashboard.putString("Coral Wrist PID",coralWristPID.toString());
-        SmartDashboard.putNumber("gravity calc",getGravity());
-        SmartDashboard.updateValues();
+        // SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
+        // SmartDashboard.putString("Coral Wrist PID",coralWristPID.toString());
+        // SmartDashboard.putNumber("gravity calc",getGravity());
+        // SmartDashboard.updateValues();
     }
 
     public double getGravity(){

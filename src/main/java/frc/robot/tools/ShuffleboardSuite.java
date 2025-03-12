@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.commands.ElevatorSetStageCommand;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSpinV2;
 import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
@@ -23,6 +24,7 @@ public class ShuffleboardSuite implements Subsystem{
     CoralSpinV2 CoralSpin;
     CoralWristV2 CoralWrist;
     DriveAugments DriveAugments;
+    CommandSwerveDrivetrain Swerve;
 
     //entries
     GenericEntry leftMotorPos;
@@ -30,30 +32,37 @@ public class ShuffleboardSuite implements Subsystem{
     GenericEntry pidTarget;
     GenericEntry elevatorLevel;
     GenericEntry elevatorPID;
+    GenericEntry coralWristPID;
+    GenericEntry coralWristPosition;
 
     //shuffleboard tabs
-    ShuffleboardTab ElevatorTab = Shuffleboard.getTab("Elevator");
-    ShuffleboardTab CoralTab = Shuffleboard.getTab("Coral Intake");
+    ShuffleboardTab DataTab = Shuffleboard.getTab("Data");
     ShuffleboardTab CommandsTab = Shuffleboard.getTab("Commands");
 
     //layouts
     ShuffleboardLayout ElevatorCommands = CommandsTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(2,2).withPosition(0,0);
-    ShuffleboardLayout Subsystems = CommandsTab.getLayout("Subsystems",BuiltInLayouts.kList).withSize(2,2).withPosition(2,0);
-    ShuffleboardLayout ElevatorData = ElevatorTab.getLayout("Data",BuiltInLayouts.kList).withSize(2,4).withPosition(0,0);
-
+    ShuffleboardLayout Subsystems = CommandsTab.getLayout("Subsystems",BuiltInLayouts.kList).withSize(2,2).withPosition(4,0);
+    ShuffleboardLayout ElevatorData = DataTab.getLayout("Data",BuiltInLayouts.kList).withSize(2,4).withPosition(0,0);
+    ShuffleboardLayout CoralData = DataTab.getLayout("Data",BuiltInLayouts.kList).withSize(2,4).withPosition(2,0);
 
     public ShuffleboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w){
         Elevator = e;
         CoralSpin = s;
         CoralWrist = w;     
         
-        Shuffleboard.getTab("Elevator").add("Motor",Elevator.ElevatorLeft);
+        DataTab.add("Motor",Elevator.ElevatorLeft);
 
+        //elevator data
         leftMotorPos = ElevatorData.add("Elevator Left Motor Position",0).getEntry();
         rightMotorPos = ElevatorData.add("Elevator Right Motor Position",0).getEntry();
         pidTarget = ElevatorData.add("Elevator PID Target",0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("Bottom",0,"Top",24)).withSize(2,1).getEntry();
         elevatorLevel = ElevatorData.add("Elevator Level",0).getEntry();
         elevatorPID = ElevatorData.add("Elevator PID",0).getEntry();
+
+        //coral data
+        coralWristPosition = CoralData.add("Coral Wrist Position",0).getEntry();
+        coralWristPID = CoralData.add("Coral PID",0).getEntry();
+
 
          //subsystems
         //  SmartDashboard.putData((Sendable) Elevator);
@@ -62,6 +71,7 @@ public class ShuffleboardSuite implements Subsystem{
         Subsystems.add("Coral Spin",CoralSpin);
         Subsystems.add("Coral Wrist",CoralWrist);
         Subsystems.add("Driver Augments",DriveAugments);
+        Subsystems.add("Swerve",Swerve);
  
          //commands
         //  SmartDashboard.putData("Elevator Bottom",new ElevatorSetStageCommand(Elevator,0));
@@ -74,12 +84,7 @@ public class ShuffleboardSuite implements Subsystem{
         ElevatorCommands.add("Elevator Bottom",new ElevatorSetStageCommand(Elevator,0));
 
 
-
-
-
-
-
-         this.setDefaultCommand(Commands.run(()->update()));
+         this.setDefaultCommand(Commands.run(()-> update(),this));
     }
 
 
@@ -88,17 +93,24 @@ public class ShuffleboardSuite implements Subsystem{
 
     public void update(){
 
-        
+        //elevator
         leftMotorPos.setDouble(Elevator.ElevatorLeft.getPosition().getValueAsDouble());
         rightMotorPos.setDouble(Elevator.ElevatorRight.getPosition().getValueAsDouble());
 
         pidTarget.setDouble(Elevator.getTargetPosition());
         Elevator.setTargetPosition(pidTarget.getDouble(0));
-        
 
         elevatorLevel.setInteger(Elevator.getStageLevel());
         elevatorPID.setString(Elevator.elevatorPID.toString());
         
+
+        //coral
+        coralWristPID.setString(CoralWrist.coralWristPID.toString());
+        coralWristPosition.setDouble(CoralWrist.CoralWrist.getPosition().getValueAsDouble());
+
+
+
+
 
     }
 

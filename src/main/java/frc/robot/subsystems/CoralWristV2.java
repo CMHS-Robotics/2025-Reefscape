@@ -32,24 +32,24 @@ public class CoralWristV2 implements Subsystem {
 
         //set wrist positions
         wristPositions[0] = 0;
-        wristPositions[1] = -186;
-        wristPositions[2] = -560;
-        wristPositions[3] = -520;
+        wristPositions[1] = -2.6;
+        wristPositions[2] = -5.6;
+        wristPositions[3] = -5.98;
 
 
         //set pid
-        coralWristPID = new PID(0.0007,0,0.0003);
+        coralWristPID = new PID(0.2,0,0.1);
         coralWristPID.setMaxOutput(0.1);
         coralWristPID.setMinOutput(-0.1);
-        coralWristPID.setGravity(0.01);
 
 
         //motor configs
         TalonFXConfiguration wristConfig = new TalonFXConfiguration();
         var motOutConfig = wristConfig.MotorOutput;
-        motOutConfig.Inverted = InvertedValue.CounterClockwise_Positive;
+        motOutConfig.Inverted = InvertedValue.Clockwise_Positive;
         motOutConfig.NeutralMode = NeutralModeValue.Brake;
-        wristConfig.Feedback.SensorToMechanismRatio = 100;
+        //wristConfig.Feedback.SensorToMechanismRatio = 1/1000;
+        //wristConfig.Feedback.RotorToSensorRatio = 100;
 
 
         CoralWrist.getConfigurator().apply(wristConfig);
@@ -76,6 +76,7 @@ public class CoralWristV2 implements Subsystem {
                     default -> wristPositions[0];
                 };
                 }else{
+                    Commands.print("getting manual control:   " + getShuffleboardManualControlValue());
                     wristTarget = getShuffleboardManualControlValue();
                 }
                 //coralWristPID.setGravity(getGravity());
@@ -119,8 +120,8 @@ public class CoralWristV2 implements Subsystem {
 
 
     public void smartDashboard(){
-        // SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
-        // SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
+         SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
+         //SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
         // SmartDashboard.putString("Coral Wrist PID",coralWristPID.toString());
         // SmartDashboard.putNumber("gravity calc",getGravity());
         // SmartDashboard.updateValues();

@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 
 public class CoralSpinV2 implements Subsystem {
-    private final int CoralIntakeMotorA = 19;
-    private final int CoralIntakeMotorB = 20;
+    private final int CoralIntakeMotorBackId = 16;
+    private final int CoralIntakeMotorFrontId = 17;
 
-    public TalonFX CoralIntakeRight = new TalonFX(CoralIntakeMotorA);
-    public TalonFX CoralIntakeLeft = new TalonFX(CoralIntakeMotorB);   
+    public TalonFX CoralIntakeBack = new TalonFX(CoralIntakeMotorBackId);
+    public TalonFX CoralIntakeFront = new TalonFX(CoralIntakeMotorFrontId);   
     public CommandXboxController Manipulator;
     public CoralSpinV2(CommandXboxController x){
         Manipulator = x;
@@ -25,14 +25,14 @@ public class CoralSpinV2 implements Subsystem {
         config.Voltage.PeakForwardVoltage = 3;
         config.Voltage.PeakReverseVoltage = 3;
 
-        CoralIntakeRight.getConfigurator().apply(config);
-        CoralIntakeRight.setPosition(0);
+        CoralIntakeBack.getConfigurator().apply(config);
+        CoralIntakeBack.setPosition(0);
 
-        CoralIntakeLeft.getConfigurator().apply(config);
-        CoralIntakeLeft.setPosition(0);
+        CoralIntakeFront.getConfigurator().apply(config);
+        CoralIntakeFront.setPosition(0);
 
-        CoralIntakeLeft.set(0);
-        CoralIntakeRight.set(0);
+        CoralIntakeFront.set(0);
+        CoralIntakeBack.set(0);
 
         //commands
         CoralSetSpinSpeedCommandV2 CoralInSpin = new CoralSetSpinSpeedCommandV2(this,0.2);

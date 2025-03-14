@@ -17,7 +17,7 @@ public class ElevatorSetStageCommand extends Command {
 
     @Override
     public void initialize(){      
-      Elevator.setTargetPosition(level);
+      Elevator.setTargetStage(level);
       Elevator.setStageLevel(level);
 
     }
@@ -32,6 +32,6 @@ public class ElevatorSetStageCommand extends Command {
 
     @Override
     public boolean isFinished() {
-       return end();
+       return true;
     }
    }

@@ -58,10 +58,10 @@ public class Elevator implements Subsystem {
 
         //set stage levels
         stages[0]= 0;
-        stages[1]=  8.1;
+        stages[1]=  7.9;
         stages[2]= 10.6;
         stages[3]= 16;
-        stages[4]= 23.8;
+        stages[4]= 24;
 
         //Make new config
         var config = new TalonFXConfiguration();
@@ -144,16 +144,16 @@ public class Elevator implements Subsystem {
     
 
     private void SmartDashboard(){
-        // SmartDashboard.putNumber("Left Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
-        // SmartDashboard.putNumber("Right Motor Pos", ElevatorRight.getPosition().getValueAsDouble());
-        // SmartDashboard.putNumber("PID Target Position",targetPosition);
-        // SmartDashboard.putNumber("Stage Level", (int)stageLevel);
-        // SmartDashboard.putString("Left Motor Request",ElevatorLeft.getAppliedControl().toString());
-        // SmartDashboard.putString("Right Motor Request",ElevatorRight.getAppliedControl().toString());
-        // SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
-        // SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getLeftY());
-        // SmartDashboard.putString("PID control",elevatorPID.toString());
-        // SmartDashboard.putData("motorrrrr",ElevatorLeft);
+        SmartDashboard.putNumber("Left Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Right Motor Pos", ElevatorRight.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("PID Target Position",targetPosition);
+        SmartDashboard.putNumber("Stage Level", (int)stageLevel);
+        SmartDashboard.putString("Left Motor Request",ElevatorLeft.getAppliedControl().toString());
+        SmartDashboard.putString("Right Motor Request",ElevatorRight.getAppliedControl().toString());
+        SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
+        SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getLeftY());
+        SmartDashboard.putString("PID control",elevatorPID.toString());
+        //SmartDashboard.putData("motorrrrr",ElevatorLeft);
 
         // if(this.getCurrentCommand()!=null){
         //     SmartDashboard.putString("Command Running:",this.getCurrentCommand().toString());

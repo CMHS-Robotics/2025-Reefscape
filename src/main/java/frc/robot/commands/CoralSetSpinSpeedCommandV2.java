@@ -13,8 +13,8 @@ public class CoralSetSpinSpeedCommandV2 extends Command {
     public CoralSetSpinSpeedCommandV2(CoralSpinV2 c, double s){
         CoralIntakeV2 = c;
         speed = s;
-        CoralIntakeRight = CoralIntakeV2.CoralIntakeRight;
-        CoralIntakeLeft = CoralIntakeV2.CoralIntakeLeft;
+        CoralIntakeRight = CoralIntakeV2.CoralIntakeFront;
+        CoralIntakeLeft = CoralIntakeV2.CoralIntakeBack;
         addRequirements(CoralIntakeV2);
     }
 

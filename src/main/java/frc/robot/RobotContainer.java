@@ -80,12 +80,12 @@ public class RobotContainer {
 
         ? stream.filter(auto -> auto.getName().contains("filter"))
         : stream
-            
+                
 
         );
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
-        Shuffleboard.getTab("Commands").add(autoChooser).withPosition(8,0);
+        Shuffleboard.getTab("Autonomous").add(autoChooser).withPosition(0,0).withSize(2,2);
 
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);

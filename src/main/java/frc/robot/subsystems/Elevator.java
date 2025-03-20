@@ -114,11 +114,11 @@ public class Elevator implements Subsystem {
         Trigger b = Manipulator.b();
 
         //bind commands to triggers
+        b.onTrue(new ElevatorSetStageCommand(this, 0).alongWith(new CoralWristSetTargetPositionCommand(wrist, 0)));
+        povDown.onTrue(new ElevatorSetStageCommand(this, 1).andThen(new CoralWristSetTargetPositionCommand(wrist, 1)));
         povLeft.onTrue(new ElevatorSetStageCommand(this, 2).andThen(new CoralWristSetTargetPositionCommand(wrist, 2)));
         povUp.onTrue(new ElevatorSetStageCommand(this,3).andThen(new CoralWristSetTargetPositionCommand(wrist, 2)));
         povRight.onTrue(new ElevatorSetStageCommand(this,4).andThen(new CoralWristSetTargetPositionCommand(wrist,3)));
-        povDown.onTrue(new ElevatorSetStageCommand(this, 1).andThen(new CoralWristSetTargetPositionCommand(wrist, 1)));
-        b.onTrue(new ElevatorSetStageCommand(this, 0).alongWith(new CoralWristSetTargetPositionCommand(wrist, 0)));
 
         rightTrigger.whileTrue(freeMoveCommand);
 

@@ -63,8 +63,10 @@ public class RobotContainer {
     //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
     //commands
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
+    ElevatorSetStageCommand IndexStage = new ElevatorSetStageCommand(Elevator,1);
     ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,0);
     CoralWristSetTargetPositionCommand TopCoral = new CoralWristSetTargetPositionCommand(CoralWrist,3);
+    CoralWristSetTargetPositionCommand IndexCoral = new CoralWristSetTargetPositionCommand(CoralWrist,1);
     CoralWristSetTargetPositionCommand BottomCoral = new CoralWristSetTargetPositionCommand(CoralWrist,0);
 
 
@@ -89,17 +91,18 @@ public class RobotContainer {
 
         //auto commands and events
         NamedCommands.registerCommand("TopStage", TopStage.andThen(TopCoral));
+        NamedCommands.registerCommand("IndexStage", IndexStage.alongWith(IndexCoral));
         NamedCommands.registerCommand("BottomStage", BottomStage.alongWith(BottomCoral));
-        NamedCommands.registerCommand("CoralIn", CoralIn);
+        NamedCommands.registerCommand("CoralIn", CoralIn.withTimeout(3));
         NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
 
         new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
 
-
-        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+        
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("blue 1 piece coral from left v1.3",
             (stream) -> filterAuto 
 
-        ? stream.filter(auto -> auto.getName().contains("comp"))
+        ? stream.filter(auto -> auto.getName().contains("v1"))
         : stream
                 
 

@@ -1,0 +1,477 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "USB Camera 0",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 640.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/USB Camera 0",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Elevator has reached target",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator has reached target",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Coral Wrist has reached target",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Coral Wrist has reached target",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Left Motor Pos",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Left Motor Pos",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Right Motor Pos",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Right Motor Pos",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Coral Wrist Encoder Position",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Coral Wrist Encoder Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "PID control",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 896.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/PID control",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Auto Mode",
+            "x": 1152.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Mode",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "SendableChooser[0]",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/Shuffleboard/Autonomous/SendableChooser[0]",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Data",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Coral",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 1280.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Coral Spin Value",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Coral/Coral Spin Value",
+                  "period": 0.06,
+                  "min_value": -1.0,
+                  "max_value": 1.0,
+                  "divisions": 5,
+                  "update_continuously": false
+                }
+              },
+              {
+                "title": "Manual PID setting",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Coral/Manual PID setting",
+                  "period": 0.06
+                }
+              },
+              {
+                "title": "PID Target Value Manual",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Coral/PID Target Value Manual",
+                  "period": 0.06,
+                  "min_value": -3.0,
+                  "max_value": 3.0,
+                  "divisions": 5,
+                  "update_continuously": false
+                }
+              },
+              {
+                "title": "Coral Wrist Position",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Coral/Coral Wrist Position",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Coral Wrist Output",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Coral/Coral Wrist Output",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Coral PID",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Coral/Coral PID",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 1280.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Elevator PID Target",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Number Bar",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/Elevator PID Target",
+                  "period": 0.06,
+                  "min_value": 0.0,
+                  "max_value": 24.0,
+                  "divisions": 5,
+                  "inverted": false,
+                  "orientation": "horizontal"
+                }
+              },
+              {
+                "title": "Manual PID Setting",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/Manual PID Setting",
+                  "period": 0.06
+                }
+              },
+              {
+                "title": "PID Target Value Manual",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/PID Target Value Manual",
+                  "period": 0.06,
+                  "min_value": -1.0,
+                  "max_value": 1.0,
+                  "divisions": 5,
+                  "update_continuously": false
+                }
+              },
+              {
+                "title": "Elevator Left Motor Position",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/Elevator Left Motor Position",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Elevator Right Motor Position",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/Elevator Right Motor Position",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Elevator Level",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/Elevator Level",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Elevator PID",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Shuffleboard/Data/Elevator/Elevator PID",
+                  "period": 0.06,
+                  "show_submit_button": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": []
+      }
+    },
+    {
+      "name": "Commands",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Coral",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 1280.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Run Coral at x",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Commands/Coral/Run Coral at x",
+                  "period": 0.06,
+                  "show_type": true
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 1280.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Elevator Top",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Commands/Elevator/Elevator Top",
+                  "period": 0.06,
+                  "show_type": true
+                }
+              },
+              {
+                "title": "Elevator L3",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Commands/Elevator/Elevator L3",
+                  "period": 0.06,
+                  "show_type": true
+                }
+              },
+              {
+                "title": "Elevator L2",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Commands/Elevator/Elevator L2",
+                  "period": 0.06,
+                  "show_type": true
+                }
+              },
+              {
+                "title": "Elevator Intake",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Commands/Elevator/Elevator Intake",
+                  "period": 0.06,
+                  "show_type": true
+                }
+              },
+              {
+                "title": "Elevator Bottom",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Commands/Elevator/Elevator Bottom",
+                  "period": 0.06,
+                  "show_type": true
+                }
+              }
+            ]
+          }
+        ],
+        "containers": []
+      }
+    }
+  ]
+}

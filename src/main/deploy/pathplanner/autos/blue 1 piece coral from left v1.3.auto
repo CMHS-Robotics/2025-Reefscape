@@ -5,9 +5,16 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "turn and go to reef"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "blue top to face coral"
+                }
+              }
+            ]
           }
         },
         {
@@ -17,28 +24,46 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "CoralOut"
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "side reef to feeder"
+                  "pathName": "blue top coral to feeder"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "BottomStage"
+                  "name": "IndexStage"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralIn"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BottomStage"
           }
         }
       ]

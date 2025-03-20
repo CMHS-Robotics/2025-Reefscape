@@ -5,12 +5,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 
-public class CoralSpinV2 implements Subsystem {
+public class CoralSpinV2 extends SubsystemBase {
     private final int CoralIntakeMotorBackId = 16;
     private final int CoralIntakeMotorFrontId = 17;
 

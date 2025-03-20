@@ -17,6 +17,7 @@ public class CoralWristTargetPositionCommand extends Command {
       wrist = e;
       pid=p;
       target = 0.0;
+      wristMotor = wrist.CoralWrist;
       addRequirements(wrist);
    }
 

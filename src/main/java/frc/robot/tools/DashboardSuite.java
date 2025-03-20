@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -15,7 +15,7 @@ import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 
-public class DashboardSuite implements Subsystem{
+public class DashboardSuite extends SubsystemBase{
     
     //subsystems
     Elevator Elevator;
@@ -89,6 +89,9 @@ public class DashboardSuite implements Subsystem{
         SmartDashboard.putData("Elevator Top Command",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
         SmartDashboard.putData("Elevator Bottom Command",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
 
+        SmartDashboard.putData("Elevator",Elevator);
+        SmartDashboard.putData("Wrist",CoralWrist);
+        SmartDashboard.putData("Spin",CoralSpin);
 
         // CoralCommands.add("Run Coral at x", new CoralSetSpinSpeedCommandV2(CoralSpin,coralSpin.getDouble(0)));
     

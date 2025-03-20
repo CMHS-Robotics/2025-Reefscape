@@ -7,13 +7,13 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CoralWristTargetPositionCommand;
 import frc.robot.tools.PID;
 
-public class CoralWristV2 implements Subsystem {
+public class CoralWristV2 extends SubsystemBase {
     CommandXboxController Manipulator;
     int CoralWristMotorId = 15;
     public TalonFX CoralWrist = new TalonFX(CoralWristMotorId);
@@ -24,7 +24,6 @@ public class CoralWristV2 implements Subsystem {
     boolean shuffleboardManualControl = false;
     double shuffleboardManualControlValue = 0.0;
     boolean reachedTarget;
-    int elevatorStage;
     
 
     public CoralWristV2 (CommandXboxController c){
@@ -66,15 +65,7 @@ public class CoralWristV2 implements Subsystem {
 
 
         //default command
-        this.setDefaultCommand(Commands.run(()->{
-            
-            coralWristPID.setSetPoint(wristTarget);
-
-
-            CoralWrist.set(coralWristPID.updatePID(CoralWrist.getPosition().getValueAsDouble())); 
-            
-
-        },this));   
+        this.setDefaultCommand(pidTarget);   
 
         //reset encoder
         leftStickClick.onTrue(Commands.runOnce(()->{

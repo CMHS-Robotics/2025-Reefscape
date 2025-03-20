@@ -8,12 +8,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.tools.PID;
-
-public class AlgaeIntake implements Subsystem {
+public class AlgaeIntake extends SubsystemBase {
     CommandXboxController Manipulator;
     int AlgaeSpinId = 16;
     int AlgaeWristId = 17;

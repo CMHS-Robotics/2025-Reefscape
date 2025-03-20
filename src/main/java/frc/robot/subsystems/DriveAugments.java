@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ChangeSpeedMultiplierCommand;
@@ -9,7 +9,7 @@ import frc.robot.commands.ChangeSpeedMultiplierCommand;
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
  */
-public class DriveAugments implements Subsystem {
+public class DriveAugments extends SubsystemBase {
     public CommandXboxController Driver;
     ChangeSpeedMultiplierCommand speedMod;
     Elevator elevator;

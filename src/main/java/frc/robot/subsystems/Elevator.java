@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorFreeMoveCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.commands.ElevatorTargetPositionCommand;
@@ -42,19 +43,21 @@ public class Elevator implements Subsystem {
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
     public CommandXboxController Manipulator;
 
-    public Elevator(CommandXboxController x){
-        Manipulator = x;
+    CoralWristV2 wrist;
 
+    public Elevator(CommandXboxController x,CoralWristV2 w){
+        Manipulator = x;
+        wrist = w;
         //set PID
         elevatorPID = new PID(0.4,0,0.5);
 
-        elevatorPID.setMaxOutput(0.17);
-        elevatorPID.setMinOutput(-0.10);
+        elevatorPID.setMaxOutput(0.24);//.17
+        elevatorPID.setMinOutput(-0.15);//-.1
         elevatorPID.setGravity(0.023);
         elevatorPID.setThresholdOn(false);
         elevatorPID.setErrorThreshold(0.4);
         elevatorPID.setThresholdValue(0.04);
-        elevatorPID.setReachedTargetErrorThreshold(0.5);
+        elevatorPID.setReachedTargetErrorThreshold(1);
 
         //set stage levels
         stages[0]= 0;
@@ -111,11 +114,11 @@ public class Elevator implements Subsystem {
         Trigger b = Manipulator.b();
 
         //bind commands to triggers
-        povLeft.onTrue(new ElevatorSetStageCommand(this, 2));
-        povUp.onTrue(new ElevatorSetStageCommand(this,3));
-        povRight.onTrue(new ElevatorSetStageCommand(this,4));
-        povDown.onTrue(new ElevatorSetStageCommand(this, 1));
-        b.onTrue(new ElevatorSetStageCommand(this, 0));
+        povLeft.onTrue(new ElevatorSetStageCommand(this, 2).andThen(new CoralWristSetTargetPositionCommand(wrist, 2)));
+        povUp.onTrue(new ElevatorSetStageCommand(this,3).andThen(new CoralWristSetTargetPositionCommand(wrist, 2)));
+        povRight.onTrue(new ElevatorSetStageCommand(this,4).andThen(new CoralWristSetTargetPositionCommand(wrist,3)));
+        povDown.onTrue(new ElevatorSetStageCommand(this, 1).andThen(new CoralWristSetTargetPositionCommand(wrist, 1)));
+        b.onTrue(new ElevatorSetStageCommand(this, 0).alongWith(new CoralWristSetTargetPositionCommand(wrist, 0)));
 
         rightTrigger.whileTrue(freeMoveCommand);
 
@@ -153,6 +156,7 @@ public class Elevator implements Subsystem {
         SmartDashboard.putNumber("Joystick Right Y: ", Manipulator.getRightY());
         SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getLeftY());
         SmartDashboard.putString("PID control",elevatorPID.toString());
+        SmartDashboard.putBoolean("Elevator has reached target",hasReachedTarget());
         //SmartDashboard.putData("motorrrrr",ElevatorLeft);
 
         // if(this.getCurrentCommand()!=null){

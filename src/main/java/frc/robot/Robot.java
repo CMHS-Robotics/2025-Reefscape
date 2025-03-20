@@ -21,6 +21,11 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void robotInit(){
+    //WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+  }
+
+  @Override
   public void disabledInit() {}
 
   @Override

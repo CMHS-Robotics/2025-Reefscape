@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
+import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -29,7 +31,7 @@ import frc.robot.subsystems.CoralSpinV2;
 import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
-import frc.robot.tools.ShuffleboardSuite;
+import frc.robot.tools.DashboardSuite;
 ;
 
 public class RobotContainer {   
@@ -54,31 +56,50 @@ public class RobotContainer {
     CommandXboxController Driver = new CommandXboxController(0);
     CommandXboxController Manipulator = new CommandXboxController(1);
     //subsystems
-    Elevator Elevator = new Elevator(Manipulator);
-    DriveAugments Augment = new DriveAugments(Driver,Elevator);
-    CoralWristV2 CoralWrist = new CoralWristV2(Manipulator,Elevator);
     CoralSpinV2 CoralSpin = new CoralSpinV2(Manipulator);
+    CoralWristV2 CoralWrist = new CoralWristV2(Manipulator);
+    Elevator Elevator = new Elevator(Manipulator,CoralWrist);
+    DriveAugments Augment = new DriveAugments(Driver,Elevator);
     //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
     //commands
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
-    ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,4);
+    ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,0);
+    CoralWristSetTargetPositionCommand TopCoral = new CoralWristSetTargetPositionCommand(CoralWrist,3);
+    CoralWristSetTargetPositionCommand BottomCoral = new CoralWristSetTargetPositionCommand(CoralWrist,0);
+
 
     CoralSetSpinSpeedCommandV2 CoralIn = new CoralSetSpinSpeedCommandV2(CoralSpin,-0.3);
     CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
 
     //shuffleboard
-    ShuffleboardSuite ShuffleboardSuite = new ShuffleboardSuite(Elevator, CoralSpin, CoralWrist);
+    DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist);
 
 
+    
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+
     public RobotContainer() {
+        CameraServer.startAutomaticCapture();
         boolean filterAuto = true;
+
+
+        Elevator.ElevatorRight.setPosition(0);
+        Elevator.ElevatorLeft.setPosition(0);
+
+        //auto commands and events
+        NamedCommands.registerCommand("TopStage", TopStage.andThen(TopCoral));
+        NamedCommands.registerCommand("BottomStage", BottomStage.alongWith(BottomCoral));
+        NamedCommands.registerCommand("CoralIn", CoralIn);
+        NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
+
+        new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
+
 
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
             (stream) -> filterAuto 
 
-        ? stream.filter(auto -> auto.getName().contains("filter"))
+        ? stream.filter(auto -> auto.getName().contains("comp"))
         : stream
                 
 
@@ -86,17 +107,6 @@ public class RobotContainer {
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
         Shuffleboard.getTab("Autonomous").add(autoChooser).withPosition(0,0).withSize(2,2);
-
-        Elevator.ElevatorRight.setPosition(0);
-        Elevator.ElevatorLeft.setPosition(0);
-
-        //auto commands and events
-        NamedCommands.registerCommand("TopStage", TopStage);
-        NamedCommands.registerCommand("BottomStage", BottomStage);
-        NamedCommands.registerCommand("CoralIn", CoralIn);
-        NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
-
-        new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
 
 
         configureBindings();

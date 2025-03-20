@@ -10,38 +10,40 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.CoralWristTargetPositionCommand;
 import frc.robot.tools.PID;
 
 public class CoralWristV2 implements Subsystem {
     CommandXboxController Manipulator;
     int CoralWristMotorId = 15;
     public TalonFX CoralWrist = new TalonFX(CoralWristMotorId);
-    double wristTarget;
+    double wristTarget = 0;
     public final PID coralWristPID;
-    Elevator elevator;
-    int elevatorStage = 0;
     double gravity = 0;
-    double[] wristPositions = new double[4];
+    public double[] wristPositions = new double[4];
     boolean shuffleboardManualControl = false;
     double shuffleboardManualControlValue = 0.0;
+    boolean reachedTarget;
+    int elevatorStage;
     
 
-    public CoralWristV2 (CommandXboxController c,Elevator e){
+    public CoralWristV2 (CommandXboxController c){
         Manipulator = c;
-        elevator = e;
 
         //set wrist positions
         wristPositions[0] = 0;
-        wristPositions[1] = -2.6;
-        wristPositions[2] = -5.6;
-        wristPositions[3] = -5.98;
+        wristPositions[1] = -1.9;
+        wristPositions[2] = -5.1;
+        wristPositions[3] = -5.85;
 
+
+        CoralWrist.setPosition(0);
 
         //set pid
         coralWristPID = new PID(0.2,0,0.1);
         coralWristPID.setMaxOutput(0.1);
         coralWristPID.setMinOutput(-0.1);
-
+        coralWristPID.setReachedTargetErrorThreshold(0.3);
 
         //motor configs
         TalonFXConfiguration wristConfig = new TalonFXConfiguration();
@@ -59,32 +61,18 @@ public class CoralWristV2 implements Subsystem {
         Trigger leftTrigger = Manipulator.leftTrigger();
         Trigger leftStickClick = Manipulator.leftStick();
 
+        //commands
+        CoralWristTargetPositionCommand pidTarget = new CoralWristTargetPositionCommand(this, coralWristPID);
+
 
         //default command
         this.setDefaultCommand(Commands.run(()->{
-
-
             
-                elevatorStage = elevator.getStageLevel();
-                if(!shuffleboardManualControl){
-                wristTarget = switch (elevatorStage) {
-                    case 0 -> wristPositions[0];
-                    case 1 -> wristPositions[1];
-                    case 2 -> wristPositions[2];
-                    case 3 -> wristPositions[2];
-                    case 4 -> wristPositions[3];
-                    default -> wristPositions[0];
-                };
-                }else{
-                    Commands.print("getting manual control:   " + getShuffleboardManualControlValue());
-                    wristTarget = getShuffleboardManualControlValue();
-                }
-                //coralWristPID.setGravity(getGravity());
-                coralWristPID.setSetPoint(wristTarget);
+            coralWristPID.setSetPoint(wristTarget);
 
 
-                CoralWrist.set(coralWristPID.updatePID(CoralWrist.getPosition().getValueAsDouble())); 
-                
+            CoralWrist.set(coralWristPID.updatePID(CoralWrist.getPosition().getValueAsDouble())); 
+            
 
         },this));   
 
@@ -95,7 +83,6 @@ public class CoralWristV2 implements Subsystem {
 
         //manual control
         leftTrigger.whileTrue(Commands.run(()->{
-
             CoralWrist.set(-Manipulator.getLeftY() * 0.05);
         },this));
 
@@ -118,13 +105,35 @@ public class CoralWristV2 implements Subsystem {
         return shuffleboardManualControlValue;
     }
 
+    
+    public void setTarget(double t){
+        wristTarget = t;
+    }
+
+    public double getTarget(){
+        return wristTarget;
+    }
+
+    public void setTargetLevel(int a){
+        wristTarget = wristPositions[a];
+    }
+    
+    public boolean hasReachedTarget(){
+        reachedTarget = (Math.abs(coralWristPID.getError()) < coralWristPID.getReachedTargetErrorThreshold());
+        return reachedTarget;
+    }
+    public void setReachedTarget(boolean g){
+        reachedTarget = g;
+    }
+
 
     public void smartDashboard(){
-         SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
-         //SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
-        // SmartDashboard.putString("Coral Wrist PID",coralWristPID.toString());
-        // SmartDashboard.putNumber("gravity calc",getGravity());
-        // SmartDashboard.updateValues();
+        SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
+        SmartDashboard.putString("Coral Wrist PID",coralWristPID.toString());
+        SmartDashboard.putNumber("gravity calc",getGravity());
+        SmartDashboard.putBoolean("Coral Wrist has reached target",hasReachedTarget());
+        SmartDashboard.updateValues();
     }
 
     public double getGravity(){

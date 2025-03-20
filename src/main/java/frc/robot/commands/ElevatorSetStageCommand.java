@@ -5,14 +5,12 @@ import frc.robot.subsystems.Elevator;
 
 public class ElevatorSetStageCommand extends Command {
    Elevator Elevator;
-
    int level;
   
    public ElevatorSetStageCommand(Elevator e, int l){
       Elevator = e;
       level = l;
-      
-      addRequirements(Elevator);  
+       
    }
 
     @Override
@@ -31,7 +29,11 @@ public class ElevatorSetStageCommand extends Command {
     }
 
     @Override
+    public void end(boolean interrupted){
+    }
+
+    @Override
     public boolean isFinished() {
-       return true;
+       return end();
     }
    }

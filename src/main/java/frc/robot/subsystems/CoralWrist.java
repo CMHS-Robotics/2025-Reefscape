@@ -107,7 +107,6 @@ public class CoralWrist implements Subsystem {
 
     }
 
-
     public void smartDashboard(){
         SmartDashboard.putNumber("Coral Wrist Encoder Position",WristEncoder.getPosition());
         SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());

@@ -13,14 +13,14 @@
                 "data": {
                   "pathName": "top to face coral"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "TopStage"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TopStage"
           }
         },
         {
@@ -34,15 +34,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "BottomStage"
+                  "pathName": "top coral to feeder"
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "return from coral"
+                  "name": "BottomStage"
                 }
               }
             ]

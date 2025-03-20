@@ -35,17 +35,17 @@ public class CoralSpinV2 implements Subsystem {
         CoralIntakeBack.set(0);
 
         //commands
-        CoralSetSpinSpeedCommandV2 CoralInSpin = new CoralSetSpinSpeedCommandV2(this,0.2);
-        CoralSetSpinSpeedCommandV2 CoralOutSpin = new CoralSetSpinSpeedCommandV2(this,-0.2);
+        CoralSetSpinSpeedCommandV2 CoralOutSpin = new CoralSetSpinSpeedCommandV2(this,0.2);
+        CoralSetSpinSpeedCommandV2 CoralInSpin = new CoralSetSpinSpeedCommandV2(this,-0.2);
         CoralSetSpinSpeedCommandV2 CoralNoSpin = new CoralSetSpinSpeedCommandV2(this,0);
 
         Trigger leftBumper = Manipulator.leftBumper();
         Trigger rightBumper = Manipulator.rightBumper();
 
-        this.setDefaultCommand(CoralNoSpin);
+        //this.setDefaultCommand(CoralNoSpin);
 
-        leftBumper.whileTrue(CoralOutSpin);
+        leftBumper.whileTrue(CoralInSpin);
 
-        rightBumper.whileTrue(CoralInSpin);
+        rightBumper.whileTrue(CoralOutSpin);
     }
 }

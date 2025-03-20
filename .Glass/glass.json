@@ -1,0 +1,46 @@
+{
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "transitory": {
+      "CameraPublisher": {
+        "USB Camera 0": {
+          "open": true
+        }
+      },
+      "Shuffleboard": {
+        "Commands": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Pose": "Field2d",
+      "/Shuffleboard/Autonomous/SendableChooser[0]": "String Chooser",
+      "/Shuffleboard/Commands/Coral/Run Coral at x": "Command",
+      "/Shuffleboard/Commands/Elevator/Elevator Bottom": "Command",
+      "/Shuffleboard/Commands/Elevator/Elevator Intake": "Command",
+      "/Shuffleboard/Commands/Elevator/Elevator L2": "Command",
+      "/Shuffleboard/Commands/Elevator/Elevator L3": "Command",
+      "/Shuffleboard/Commands/Elevator/Elevator Top": "Command",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/Module 0": "Mechanism2d",
+      "/SmartDashboard/Module 1": "Mechanism2d",
+      "/SmartDashboard/Module 2": "Mechanism2d",
+      "/SmartDashboard/Module 3": "Mechanism2d"
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)"
+  }
+}

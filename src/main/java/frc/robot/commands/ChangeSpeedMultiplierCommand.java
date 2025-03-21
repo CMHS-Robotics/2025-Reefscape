@@ -10,6 +10,8 @@ public class ChangeSpeedMultiplierCommand extends Command {
     DriveAugments Augments;
     double wheels;
     double turn;
+    double Speed;
+    double rotSpeed;
 
     public ChangeSpeedMultiplierCommand(DriveAugments d,double w, double t){
         Augments = d;
@@ -31,6 +33,8 @@ public class ChangeSpeedMultiplierCommand extends Command {
     }
     
     public Command run(double speed,double rotspeed){
+        Speed = speed;
+        rotSpeed = rotspeed;
         return Commands.run(()->{
         RobotContainer.SpeedMultiplier = speed;
         RobotContainer.RotationSpeedMultiplier = rotspeed;
@@ -39,6 +43,15 @@ public class ChangeSpeedMultiplierCommand extends Command {
 
     @Override
     public void initialize(){
+    }
+
+    
+    public double getTransMult(){
+        return Speed;
+    }
+
+    public double getRotMult(){
+        return rotSpeed;
     }
 
     @Override

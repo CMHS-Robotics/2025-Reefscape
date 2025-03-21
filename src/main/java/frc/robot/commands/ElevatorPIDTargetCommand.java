@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Elevator;
 import frc.robot.tools.PID;
 
-public class ElevatorTargetPositionCommand extends Command {
+public class ElevatorPIDTargetCommand extends Command {
    Elevator Elevator;
 
    TalonFX ElevatorLeft,ElevatorRight;
@@ -15,7 +15,7 @@ public class ElevatorTargetPositionCommand extends Command {
    PID pid;
    double target;
 
-   public ElevatorTargetPositionCommand(Elevator e,PID p){
+   public ElevatorPIDTargetCommand(Elevator e,PID p){
       Elevator = e;
       ElevatorLeft = Elevator.ElevatorLeft;
       ElevatorRight = Elevator.ElevatorRight;
@@ -37,7 +37,7 @@ public class ElevatorTargetPositionCommand extends Command {
       target = Elevator.getTargetPosition();
 
       pid.setSetPoint(target);
-      
+
       pid.updatePID(ElevatorLeft.getPosition().getValueAsDouble());
             if(target <= 1 && ElevatorLeft.getPosition().getValueAsDouble() <= 1){
                 ElevatorLeft.set(0);

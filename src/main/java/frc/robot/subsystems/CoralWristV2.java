@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.CoralWristTargetPositionCommand;
+import frc.robot.commands.CoralWristPIDTargetCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.tools.PID;
 
@@ -62,7 +62,7 @@ public class CoralWristV2 extends SubsystemBase {
         Trigger leftStickClick = Manipulator.leftStick();
 
         //commands
-        CoralWristTargetPositionCommand pidTarget = new CoralWristTargetPositionCommand(this, coralWristPID);
+        CoralWristPIDTargetCommand pidTarget = new CoralWristPIDTargetCommand(this, coralWristPID);
 
 
         //default command

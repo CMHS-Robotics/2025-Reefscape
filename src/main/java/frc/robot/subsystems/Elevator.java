@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorFreeMoveCommand;
+import frc.robot.commands.ElevatorPIDTargetCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.ElevatorTargetPositionCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.tools.PID;
 
@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase {
     final public PID elevatorPID;
 
     ElevatorFreeMoveCommand freeMoveCommand;
-    ElevatorTargetPositionCommand targetPositionCommand;
+    ElevatorPIDTargetCommand targetPositionCommand;
 
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
@@ -96,7 +96,7 @@ public class Elevator extends SubsystemBase {
         //define commands
         freeMoveCommand = new ElevatorFreeMoveCommand(this);
 
-        targetPositionCommand = new ElevatorTargetPositionCommand(this,elevatorPID);
+        targetPositionCommand = new ElevatorPIDTargetCommand(this,elevatorPID);
 
         this.setDefaultCommand(targetPositionCommand);
 

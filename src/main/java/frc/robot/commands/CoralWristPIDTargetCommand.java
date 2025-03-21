@@ -6,14 +6,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralWristV2;
 import frc.robot.tools.PID;
 
-public class CoralWristTargetPositionCommand extends Command {
+public class CoralWristPIDTargetCommand extends Command {
    CoralWristV2 wrist;
 
    TalonFX wristMotor;
    PID pid;
    double target;
 
-   public CoralWristTargetPositionCommand(CoralWristV2 e,PID p){
+   public CoralWristPIDTargetCommand(CoralWristV2 e,PID p){
       wrist = e;
       pid=p;
       target = 0.0;

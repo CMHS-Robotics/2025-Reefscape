@@ -122,7 +122,7 @@ public class PID {
 	public double getGravity(){
 		return gravity;
 	}
-	public void setThresholdOn(boolean  g){
+	public void setThresholdOn(boolean g){
 		thresholdOn = g;
 	}
 	public boolean getThresholdOn(){

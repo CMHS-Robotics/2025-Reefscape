@@ -8,7 +8,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,6 +15,7 @@ import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorFreeMoveCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
 import frc.robot.commands.ElevatorTargetPositionCommand;
+import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.tools.PID;
 
 /**
@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase {
         Manipulator = x;
         wrist = w;
         //set PID
-        elevatorPID = new PID(0.4,0,0.5);
+        elevatorPID = new PID(0.4,0,0.52);
 
         elevatorPID.setMaxOutput(0.24);//.17
         elevatorPID.setMinOutput(-0.15);//-.1
@@ -123,11 +123,7 @@ public class Elevator extends SubsystemBase {
         rightTrigger.whileTrue(freeMoveCommand);
 
         //reset motor position command
-        rightStickClick.onTrue(Commands.runOnce(()->{
-            ElevatorLeft.setPosition(Rotations.of(0));
-            ElevatorRight.setPosition(Rotations.of(0));
-            targetPosition = 0;
-    }));
+        rightStickClick.onTrue(new ZeroTalonCommand(ElevatorLeft).alongWith(new ZeroTalonCommand(ElevatorRight)));
 
         //resetting motors again just to bet sure
         ElevatorRight.setPosition(0,1);
@@ -166,6 +162,9 @@ public class Elevator extends SubsystemBase {
 
         // }
 
+        SmartDashboard.putNumber("bruh why is the error off",ElevatorLeft.getPosition().getValueAsDouble() - targetPosition);
+        SmartDashboard.putNumber("im crashing out",elevatorPID.getError());
+        SmartDashboard.putNumber("Pid get value - pid get target",elevatorPID.getInputValue()-elevatorPID.getSetPoint());
         SmartDashboard.updateValues();
     }
 

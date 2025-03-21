@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.185227272727272,
-        "y": 4.917457386363636
+        "x": 5.150227649006622,
+        "y": 4.722350993377484
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.267840909090909,
-        "y": 5.575582386363636
+        "x": 4.232841285370259,
+        "y": 5.380475993377484
       },
       "isLocked": false,
       "linkedName": "1pccrl1"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -122.65773099455465
+    "rotation": -123.11134196037224
   },
   "useDefaultConstraints": true
 }

@@ -9,9 +9,12 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -25,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
+import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSpinV2;
@@ -35,6 +39,7 @@ import frc.robot.tools.DashboardSuite;
 ;
 
 public class RobotContainer {   
+
 
     
 
@@ -65,7 +70,7 @@ public class RobotContainer {
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
     ElevatorSetStageCommand IntakeStage = new ElevatorSetStageCommand(Elevator,1);
     ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,0);
-    CoralWristSetTargetPositionCommand TopCoral = new CoralWristSetTargetPositionCommand(CoralWrist,3);
+    CoralWristSetTargetPositionCommand TopCoral = new CoralWristSetTargetPositionCommand(CoralWrist,-5.78);
     CoralWristSetTargetPositionCommand IntakeCoral = new CoralWristSetTargetPositionCommand(CoralWrist,1);
     CoralWristSetTargetPositionCommand BottomCoral = new CoralWristSetTargetPositionCommand(CoralWrist,0);
 
@@ -77,14 +82,26 @@ public class RobotContainer {
     DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist);
 
 
+
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+            3.0, 1.0,
+            Units.degreesToRadians(540), Units.degreesToRadians(720));
+    
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    Command pathfindingCommand = AutoBuilder.pathfindToPose(
+            targetPose,
+            constraints,
+            0.0 // Goal end velocity in meters/sec
+    );
 
     public RobotContainer() {
         CameraServer.startAutomaticCapture();
-        boolean filterAuto = true;
-
 
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);
@@ -97,17 +114,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
 
         new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
-
-   
-        
-        // autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("blue 1 piece coral from left v1.3",
-        //     (stream) -> filterAuto 
-
-        // ? stream.filter(auto -> auto.getName().contains("v1"))
-        // : stream
-                
-
-        // );
 
         autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -205,9 +211,17 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
+        Driver.back().onTrue(pathfindingCommand);
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
+
+    
+    public void zeroMotors(){
+        new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)).schedule();;
+
+    }
+
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

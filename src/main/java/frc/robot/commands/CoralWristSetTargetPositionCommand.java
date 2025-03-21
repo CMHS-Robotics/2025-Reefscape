@@ -6,15 +6,29 @@ public class CoralWristSetTargetPositionCommand extends Command {
    CoralWristV2 wrist;
    
    int level;
+   double targetPosition;
+   boolean usePosition = false;
 
    public CoralWristSetTargetPositionCommand(CoralWristV2 w,int a){
       wrist = w;
+      usePosition = false;
       level = a;
+   }
+   
+   public CoralWristSetTargetPositionCommand(CoralWristV2 w,double a){
+      wrist = w;
+      usePosition = true;
+      targetPosition = a;
    }
 
    @Override
    public void initialize(){
-      wrist.setTargetLevel(level);
+      if(usePosition){
+         wrist.setTarget(targetPosition);
+      }
+         else{
+            wrist.setTargetLevel(level);};
+
       
    }
 

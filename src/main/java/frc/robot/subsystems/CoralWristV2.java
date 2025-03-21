@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CoralWristTargetPositionCommand;
+import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.tools.PID;
 
 public class CoralWristV2 extends SubsystemBase {
@@ -68,9 +69,7 @@ public class CoralWristV2 extends SubsystemBase {
         this.setDefaultCommand(pidTarget);   
 
         //reset encoder
-        leftStickClick.onTrue(Commands.runOnce(()->{
-            CoralWrist.setPosition(0);
-        }));
+        leftStickClick.onTrue(new ZeroTalonCommand(CoralWrist));
 
         //manual control
         leftTrigger.whileTrue(Commands.run(()->{

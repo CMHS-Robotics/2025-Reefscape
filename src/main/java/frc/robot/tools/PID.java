@@ -5,6 +5,8 @@ public class PID {
 	private double totalError;
 	private double prevError;
 
+	private double inputValue;
+
 	private double PValue;
 	private double IValue;
 	private double DValue;
@@ -54,6 +56,7 @@ public class PID {
 	 */
 	public double updatePID(double value) {
 		error = setPoint - value;
+		inputValue = value;
 		if(thresholdOn){
 			if(Math.abs(error) <= errorThreshold){
 				return thresholdValue;
@@ -105,6 +108,10 @@ public class PID {
 		DValue = d;
 	}
 
+
+	public double getInputValue(){
+		return inputValue;
+	}
 
 	public double getError(){
 		return error;
@@ -284,6 +291,6 @@ public class PID {
 	@Override
 	public String toString(){
 
-		return "Target Position:" + getSetPoint() + "  Set Value: " + (int)(getResult()*100)/100.0 + "  Error: " + (int)(error * 100)/100.0  + "  Threshold: " + thresholdOn + ", errorThreshold:  " + errorThreshold + ", thresholdValue: " + thresholdValue;
+		return "Target Position:" + getSetPoint() + "  Set Value: " + (int)(getResult()*100)/100.0 + "  Error: " + error  + "  Threshold: " + thresholdOn + ", errorThreshold:  " + errorThreshold + ", thresholdValue: " + thresholdValue;
 	}
 }

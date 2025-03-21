@@ -98,15 +98,19 @@ public class RobotContainer {
 
         new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
 
+   
         
-        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("blue 1 piece coral from left v1.3",
-            (stream) -> filterAuto 
+        // autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("blue 1 piece coral from left v1.3",
+        //     (stream) -> filterAuto 
 
-        ? stream.filter(auto -> auto.getName().contains("v1"))
-        : stream
+        // ? stream.filter(auto -> auto.getName().contains("v1"))
+        // : stream
                 
 
-        );
+        // );
+
+        autoChooser = AutoBuilder.buildAutoChooser();
+
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
         Shuffleboard.getTab("Autonomous").add(autoChooser).withPosition(0,0).withSize(2,2);
@@ -207,5 +211,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+        //return new PathPlannerAuto("move back");
     }
 }

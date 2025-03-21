@@ -37,11 +37,13 @@ public class ElevatorTargetPositionCommand extends Command {
       target = Elevator.getTargetPosition();
 
       pid.setSetPoint(target);
+      
+      pid.updatePID(ElevatorLeft.getPosition().getValueAsDouble());
             if(target <= 1 && ElevatorLeft.getPosition().getValueAsDouble() <= 1){
                 ElevatorLeft.set(0);
                 ElevatorRight.set(0);
             }else{
-            ElevatorLeft.set(pid.updatePID(ElevatorLeft.getPosition().getValueAsDouble()));
+            ElevatorLeft.set(pid.getResult());
             ElevatorRight.set(ElevatorLeft.get());
             }
             if(Math.abs(Manipulator.getLeftTriggerAxis()) > 0.1){

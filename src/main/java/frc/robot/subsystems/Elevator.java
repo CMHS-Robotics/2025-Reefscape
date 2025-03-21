@@ -51,12 +51,9 @@ public class Elevator extends SubsystemBase {
         //set PID
         elevatorPID = new PID(0.4,0,0.52);
 
-        elevatorPID.setMaxOutput(0.24);//.17
-        elevatorPID.setMinOutput(-0.15);//-.1
+        elevatorPID.setMaxOutput(0.24);
+        elevatorPID.setMinOutput(-0.15);
         elevatorPID.setGravity(0.023);
-        elevatorPID.setThresholdOn(false);
-        elevatorPID.setErrorThreshold(0.4);
-        elevatorPID.setThresholdValue(0.04);
         elevatorPID.setReachedTargetErrorThreshold(1);
 
         //set stage levels
@@ -64,7 +61,7 @@ public class Elevator extends SubsystemBase {
         stages[1]=  7.9;
         stages[2]= 10.6;
         stages[3]= 16;
-        stages[4]= 24;
+        stages[4]= 24.1;
 
         //Make new config
         var config = new TalonFXConfiguration();
@@ -128,7 +125,6 @@ public class Elevator extends SubsystemBase {
         //resetting motors again just to bet sure
         ElevatorRight.setPosition(0,1);
         ElevatorLeft.setPosition(0,1);
-
     }
         
     public final double distanceToMotorRot(double distance){
@@ -153,18 +149,11 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putNumber("Joystick Left Y: ", Manipulator.getLeftY());
         SmartDashboard.putString("PID control",elevatorPID.toString());
         SmartDashboard.putBoolean("Elevator has reached target",hasReachedTarget());
-        //SmartDashboard.putData("motorrrrr",ElevatorLeft);
-
-        // if(this.getCurrentCommand()!=null){
-        //     SmartDashboard.putString("Command Running:",this.getCurrentCommand().toString());
-        // }else{
-        //     SmartDashboard.putString("Command Running:","null");
-
-        // }
-
-        SmartDashboard.putNumber("bruh why is the error off",ElevatorLeft.getPosition().getValueAsDouble() - targetPosition);
-        SmartDashboard.putNumber("im crashing out",elevatorPID.getError());
-        SmartDashboard.putNumber("Pid get value - pid get target",elevatorPID.getInputValue()-elevatorPID.getSetPoint());
+        SmartDashboard.putNumber("elevatorleft getPosition - targetPosition",ElevatorLeft.getPosition().getValueAsDouble() - targetPosition);
+        SmartDashboard.putNumber("pid getError", elevatorPID.getError());
+        SmartDashboard.putNumber("Pid getInputValue - pid getSetPPoint",elevatorPID.getInputValue() - elevatorPID.getSetPoint());
+        SmartDashboard.putNumber("pid getSetPPoint",elevatorPID.getSetPoint());
+        SmartDashboard.putNumber("pid getInputValue",elevatorPID.getInputValue());
         SmartDashboard.updateValues();
     }
 

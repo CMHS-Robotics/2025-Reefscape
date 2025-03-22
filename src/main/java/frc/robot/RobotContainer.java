@@ -187,10 +187,10 @@ public class RobotContainer {
         Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier  )));
 
-        Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(Math.sqrt(2)*MaxSpeed*SpeedMultiplier  )));
-        Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
-        Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
-        Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
+        Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(1/Math.sqrt(2)*MaxSpeed*SpeedMultiplier  )));
+        Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
+        Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
+        Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
 
         Driver.b().whileTrue(drivetrain.applyRequest(() -> brake));
         Driver.y().whileTrue(drivetrain.applyRequest(() ->
@@ -215,8 +215,7 @@ public class RobotContainer {
 
     
     public void zeroMotors(){
-        new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)).schedule();;
-
+        new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)).schedule();
     }
 
 

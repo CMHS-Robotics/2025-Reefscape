@@ -2,6 +2,7 @@ package frc.robot.tools;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -83,6 +84,7 @@ public class DashboardSuite extends SubsystemBase{
  
         SmartDashboard.putNumber("Match Time",DriverStation.getMatchTime());
         SmartDashboard.putString("Match Type",DriverStation.getMatchType().toString());
+        SmartDashboard.putNumber("Voltage",RobotController.getBatteryVoltage());
 
         //  //commands
         // ElevatorCommands.add("Elevator Top",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));

@@ -107,7 +107,7 @@ public class Telemetry {
                 builder.addDoubleProperty("Back Left Velocity", () -> state.ModuleStates[2].speedMetersPerSecond, null);
                 builder.addDoubleProperty("Back Right Angle", () -> state.ModuleStates[3].angle.getRadians(), null);
                 builder.addDoubleProperty("Back Right Velocity", () -> state.ModuleStates[3].speedMetersPerSecond, null);
-                builder.addDoubleProperty("Robot Angle", () -> state.Speeds.omegaRadiansPerSecond, null);
+                builder.addDoubleProperty("Robot Angle", () -> state.Pose.getRotation().getRadians(), null);
             });
 
             SmartDashboard.putNumber("Velocity",Math.sqrt(Math.pow(state.Speeds.vxMetersPerSecond,2) + Math.pow(state.Speeds.vyMetersPerSecond,2)));

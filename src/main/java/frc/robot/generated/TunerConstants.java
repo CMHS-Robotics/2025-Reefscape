@@ -49,7 +49,7 @@ public class TunerConstants {
     public static final double KPDrive = 0.1;
     public static final double KIDrive = 0;
     public static final double KDDrive = 0;
-    public static final double kVoltMagnitude = 4.48;
+    public static final double kVoltMagnitude = 5.5;//4.48//5
 
     private static final Slot0Configs steerGains = new Slot0Configs()
         .withKP(KPSteer).withKI(KISteer).withKD(KDSteer)
@@ -60,7 +60,7 @@ public class TunerConstants {
     private static final Slot0Configs driveGains = new Slot0Configs()
         .withKP(KPDrive).withKI(KIDrive).withKD(KDDrive)
         .withKS(0).withKV(0.124);
-
+    
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
     private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
@@ -228,7 +228,6 @@ public class TunerConstants {
             DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
         );
     }
-
 
     /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types.

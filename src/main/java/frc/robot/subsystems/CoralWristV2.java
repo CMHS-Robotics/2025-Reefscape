@@ -34,7 +34,7 @@ public class CoralWristV2 extends SubsystemBase {
         wristPositions[0] = 0;
         wristPositions[1] = -1.9;
         wristPositions[2] = -5.1;
-        wristPositions[3] = -5.85;
+        wristPositions[3] = -5.78;//-5.85
 
 
         CoralWrist.setPosition(0);

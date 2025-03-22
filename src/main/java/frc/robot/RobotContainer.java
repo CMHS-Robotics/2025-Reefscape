@@ -48,6 +48,7 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
+
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
@@ -118,6 +119,7 @@ public class RobotContainer {
 
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
+        SmartDashboard.putNumber("MaxSpeed",MaxSpeed);
 
         configureBindings();
 
@@ -208,7 +210,7 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
-        Driver.back().onTrue(pathfindingCommand);
+        //Driver.back().onTrue(pathfindingCommand);
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }

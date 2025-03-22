@@ -21,6 +21,7 @@ public class PID {
 
 	private boolean continuous = false; // only for absolute encoders
 	private double setPoint; // this will be set continuously
+	private double resultPreClamp;
 	private double result;
 
 	private boolean thresholdOn = false;
@@ -81,6 +82,7 @@ public class PID {
 
 		result = (PValue * error + IValue * totalError + DValue * (error - prevError));
 		prevError = error;
+		resultPreClamp = result;
 		result = clamp(result);
 		result += gravity;
 		return result;
@@ -111,6 +113,10 @@ public class PID {
 
 	public double getInputValue(){
 		return inputValue;
+	}
+
+	public double getResultPreClamp(){
+		return resultPreClamp;
 	}
 
 	public double getError(){
@@ -292,5 +298,9 @@ public class PID {
 	public String toString(){
 
 		return "Target Position:" + getSetPoint() + "  Set Value: " + (int)(getResult()*100)/100.0 + "  Error: " + (int)(error*100)/100.0 + "Reached Target Error Threshold: " + reachedTargetErrorThreshold + "  ThresholdOn: " + thresholdOn + ", errorThreshold:  " + errorThreshold + ", thresholdValue: " + thresholdValue;
+	}
+
+	public String getSettings(){
+		return "P: " + PValue + "  I: " + IValue + "  D: " + DValue + "  MinOutput: " + minOutput + "  MaxOutput: " + maxOutput;
 	}
 }

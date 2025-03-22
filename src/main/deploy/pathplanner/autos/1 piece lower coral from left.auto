@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "top to face coral"
+                  "pathName": "top to face lower coral"
                 }
               }
             ]
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "top coral to feeder"
+                  "pathName": "top lower coral to feeder"
                 }
               },
               {

@@ -1,6 +1,7 @@
 package frc.robot.tools;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -80,15 +81,20 @@ public class DashboardSuite extends SubsystemBase{
         // // Subsystems.add("Driver Augments",DriveAugments);
         // // Subsystems.add("Swerve",Swerve);
  
+        DriverStation.getMatchTime();
+
         //  //commands
         // ElevatorCommands.add("Elevator Top",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
         // ElevatorCommands.add("Elevator L3",new ElevatorSetStageCommand(Elevator,3).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
         // ElevatorCommands.add("Elevator L2",new ElevatorSetStageCommand(Elevator,2).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
         // ElevatorCommands.add("Elevator Intake",new ElevatorSetStageCommand(Elevator,1).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 1)));
         // ElevatorCommands.add("Elevator Bottom",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
-
-        SmartDashboard.putData("Elevator Top Command",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
         SmartDashboard.putData("Elevator Bottom Command",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
+        SmartDashboard.putData("Elevator Intake Stage Command",new ElevatorSetStageCommand(Elevator,1).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 1)));
+        SmartDashboard.putData("Elevator L2 Command",new ElevatorSetStageCommand(Elevator,2).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
+        SmartDashboard.putData("Elevator L3 Command",new ElevatorSetStageCommand(Elevator,3).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
+        SmartDashboard.putData("Elevator L4 Command",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
+
 
         SmartDashboard.putData("Zero All Motors",new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)));
 

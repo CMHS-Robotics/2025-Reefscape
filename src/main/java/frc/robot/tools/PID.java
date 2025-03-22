@@ -291,6 +291,6 @@ public class PID {
 	@Override
 	public String toString(){
 
-		return "Target Position:" + getSetPoint() + "  Set Value: " + (int)(getResult()*100)/100.0 + "  Error: " + error + "Reached Target Error Threshold: " + reachedTargetErrorThreshold + "  ThresholdOn: " + thresholdOn + ", errorThreshold:  " + errorThreshold + ", thresholdValue: " + thresholdValue;
+		return "Target Position:" + getSetPoint() + "  Set Value: " + (int)(getResult()*100)/100.0 + "  Error: " + (int)(error*100)/100.0 + "Reached Target Error Threshold: " + reachedTargetErrorThreshold + "  ThresholdOn: " + thresholdOn + ", errorThreshold:  " + errorThreshold + ", thresholdValue: " + thresholdValue;
 	}
 }

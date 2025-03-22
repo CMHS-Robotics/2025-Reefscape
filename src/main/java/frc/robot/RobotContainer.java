@@ -18,7 +18,6 @@ import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -119,8 +118,6 @@ public class RobotContainer {
 
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
-        Shuffleboard.getTab("Autonomous").add(autoChooser).withPosition(0,0).withSize(2,2);
-
 
         configureBindings();
 

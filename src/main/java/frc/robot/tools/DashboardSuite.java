@@ -81,7 +81,8 @@ public class DashboardSuite extends SubsystemBase{
         // // Subsystems.add("Driver Augments",DriveAugments);
         // // Subsystems.add("Swerve",Swerve);
  
-        DriverStation.getMatchTime();
+        SmartDashboard.putNumber("Match Time",DriverStation.getMatchTime());
+        SmartDashboard.putString("Match Type",DriverStation.getMatchType().toString());
 
         //  //commands
         // ElevatorCommands.add("Elevator Top",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));

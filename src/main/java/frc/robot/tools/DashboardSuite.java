@@ -1,9 +1,12 @@
 package frc.robot.tools;
 
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,13 +44,24 @@ public class DashboardSuite extends SubsystemBase{
     // GenericEntry elevatorManual;
     // GenericEntry coralWristOutput;
 
-    DoubleSubscriber sPIDBar;
-    BooleanSubscriber sPIDManual;
-    DoubleSubscriber sPIDP;
-    DoubleSubscriber sPIDD;
-    DoubleSubscriber sPIDClampUpper;
-    DoubleSubscriber sPIDClampLower;
+    //subscribers
+    //elevator
+    DoubleSubscriber sElevatorPIDBar;
+    BooleanSubscriber sElevatorPIDManual;
+    DoubleSubscriber sElevatorPIDP;
+    DoubleSubscriber sElevatorPIDD;
+    DoubleSubscriber sElevatorPIDClampUpper;
+    DoubleSubscriber sElevatorPIDClampLower;
  
+    //publishers
+    //elevator
+    DoublePublisher pElevatorLeftMotor;
+    DoublePublisher pElevatorRightMotor;
+    StringPublisher pElevatorPID;
+    StringPublisher pElevatorPIDSettings;
+    BooleanPublisher pElevatorHasReached;
+    DoublePublisher pElevatorPIDResult;
+
     // //shuffleboard tabs
     // ShuffleboardTab DataTab = Shuffleboard.getTab("Data");
     // ShuffleboardTab CommandsTab = Shuffleboard.getTab("Commands");
@@ -66,38 +80,34 @@ public class DashboardSuite extends SubsystemBase{
         
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
+        //elevator data
         NetworkTable ElevatorData = inst.getTable("Elevator");
 
         ElevatorData.getDoubleTopic("Elevator PID Bar Manual Target").publish();
 
-        sPIDBar = ElevatorData.getDoubleTopic("Elevator PID Bar Manual Target").subscribe(0.0);
+        sElevatorPIDBar = ElevatorData.getDoubleTopic("Elevator PID Bar Manual Target").subscribe(0.0);
 
         ElevatorData.getBooleanTopic("Elevator Manual Control Active").publish();
 
-        sPIDManual = ElevatorData.getBooleanTopic("Elevator Manual Control Active").subscribe(false);
+        sElevatorPIDManual = ElevatorData.getBooleanTopic("Elevator Manual Control Active").subscribe(false);
 
         ElevatorData.getDoubleTopic("Elevator PID P Value").publish().set(0.2);
         ElevatorData.getDoubleTopic("Elevator PID D Value").publish().set(0.4);
         ElevatorData.getDoubleTopic("Elevator PID Lower Limit").publish().set(-0.15);
         ElevatorData.getDoubleTopic("Elevator PID Upper Limit").publish().set(0.4);
-
-        sPIDP = ElevatorData.getDoubleTopic("Elevator PID P Value").subscribe(0);
-        sPIDD = ElevatorData.getDoubleTopic("Elevator PID D Value").subscribe(0);
-        sPIDClampLower = ElevatorData.getDoubleTopic("Elevator PID Lower Limit").subscribe(0);
-        sPIDClampUpper = ElevatorData.getDoubleTopic("Elevator PID Upper Limit").subscribe(0);
-
-
-
+        pElevatorLeftMotor = ElevatorData.getDoubleTopic("Elevator Left Motor").publish();
+        pElevatorRightMotor = ElevatorData.getDoubleTopic("Elevator Right Motor").publish();
+        pElevatorPID = ElevatorData.getStringTopic("Elevator PID").publish();
+        pElevatorPIDSettings = ElevatorData.getStringTopic("Elevator PID Settings").publish();
+        pElevatorPIDResult = ElevatorData.getDoubleTopic("Elevator PID Result").publish();
+        pElevatorHasReached = ElevatorData.getBooleanTopic("Elevator Has Reached Target").publish();
 
 
-        //elevator data
-        // leftMotorPos = ElevatorData.add("Elevator Left Motor Position",0).getEntry();
-        // rightMotorPos = ElevatorData.add("Elevator Right Motor Position",0).getEntry();
-        // pidTarget = ElevatorData.add("Elevator PID Target",0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value",0,"max_value",24)).withSize(2,1).getEntry();
-        // elevatorLevel = ElevatorData.add("Elevator Level",0).getEntry();
-        // elevatorPID = ElevatorData.add("Elevator PID","").getEntry();
-        // elevatorManual = ElevatorData.add("Manual PID Setting",false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-        // elevatorSetPosManual = ElevatorData.add("PID Target Value Manual",0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+
+        sElevatorPIDP = ElevatorData.getDoubleTopic("Elevator PID P Value").subscribe(0);
+        sElevatorPIDD = ElevatorData.getDoubleTopic("Elevator PID D Value").subscribe(0);
+        sElevatorPIDClampLower = ElevatorData.getDoubleTopic("Elevator PID Lower Limit").subscribe(0);
+        sElevatorPIDClampUpper = ElevatorData.getDoubleTopic("Elevator PID Upper Limit").subscribe(0);
 
         // //coral data
         // coralWristPosition = CoralData.add("Coral Wrist Position",0).getEntry();
@@ -106,24 +116,11 @@ public class DashboardSuite extends SubsystemBase{
         // coralSpin = CoralData.add("Coral Spin Value",0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
         // coralWristManual = CoralData.add("Manual PID setting",false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
         // coralWristSetPosManual = CoralData.add("PID Target Value Manual",0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min_value",-3,"max_value",3 )).getEntry();
-
-
-        //  //subsystems
-        // // Subsystems.add("Elevator",Elevator);
-        // // Subsystems.add("Coral Spin",CoralSpin);
-        // // Subsystems.add("Coral Wrist",CoralWrist);
-        // // Subsystems.add("Driver Augments",DriveAugments);
-        // // Subsystems.add("Swerve",Swerve);
  
         SmartDashboard.putNumber("Match Time",DriverStation.getMatchTime());
         SmartDashboard.putNumber("Voltage",RobotController.getBatteryVoltage());
 
         //  //commands
-        // ElevatorCommands.add("Elevator Top",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
-        // ElevatorCommands.add("Elevator L3",new ElevatorSetStageCommand(Elevator,3).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
-        // ElevatorCommands.add("Elevator L2",new ElevatorSetStageCommand(Elevator,2).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
-        // ElevatorCommands.add("Elevator Intake",new ElevatorSetStageCommand(Elevator,1).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 1)));
-        // ElevatorCommands.add("Elevator Bottom",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
         SmartDashboard.putData("Elevator Bottom Command",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
         SmartDashboard.putData("Elevator Intake Stage Command",new ElevatorSetStageCommand(Elevator,1).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 1)));
         SmartDashboard.putData("Elevator L2 Command",new ElevatorSetStageCommand(Elevator,2).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
@@ -133,49 +130,30 @@ public class DashboardSuite extends SubsystemBase{
 
         SmartDashboard.putData("Zero All Motors",new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)));
 
+        //subsystems
         SmartDashboard.putData("Elevator",Elevator);
         SmartDashboard.putData("Wrist",CoralWrist);
         SmartDashboard.putData("Spin",CoralSpin);
+        SmartDashboard.putData("Drive Augments",DriveAugments);
 
-        // CoralCommands.add("Run Coral at x", new CoralSetSpinSpeedCommandV2(CoralSpin,coralSpin.getDouble(0)));
-    
     }
 
 
     @Override
     public void periodic(){
 
-        // //elevator
-        // leftMotorPos.setDouble(Elevator.ElevatorLeft.getPosition().getValueAsDouble());
-        // rightMotorPos.setDouble(Elevator.ElevatorRight.getPosition().getValueAsDouble());
+        //elevator
 
-        // pidTarget.setDouble(Elevator.getTargetPosition());
-
-        // elevatorLevel.setInteger(Elevator.getStageLevel());
-        // elevatorPID.setString(Elevator.elevatorPID.toString());
-        
-        // if(elevatorManual.getBoolean(false)){
-        //     Elevator.setTargetPosition(elevatorSetPosManual.getDouble(0.0));
-        // }
-
-
-        double value = sPIDBar.get();
-        if(sPIDManual.get()){
-        Elevator.setTargetPosition(value);
-        Elevator.elevatorPID.setPID(sPIDP.get(),0,sPIDD.get());
-        Elevator.elevatorPID.setMaxOutput(sPIDClampUpper.get(0.4));
-        Elevator.elevatorPID.setMinOutput(sPIDClampLower.get(-0.15));
+        if(sElevatorPIDManual.get()){
+        Elevator.setTargetPosition(sElevatorPIDBar.get());
+        Elevator.elevatorPID.setPID(sElevatorPIDP.get(0.2),0,sElevatorPIDD.get(0.4));
+        Elevator.elevatorPID.setMaxOutput(sElevatorPIDClampUpper.get(0.4));
+        Elevator.elevatorPID.setMinOutput(sElevatorPIDClampLower.get(-0.15));
         }
-        // //coral
-        // coralWristPID.setString(CoralWrist.coralWristPID.toString());
-        // coralWristPosition.setDouble(CoralWrist.CoralWrist.getPosition().getValueAsDouble());
-        // coralWristOutput.setDouble(CoralWrist.CoralWrist.get());
 
-        // CoralWrist.setShuffleboardManualControl(coralWristManual.getBoolean(false));
-        // CoralWrist.setShuffleboardManualControlValue(coralWristSetPosManual.getDouble(0.0));
-
-        // //Commands.print("" + elevatorSetPosManual.getDouble(0.0));
-
+        pElevatorHasReached.set(Elevator.hasReachedTarget());
+        pElevatorLeftMotor.set(Elevator.ElevatorLeft.getPosition().getValueAsDouble());
+        pElevatorRightMotor.set(Elevator.ElevatorRight.getPosition().getValueAsDouble());
 
 
     }

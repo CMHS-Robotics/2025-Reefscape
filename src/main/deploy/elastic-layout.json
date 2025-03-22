@@ -121,78 +121,6 @@
       "grid_layout": {
         "layouts": [
           {
-            "title": "Coral",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 1280.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Coral Wrist PID",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Coral Wrist PID",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Coral Wrist Output",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Coral Wrist Output",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Coral Wrist Encoder Position",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Coral Wrist Encoder Position",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Coral Wrist has reached target",
-                "x": 512.0,
-                "y": 384.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/SmartDashboard/Coral Wrist has reached target",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              }
-            ]
-          },
-          {
             "title": "Elevator",
             "x": 0.0,
             "y": 0.0,
@@ -204,62 +132,45 @@
             },
             "children": [
               {
-                "title": "Elevator PID control",
+                "title": "Elevator PID",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Elevator PID control",
+                  "topic": "/Elevator/Elevator PID",
                   "period": 0.06,
                   "data_type": "string",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "Elevator Left Motor Pos",
+                "title": "Elevator PID Settings",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Elevator Left Motor Pos",
+                  "topic": "/Elevator/Elevator PID Settings",
                   "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "string",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "Elevator Right Motor Pos",
+                "title": "Elevator Right Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Elevator Right Motor Pos",
+                  "topic": "/Elevator/Elevator Right Motor",
                   "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
-                }
-              },
-              {
-                "title": "Elevator has reached target",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/SmartDashboard/Elevator has reached target",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
                 }
               },
               {
@@ -270,110 +181,230 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Elevator PID Result",
+                  "topic": "/Elevator/Elevator PID Result",
                   "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
               },
               {
-                "title": "Elevator PID settings",
+                "title": "Elevator Left Motor",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Elevator PID settings",
+                  "topic": "/Elevator/Elevator Left Motor",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Elevator Has Reached Target",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/Elevator/Elevator Has Reached Target",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Coral",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 320.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Wrist PID",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Coral/Elevator PID",
                   "period": 0.06,
                   "data_type": "string",
                   "show_submit_button": false
+                }
+              },
+              {
+                "title": "Coral Wrist Position",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Coral/Coral Wrist Position",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Coral Wrist Output",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Coral/Coral Wrist Output",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Wrist Has Reached Target",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/Coral/Wrist Has Reached Target",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator PID Manual",
+            "x": 1216.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 640.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Elevator Manual Control Active",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/Elevator PID Manual/Elevator Manual Control Active",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": "Elevator PID Bar Manual Target",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Elevator PID Manual/Elevator PID Bar Manual Target",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 24.1,
+                  "divisions": 5,
+                  "update_continuously": true
+                }
+              },
+              {
+                "title": "Elevator PID D Value",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Elevator PID Manual/Elevator PID D Value",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 1.0,
+                  "divisions": 5,
+                  "update_continuously": true
+                }
+              },
+              {
+                "title": "Elevator PID Lower Limit",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Elevator PID Manual/Elevator PID Lower Limit",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": -1.0,
+                  "max_value": 0.0,
+                  "divisions": 5,
+                  "update_continuously": true
+                }
+              },
+              {
+                "title": "Elevator PID P Value",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Elevator PID Manual/Elevator PID P Value",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 1.0,
+                  "divisions": 5,
+                  "update_continuously": true
+                }
+              },
+              {
+                "title": "Elevator PID Upper Limit",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Number Slider",
+                "properties": {
+                  "topic": "/Elevator PID Manual/Elevator PID Upper Limit",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "min_value": 0.0,
+                  "max_value": 1.0,
+                  "divisions": 5,
+                  "update_continuously": true
                 }
               }
             ]
           }
         ],
         "containers": [
-          {
-            "title": "Elevator PID Result Pre Clamp",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 448.0,
-            "height": 384.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/Elevator PID Result Pre Clamp",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
-            "title": "Elevator PID Bar Manual Target",
-            "x": 1216.0,
-            "y": 256.0,
-            "width": 384.0,
-            "height": 192.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/Elevator/Elevator PID Bar Manual Target",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 22.0,
-              "divisions": 5,
-              "update_continuously": true
-            }
-          },
-          {
-            "title": "Elevator Manual Control Active",
-            "x": 1216.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Toggle Button",
-            "properties": {
-              "topic": "/Elevator/Elevator Manual Control Active",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Elevator PID P Value",
-            "x": 1216.0,
-            "y": 448.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/Elevator/Elevator PID P Value",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 1.0,
-              "divisions": 5,
-              "update_continuously": true
-            }
-          },
-          {
-            "title": "Elevator PID D Value",
-            "x": 1216.0,
-            "y": 576.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/Elevator/Elevator PID D Value",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": -1.0,
-              "max_value": 1.0,
-              "divisions": 5,
-              "update_continuously": false
-            }
-          },
           {
             "title": "Elevator PID Result",
             "x": 768.0,
@@ -382,7 +413,7 @@
             "height": 384.0,
             "type": "Graph",
             "properties": {
-              "topic": "/SmartDashboard/Elevator PID Result",
+              "topic": "/Elevator/Elevator PID Result",
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
@@ -391,37 +422,19 @@
             }
           },
           {
-            "title": "Elevator PID Lower Limit",
-            "x": 1408.0,
-            "y": 576.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Number Slider",
+            "title": "Elevator PID Pre Clamp Result",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 448.0,
+            "height": 384.0,
+            "type": "Graph",
             "properties": {
-              "topic": "/Elevator/Elevator PID Lower Limit",
-              "period": 0.06,
+              "topic": "/Elevator/Elevator PID Pre Clamp Result",
+              "period": 0.033,
               "data_type": "double",
-              "min_value": -1.0,
-              "max_value": 0.0,
-              "divisions": 5,
-              "update_continuously": true
-            }
-          },
-          {
-            "title": "Elevator PID Upper Limit",
-            "x": 1408.0,
-            "y": 448.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/Elevator/Elevator PID Upper Limit",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 1.0,
-              "divisions": 5,
-              "update_continuously": true
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
             }
           }
         ]
@@ -505,47 +518,6 @@
                   "topic": "/SmartDashboard/Elevator L4 Command",
                   "period": 0.06,
                   "show_type": true
-                }
-              }
-            ]
-          },
-          {
-            "title": "Module 0",
-            "x": 448.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "backgroundColor",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Module 0/backgroundColor",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "dims",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Module 0/dims",
-                  "period": 0.06,
-                  "data_type": "double[]",
-                  "show_submit_button": false
                 }
               }
             ]

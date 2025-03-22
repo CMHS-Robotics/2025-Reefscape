@@ -5,7 +5,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -117,23 +116,12 @@ public class CoralWristV2 extends SubsystemBase {
     }
 
 
-    public void smartDashboard(){
-        SmartDashboard.putNumber("Coral Wrist Encoder Position",CoralWrist.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Coral Wrist Output",CoralWrist.get());
-        SmartDashboard.putString("Coral Wrist PID",coralWristPID.toString());
-        SmartDashboard.putNumber("gravity calc",getGravity());
-        SmartDashboard.putBoolean("Coral Wrist has reached target",hasReachedTarget());
-        SmartDashboard.updateValues();
-    }
-
     public double getGravity(){
         double RadiansPerTick = Math.PI * 2 / 1200;
         double angle = CoralWrist.getPosition().getValueAsDouble() * RadiansPerTick;
         double weight = 5;
         double cx = 0.3;
         double torque = 9.8 * cx * weight * Math.cos(angle);
-        SmartDashboard.putNumber("Torque",torque);
-        SmartDashboard.putString("Angle",angle / Math.PI + " Pi");
         double torqueCompensation = 0.2;
         gravity = torque * torqueCompensation;
         return gravity;
@@ -141,7 +129,6 @@ public class CoralWristV2 extends SubsystemBase {
 
     @Override
     public void periodic(){
-        smartDashboard();
     }
 
 

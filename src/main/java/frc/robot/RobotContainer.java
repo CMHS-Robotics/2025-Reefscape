@@ -119,7 +119,6 @@ public class RobotContainer {
 
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
-        SmartDashboard.putNumber("MaxSpeed",MaxSpeed);
 
         configureBindings();
 

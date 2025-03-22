@@ -212,14 +212,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ),
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
                 // holonomic drive trains
-new PIDConstants(4.285, 0.0, 0.0), // Translation PID constants
-new PIDConstants(5, 0.0, 0.2857) // Rotation PID constants
-),
+                new PIDConstants(4.285, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(5, 0.0, 0.2857) // Rotation PID constants
+                ),
                 config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 /*() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red*/
                 () ->{
                     var alliance = DriverStation.getAlliance();
+                    
                     if (alliance.isPresent()) {
                         return alliance.get() == DriverStation.Alliance.Red;
                     }

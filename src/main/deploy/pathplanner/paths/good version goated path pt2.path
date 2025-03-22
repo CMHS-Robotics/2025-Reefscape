@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.24466059602649,
+        "y": 4.991121688741721
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.208340231788079,
+        "y": 6.029884105960265
+      },
+      "isLocked": false,
+      "linkedName": "bruh"
+    },
+    {
+      "anchor": {
+        "x": 1.3656456953642384,
+        "y": 7.286568708609272
+      },
+      "prevControl": {
+        "x": 3.4940190397350994,
+        "y": 7.548075331125827
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 125.5376777919745
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -122.85572195043297
+  },
+  "useDefaultConstraints": true
+}

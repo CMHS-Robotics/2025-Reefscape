@@ -29,23 +29,8 @@ public class DashboardSuite extends SubsystemBase{
     DriveAugments DriveAugments;
     CommandSwerveDrivetrain Swerve;
 
-    // //entries
-    // GenericEntry leftMotorPos;
-    // GenericEntry rightMotorPos;
-    // GenericEntry pidTarget;
-    // GenericEntry elevatorLevel;
-    // GenericEntry elevatorPID;
-    // GenericEntry coralWristPID;
-    // GenericEntry coralWristPosition;
-    // GenericEntry coralSpin;
-    // GenericEntry coralWristSetPosManual;
-    // GenericEntry coralWristManual;
-    // GenericEntry elevatorSetPosManual;
-    // GenericEntry elevatorManual;
-    // GenericEntry coralWristOutput;
-
     //subscribers
-    //elevator
+        //elevator
     DoubleSubscriber sElevatorPIDBar;
     BooleanSubscriber sElevatorPIDManual;
     DoubleSubscriber sElevatorPIDP;
@@ -54,25 +39,20 @@ public class DashboardSuite extends SubsystemBase{
     DoubleSubscriber sElevatorPIDClampLower;
  
     //publishers
-    //elevator
+        //elevator
     DoublePublisher pElevatorLeftMotor;
     DoublePublisher pElevatorRightMotor;
     StringPublisher pElevatorPID;
     StringPublisher pElevatorPIDSettings;
     BooleanPublisher pElevatorHasReached;
     DoublePublisher pElevatorPIDResult;
-
-    // //shuffleboard tabs
-    // ShuffleboardTab DataTab = Shuffleboard.getTab("Data");
-    // ShuffleboardTab CommandsTab = Shuffleboard.getTab("Commands");
-
+    DoublePublisher pElevatorPIDPreClampResult;
+        //coral
+    DoublePublisher pCoralWristMotor;
+    DoublePublisher pCoralWristOutput;
+    StringPublisher pCoralWristPID;
+    BooleanPublisher pCoralWristHasReached;
     
-    //layouts
-    // ShuffleboardLayout ElevatorCommands = CommandsTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(2,10).withPosition(0,0);
-    // ShuffleboardLayout CoralCommands = CommandsTab.getLayout("Coral",BuiltInLayouts.kList).withSize(2,10).withPosition(2,0);
-    // ShuffleboardLayout ElevatorData = DataTab.getLayout("Elevator",BuiltInLayouts.kList).withSize(3,10).withPosition(0,0);
-    // ShuffleboardLayout CoralData = DataTab.getLayout("Coral",BuiltInLayouts.kList).withSize(3,10).withPosition(3,0);
-
     public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w){
         Elevator = e;
         CoralSpin = s;
@@ -83,44 +63,45 @@ public class DashboardSuite extends SubsystemBase{
         //elevator data
         NetworkTable ElevatorData = inst.getTable("Elevator");
 
-        ElevatorData.getDoubleTopic("Elevator PID Bar Manual Target").publish();
 
-        sElevatorPIDBar = ElevatorData.getDoubleTopic("Elevator PID Bar Manual Target").subscribe(0.0);
-
-        ElevatorData.getBooleanTopic("Elevator Manual Control Active").publish();
-
-        sElevatorPIDManual = ElevatorData.getBooleanTopic("Elevator Manual Control Active").subscribe(false);
-
-        ElevatorData.getDoubleTopic("Elevator PID P Value").publish().set(0.2);
-        ElevatorData.getDoubleTopic("Elevator PID D Value").publish().set(0.4);
-        ElevatorData.getDoubleTopic("Elevator PID Lower Limit").publish().set(-0.15);
-        ElevatorData.getDoubleTopic("Elevator PID Upper Limit").publish().set(0.4);
         pElevatorLeftMotor = ElevatorData.getDoubleTopic("Elevator Left Motor").publish();
         pElevatorRightMotor = ElevatorData.getDoubleTopic("Elevator Right Motor").publish();
         pElevatorPID = ElevatorData.getStringTopic("Elevator PID").publish();
         pElevatorPIDSettings = ElevatorData.getStringTopic("Elevator PID Settings").publish();
         pElevatorPIDResult = ElevatorData.getDoubleTopic("Elevator PID Result").publish();
+        pElevatorPIDPreClampResult = ElevatorData.getDoubleTopic("Elevator PID Pre Clamp Result").publish();
         pElevatorHasReached = ElevatorData.getBooleanTopic("Elevator Has Reached Target").publish();
 
+        NetworkTable ElevatorManualPIDTargetting = inst.getTable("Elevator PID Manual");
+
+        ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID Bar Manual Target").publish().set(0.0);
+        ElevatorManualPIDTargetting.getBooleanTopic("Elevator Manual Control Active").publish().set(false);
+        ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID P Value").publish().set(0.2);
+        ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID D Value").publish().set(0.4);
+        ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID Lower Limit").publish().set(-0.15);
+        ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID Upper Limit").publish().set(0.4);
 
 
-        sElevatorPIDP = ElevatorData.getDoubleTopic("Elevator PID P Value").subscribe(0);
-        sElevatorPIDD = ElevatorData.getDoubleTopic("Elevator PID D Value").subscribe(0);
-        sElevatorPIDClampLower = ElevatorData.getDoubleTopic("Elevator PID Lower Limit").subscribe(0);
-        sElevatorPIDClampUpper = ElevatorData.getDoubleTopic("Elevator PID Upper Limit").subscribe(0);
+        sElevatorPIDBar = ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID Bar Manual Target").subscribe(0.0);
+        sElevatorPIDManual = ElevatorManualPIDTargetting.getBooleanTopic("Elevator Manual Control Active").subscribe(false);
+        sElevatorPIDP = ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID P Value").subscribe(0);
+        sElevatorPIDD = ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID D Value").subscribe(0);
+        sElevatorPIDClampLower = ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID Lower Limit").subscribe(0);
+        sElevatorPIDClampUpper = ElevatorManualPIDTargetting.getDoubleTopic("Elevator PID Upper Limit").subscribe(0);
 
-        // //coral data
-        // coralWristPosition = CoralData.add("Coral Wrist Position",0).getEntry();
-        // coralWristOutput = CoralData.add("Coral Wrist Output",0).getEntry();
-        // coralWristPID = CoralData.add("Coral PID","").getEntry();
-        // coralSpin = CoralData.add("Coral Spin Value",0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
-        // coralWristManual = CoralData.add("Manual PID setting",false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-        // coralWristSetPosManual = CoralData.add("PID Target Value Manual",0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min_value",-3,"max_value",3 )).getEntry();
- 
+        //coral data
+        NetworkTable CoralData = inst.getTable("Coral");
+
+        pCoralWristPID = CoralData.getStringTopic("Elevator PID").publish();
+        pCoralWristMotor = CoralData.getDoubleTopic("Coral Wrist Position").publish();
+        pCoralWristOutput = CoralData.getDoubleTopic("Coral Wrist Output").publish();
+        pCoralWristHasReached = CoralData.getBooleanTopic("Wrist Has Reached Target").publish();
+
+        //other
         SmartDashboard.putNumber("Match Time",DriverStation.getMatchTime());
         SmartDashboard.putNumber("Voltage",RobotController.getBatteryVoltage());
 
-        //  //commands
+        //commands
         SmartDashboard.putData("Elevator Bottom Command",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
         SmartDashboard.putData("Elevator Intake Stage Command",new ElevatorSetStageCommand(Elevator,1).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 1)));
         SmartDashboard.putData("Elevator L2 Command",new ElevatorSetStageCommand(Elevator,2).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
@@ -129,13 +110,6 @@ public class DashboardSuite extends SubsystemBase{
 
 
         SmartDashboard.putData("Zero All Motors",new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)));
-
-        //subsystems
-        SmartDashboard.putData("Elevator",Elevator);
-        SmartDashboard.putData("Wrist",CoralWrist);
-        SmartDashboard.putData("Spin",CoralSpin);
-        SmartDashboard.putData("Drive Augments",DriveAugments);
-
     }
 
 
@@ -145,17 +119,30 @@ public class DashboardSuite extends SubsystemBase{
         //elevator
 
         if(sElevatorPIDManual.get()){
-        Elevator.setTargetPosition(sElevatorPIDBar.get());
-        Elevator.elevatorPID.setPID(sElevatorPIDP.get(0.2),0,sElevatorPIDD.get(0.4));
-        Elevator.elevatorPID.setMaxOutput(sElevatorPIDClampUpper.get(0.4));
-        Elevator.elevatorPID.setMinOutput(sElevatorPIDClampLower.get(-0.15));
+            Elevator.setTargetPosition(sElevatorPIDBar.get());
+            Elevator.elevatorPID.setPID(sElevatorPIDP.get(0.2),0,sElevatorPIDD.get(0.4));
+            Elevator.elevatorPID.setMaxOutput(sElevatorPIDClampUpper.get(0.4));
+            Elevator.elevatorPID.setMinOutput(sElevatorPIDClampLower.get(-0.15));
         }
 
         pElevatorHasReached.set(Elevator.hasReachedTarget());
         pElevatorLeftMotor.set(Elevator.ElevatorLeft.getPosition().getValueAsDouble());
         pElevatorRightMotor.set(Elevator.ElevatorRight.getPosition().getValueAsDouble());
+        pElevatorPID.set(Elevator.elevatorPID.toString());
+        pElevatorPIDSettings.set(Elevator.elevatorPID.getSettings());
+        pElevatorPIDResult.set(Elevator.elevatorPID.getResult());
+        pElevatorPIDPreClampResult.set(Elevator.elevatorPID.getResultPreClamp());
 
 
+        //coral
+        pCoralWristHasReached.set(CoralWrist.hasReachedTarget());
+        pCoralWristMotor.set(CoralWrist.CoralWrist.getPosition().getValueAsDouble());
+        pCoralWristPID.set(CoralWrist.coralWristPID.toString());
+        pCoralWristOutput.set(CoralWrist.CoralWrist.get());
+
+
+
+
+    
     }
-
 }

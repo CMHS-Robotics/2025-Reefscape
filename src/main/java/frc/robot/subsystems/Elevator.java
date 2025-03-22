@@ -7,7 +7,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.Rotations;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -138,23 +137,8 @@ public class Elevator extends SubsystemBase {
     }
     
 
-    private void SmartDashboard(){
-        SmartDashboard.putNumber("Elevator Left Motor Pos", ElevatorLeft.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Elevator Right Motor Pos", ElevatorRight.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("PID Target Position",targetPosition);
-        SmartDashboard.putNumber("Elevator Stage Level", (int)stageLevel);
-        SmartDashboard.putString("Elevator PID control",elevatorPID.toString());
-        SmartDashboard.putString("Elevator PID settings",elevatorPID.getSettings());
-        SmartDashboard.putBoolean("Elevator has reached target",hasReachedTarget());
-        SmartDashboard.putNumber("Elevator PID Result", elevatorPID.getResult());
-        SmartDashboard.putNumber("Elevator PID Result Pre Clamp", elevatorPID.getResultPreClamp());
-        SmartDashboard.updateValues();
-    }
-
-
     @Override
     public void periodic(){
-        SmartDashboard();
 
     }
 

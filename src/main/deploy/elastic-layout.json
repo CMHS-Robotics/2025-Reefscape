@@ -539,6 +539,125 @@
           }
         ]
       }
+    },
+    {
+      "name": "Vision",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "little-freak_Port_1182_Output_MJPEG_Server",
+            "x": 832.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 448.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/little-freak_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Pose",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 832.0,
+            "height": 448.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/Pose",
+              "period": 0.06,
+              "field_game": "Reefscape",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295
+            }
+          },
+          {
+            "title": "Swerve Drive",
+            "x": 0.0,
+            "y": 448.0,
+            "width": 320.0,
+            "height": 320.0,
+            "type": "SwerveDrive",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Drive",
+              "period": 0.06,
+              "show_robot_rotation": true,
+              "rotation_unit": "Radians"
+            }
+          },
+          {
+            "title": "ID of April Tag Detected",
+            "x": 640.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/Vision/ID of April Tag Detected",
+              "period": 0.06,
+              "data_type": "int"
+            }
+          },
+          {
+            "title": "Vision April Tag ID Target",
+            "x": 832.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Number Slider",
+            "properties": {
+              "topic": "/Vision/Vision April Tag ID Target",
+              "period": 0.06,
+              "data_type": "int",
+              "min_value": 1.0,
+              "max_value": 22.0,
+              "divisions": 4,
+              "update_continuously": true
+            }
+          },
+          {
+            "title": "Vision Has Target",
+            "x": 512.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Vision/Vision Has Target",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Vision Has Detected Target",
+            "x": 896.0,
+            "y": 576.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Vision/Vision Has Detected Target",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
     }
   ]
 }

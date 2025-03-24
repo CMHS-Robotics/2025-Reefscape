@@ -11,7 +11,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
 
-public class LockOnAprilTagCommand extends Command {
+public class LockOnAprilTagRotationCommand extends Command {
     
     CommandSwerveDrivetrain swerve;
     Vision vision;
@@ -25,7 +25,7 @@ public class LockOnAprilTagCommand extends Command {
     PhotonTrackedTarget target;
     double targetYaw;
 
-    public LockOnAprilTagCommand(CommandSwerveDrivetrain s, Vision v, CommandXboxController x){
+    public LockOnAprilTagRotationCommand(CommandSwerveDrivetrain s, Vision v, CommandXboxController x){
         swerve = s;
         vision = v;
         Driver = x;
@@ -33,7 +33,7 @@ public class LockOnAprilTagCommand extends Command {
         addRequirements(swerve);
     }
     
-    public LockOnAprilTagCommand(CommandSwerveDrivetrain s, Vision v,CommandXboxController x, int id){
+    public LockOnAprilTagRotationCommand(CommandSwerveDrivetrain s, Vision v,CommandXboxController x, int id){
         swerve = s;
         vision = v;
         Driver = x;

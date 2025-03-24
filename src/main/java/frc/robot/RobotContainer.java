@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.LockOnAprilTagCommand;
+import frc.robot.commands.LockOnAprilTagRotationCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -216,7 +216,7 @@ public class RobotContainer {
         
         //Driver.back().onTrue(pathfindingCommand);
 
-        Driver.rightBumper().onTrue(new LockOnAprilTagCommand(drivetrain, Vision, Driver));
+        Driver.rightBumper().onTrue(new LockOnAprilTagRotationCommand(drivetrain, Vision, Driver));
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }

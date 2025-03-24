@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.LockOnAprilTagCommand;
+import frc.robot.commands.LockOnAprilTagRotationCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSpinV2;

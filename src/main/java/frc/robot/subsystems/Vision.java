@@ -25,16 +25,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.tools.PID;
 
 public class Vision extends SubsystemBase {
-    // PhotonCamera Left = new PhotonCamera("LeftCamera");
-    // PhotonCamera Right = new PhotonCamera("RightCamera");
-    // PhotonCamera Back = new PhotonCamera("BackCamera");
+    PhotonCamera Left = new PhotonCamera("LeftCamera");
+    PhotonCamera Right = new PhotonCamera("RightCamera");
+    PhotonCamera Back = new PhotonCamera("BackCamera");
     PhotonCamera Front = new PhotonCamera("FrontCamera");
     CommandSwerveDrivetrain swerve;
 
-    PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,Rotation3d.kZero));
+    PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.0,0.0,Rotation3d.kZero));
+    PhotonPoseEstimator RightPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.kCW_90deg)));
+    PhotonPoseEstimator BackPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.k180deg)));
+    PhotonPoseEstimator LeftPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.kCCW_90deg)));
 
-    // public PhotonCamera[] Cameras = {Front,Right,Back,Left};
-    public PhotonCamera[] Cameras = {Front};
+    public PhotonCamera[] Cameras = {Front,Right,Back,Left};
 
     PhotonTrackedTarget FrontTarget;
     PhotonTrackedTarget RightTarget;
@@ -83,38 +85,77 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic(){
 
-        var visionEst = estimatePose();
+        var FrontVisionEst = estimatePose(CAMERA.FRONT);
 
         var fr = Front.getAllUnreadResults();
         if(!fr.isEmpty()){
             FrontResults=fr;
-            visionEst = FrontPoseEstimator.update(fr.get(0));
+            FrontVisionEst = FrontPoseEstimator.update(fr.get(0));
         }
-        // RightResults = Right.getAllUnreadResults();
-        // BackResults = Back.getAllUnreadResults();
-        // LeftResults = Left.getAllUnreadResults();
+
+        //var RightVisionEst = estimatePose(CAMERA.RIGHT);
+        
+        var rr = Right.getAllUnreadResults();
+        if(!rr.isEmpty()){
+            RightResults=rr;
+            //RightVisionEst = RightPoseEstimator.update(rr.get(0));
+        }
+
+        //var BackVisionEst = estimatePose(CAMERA.BACK);
+        
+        var br = Back.getAllUnreadResults();
+        if(!br.isEmpty()){
+            BackResults=br;
+            //BackVisionEst = BackPoseEstimator.update(br.get(0));
+        }
+
+        //var LeftVisionEst = estimatePose(CAMERA.LEFT);
+        
+        var lr = Right.getAllUnreadResults();
+        if(!lr.isEmpty()){
+            LeftResults=lr;
+            //LeftVisionEst = LeftPoseEstimator.update(lr.get(0));
+        }
 
         ResultsList.set(0, FrontResults);
         ResultsList.set(1, RightResults);
         ResultsList.set(2, BackResults);
         ResultsList.set(3, LeftResults);
 
-        SmartDashboard.putBoolean("Vision Estimate Present",visionEst.isPresent());
-        
-
-        visionEst.ifPresent(
+        FrontVisionEst.ifPresent(
             est -> {
             swerve.addVisionMeasurement(
                     est.estimatedPose.toPose2d(), est.timestampSeconds);
         
         });
+
+        // RightVisionEst.ifPresent(
+        //     est -> {
+        //     swerve.addVisionMeasurement(
+        //             est.estimatedPose.toPose2d(), est.timestampSeconds);
+        
+        // });
+
+        // BackVisionEst.ifPresent(
+        //     est -> {
+        //     swerve.addVisionMeasurement(
+        //             est.estimatedPose.toPose2d(), est.timestampSeconds);
+        
+        // });
+
+        // LeftVisionEst.ifPresent(
+        //     est -> {
+        //     swerve.addVisionMeasurement(
+        //             est.estimatedPose.toPose2d(), est.timestampSeconds);
+        
+        // });
     
     }
 
-    public Optional<EstimatedRobotPose> estimatePose(){
+    public Optional<EstimatedRobotPose> estimatePose(CAMERA cam){
         Optional<EstimatedRobotPose> est = Optional.empty();
 
-        for(var result : ResultsList.get(0)){
+        for(var result : ResultsList.get(cam.getId())){
             est = FrontPoseEstimator.update(result);
         }
 

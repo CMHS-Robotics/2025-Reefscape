@@ -54,12 +54,12 @@ public class LockOnAprilTagCommand extends Command {
             if(!vision.hasTarget(CAMERA.FRONT,id)){
                 this.cancel();
             }
-            target = vision.getTarget();
+            target = vision.getTarget(CAMERA.FRONT);
         }else{
             if(!vision.hasTarget(CAMERA.FRONT)){
                 this.cancel();
             }
-            target = vision.getResults().get(0).getBestTarget();
+            target = vision.getResults(CAMERA.FRONT).get(0).getBestTarget();
         }      
 
         targetYaw = target.getYaw();

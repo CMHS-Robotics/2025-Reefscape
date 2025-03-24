@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -26,6 +27,7 @@ import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Vision.CAMERA;
 
 public class DashboardSuite extends SubsystemBase{
     
@@ -65,6 +67,8 @@ public class DashboardSuite extends SubsystemBase{
     BooleanPublisher pCoralWristHasReached;
         //vision
     BooleanPublisher pVisionHasDetected;
+    IntegerPublisher pAprilTagDetected;
+    BooleanPublisher pVisionHasTarget;
     
     public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w,Vision v){
         Elevator = e;
@@ -118,7 +122,9 @@ public class DashboardSuite extends SubsystemBase{
         NetworkTable VisionData = inst.getTable("Vision");
 
         VisionData.getIntegerTopic("Vision April Tag ID Target").publish().set(0);
+        pAprilTagDetected = VisionData.getIntegerTopic("ID of April Tag Detected").publish();
         pVisionHasDetected = VisionData.getBooleanTopic("Vision Has Detected Target").publish();
+        pVisionHasTarget = VisionData.getBooleanTopic("Vision Has Target").publish();
 
         sVisionTarget = VisionData.getIntegerTopic("Vision April Tag ID Target").subscribe(0);
 
@@ -134,7 +140,7 @@ public class DashboardSuite extends SubsystemBase{
         SmartDashboard.putData("Elevator L3 Command",new ElevatorSetStageCommand(Elevator,3).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
         SmartDashboard.putData("Elevator L4 Command",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
 
-        SmartDashboard.putData("Lock On April Tag",new LockOnAprilTagCommand(Swerve, Vision, RobotContainer.Driver, (int)sVisionTarget.get()));
+        //SmartDashboard.putData("Lock On April Tag",new LockOnAprilTagCommand(Swerve, Vision, RobotContainer.Driver, (int)sVisionTarget.get()));
 
         SmartDashboard.putData("Zero All Motors",new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)));
     }
@@ -169,8 +175,9 @@ public class DashboardSuite extends SubsystemBase{
 
 
         //vision
-        pVisionHasDetected.set(Vision.hasTarget((int)sVisionTarget.get()));
-
+        pVisionHasDetected.set(Vision.hasTarget(CAMERA.FRONT,(int)sVisionTarget.get()));
+        pVisionHasTarget.set(Vision.hasTarget(CAMERA.FRONT));
+        pAprilTagDetected.set((Vision.hasTarget(CAMERA.FRONT))?Vision.getTarget(CAMERA.FRONT).getFiducialId():0);
 
     
     }

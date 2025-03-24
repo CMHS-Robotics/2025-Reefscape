@@ -68,7 +68,6 @@ public class RobotContainer {
     Elevator Elevator = new Elevator(Manipulator,CoralWrist);
     DriveAugments Augment = new DriveAugments(Driver,Elevator);
     //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
-    Vision Vision = new Vision();
 
     //commands
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
@@ -82,13 +81,15 @@ public class RobotContainer {
     CoralSetSpinSpeedCommandV2 CoralIn = new CoralSetSpinSpeedCommandV2(CoralSpin,-0.3);
     CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
 
-    //shuffleboard
-    DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist,Vision);
-
-
 
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    
+    //shuffleboard
+    Vision Vision = new Vision(drivetrain);
+    DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
+
+
 
     Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));
 

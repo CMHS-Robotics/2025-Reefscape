@@ -34,6 +34,7 @@ import frc.robot.subsystems.CoralSpinV2;
 import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Vision;
 import frc.robot.tools.DashboardSuite;
 ;
 
@@ -45,8 +46,8 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     public static double SpeedMultiplier = 1;
     public static double RotationSpeedMultiplier = 1;
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -58,14 +59,16 @@ public class RobotContainer {
 
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
-    CommandXboxController Driver = new CommandXboxController(0);
-    CommandXboxController Manipulator = new CommandXboxController(1);
+    public static CommandXboxController Driver = new CommandXboxController(0);
+    public static CommandXboxController Manipulator = new CommandXboxController(1);
     //subsystems
     CoralSpinV2 CoralSpin = new CoralSpinV2(Manipulator);
     CoralWristV2 CoralWrist = new CoralWristV2(Manipulator);
     Elevator Elevator = new Elevator(Manipulator,CoralWrist);
     DriveAugments Augment = new DriveAugments(Driver,Elevator);
     //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
+    Vision Vision = new Vision();
+
     //commands
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
     ElevatorSetStageCommand IntakeStage = new ElevatorSetStageCommand(Elevator,1);
@@ -79,7 +82,7 @@ public class RobotContainer {
     CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
 
     //shuffleboard
-    DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist);
+    DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist,Vision);
 
 
 

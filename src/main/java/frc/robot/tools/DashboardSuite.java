@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -11,14 +12,18 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.RobotContainer;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
+import frc.robot.commands.LockOnAprilTagCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSpinV2;
 import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Vision;
 
 public class DashboardSuite extends SubsystemBase{
     
@@ -28,6 +33,7 @@ public class DashboardSuite extends SubsystemBase{
     CoralWristV2 CoralWrist;
     DriveAugments DriveAugments;
     CommandSwerveDrivetrain Swerve;
+    Vision Vision;
 
     //subscribers
         //elevator
@@ -37,7 +43,10 @@ public class DashboardSuite extends SubsystemBase{
     DoubleSubscriber sElevatorPIDD;
     DoubleSubscriber sElevatorPIDClampUpper;
     DoubleSubscriber sElevatorPIDClampLower;
- 
+        //vision
+    IntegerSubscriber sVisionTarget;
+
+
     //publishers
         //elevator
     DoublePublisher pElevatorLeftMotor;
@@ -52,12 +61,18 @@ public class DashboardSuite extends SubsystemBase{
     DoublePublisher pCoralWristOutput;
     StringPublisher pCoralWristPID;
     BooleanPublisher pCoralWristHasReached;
+        //vision
+    BooleanPublisher pVisionHasDetected;
     
-    public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w){
+    public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w,Vision v){
         Elevator = e;
         CoralSpin = s;
         CoralWrist = w;
-        
+        Vision = v;
+        initialize();
+    }
+
+    public void initialize(){
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
         //elevator data
@@ -97,6 +112,15 @@ public class DashboardSuite extends SubsystemBase{
         pCoralWristOutput = CoralData.getDoubleTopic("Coral Wrist Output").publish();
         pCoralWristHasReached = CoralData.getBooleanTopic("Wrist Has Reached Target").publish();
 
+        //vision data
+        NetworkTable VisionData = inst.getTable("Vision");
+
+        VisionData.getIntegerTopic("Vision April Tag ID Target").publish().set(0);
+        pVisionHasDetected = VisionData.getBooleanTopic("Vision Has Detected Target").publish();
+
+        sVisionTarget = VisionData.getIntegerTopic("Vision April Tag ID Target").subscribe(0);
+
+
         //other
         SmartDashboard.putNumber("Match Time",DriverStation.getMatchTime());
         SmartDashboard.putNumber("Voltage",RobotController.getBatteryVoltage());
@@ -108,6 +132,7 @@ public class DashboardSuite extends SubsystemBase{
         SmartDashboard.putData("Elevator L3 Command",new ElevatorSetStageCommand(Elevator,3).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
         SmartDashboard.putData("Elevator L4 Command",new ElevatorSetStageCommand(Elevator,4).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 3)));
 
+        SmartDashboard.putData("Lock On April Tag",new LockOnAprilTagCommand(Swerve, Vision, RobotContainer.Driver, (int)sVisionTarget.get()));
 
         SmartDashboard.putData("Zero All Motors",new ZeroTalonCommand(Elevator.ElevatorLeft).alongWith(new ZeroTalonCommand(Elevator.ElevatorRight)).alongWith(new ZeroTalonCommand(CoralWrist.CoralWrist)));
     }

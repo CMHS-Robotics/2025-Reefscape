@@ -62,6 +62,7 @@ public class Vision extends SubsystemBase {
         hasTarget(id);
         return targetVisible;
     }
+
     public boolean getTargetVisible(CAMERA cam, int id){
         hasTarget(cam,id);
         return targetVisible;
@@ -80,20 +81,20 @@ public class Vision extends SubsystemBase {
                 }    
             }
         }
-                return false;
+        return false;
     }    
     
     public boolean hasTarget(CAMERA camera){
-            var results = Cameras[camera.getId()].getAllUnreadResults();
-            if(!results.isEmpty()){
-                var result = results.get(results.size()-1);
-                if(result.hasTargets()){
-                    targetVisible = true;
-                    this.results = results;
-                    return true;
-                }    
-            }
-                return false;
+        var results = Cameras[camera.getId()].getAllUnreadResults();
+        if(!results.isEmpty()){
+            var result = results.get(results.size()-1);
+            if(result.hasTargets()){
+                targetVisible = true;
+                this.results = results;
+                return true;
+            }    
+        }
+        return false;
     }
 
     public boolean hasTarget(int id){
@@ -112,7 +113,7 @@ public class Vision extends SubsystemBase {
                 }
             }
         }
-                return false;
+        return false;
     }
 
     public boolean hasTarget(CAMERA camera, int id){
@@ -129,7 +130,7 @@ public class Vision extends SubsystemBase {
                 }
             }
         }
-                return false;
+        return false;
     }
 
 }

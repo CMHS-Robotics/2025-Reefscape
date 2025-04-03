@@ -16,11 +16,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.tools.PID;
 
@@ -42,13 +37,12 @@ public class Vision extends SubsystemBase {
     PhotonTrackedTarget RightTarget;
     PhotonTrackedTarget BackTarget;
     PhotonTrackedTarget LeftTarget;
-    List<PhotonTrackedTarget> Targets = new ArrayList<PhotonTrackedTarget>(4);
+    List<PhotonTrackedTarget> Targets = new ArrayList<>(4);
     List<PhotonPipelineResult> FrontResults;
     List<PhotonPipelineResult> RightResults;
     List<PhotonPipelineResult> BackResults;
     List<PhotonPipelineResult> LeftResults;
-    List<List<PhotonPipelineResult>> ResultsList = new ArrayList<List<PhotonPipelineResult>>(4);
-    boolean targetVisible;
+    List<List<PhotonPipelineResult>> ResultsList = new ArrayList<>(4);
 
     public PID turnTrackingPID;
 
@@ -176,7 +170,6 @@ public class Vision extends SubsystemBase {
             if(!results.isEmpty()){
                 var result = results.get(results.size()-1);
                 if(result.hasTargets()){
-                    targetVisible = true;
                     Targets.set(i,result.getBestTarget());
                     return true;
                 }    
@@ -190,7 +183,6 @@ public class Vision extends SubsystemBase {
         if(!results.isEmpty()){
             var result = results.get(results.size()-1);
             if(result.hasTargets()){
-                targetVisible = true;
                 Targets.set(camera.getId(),result.getBestTarget());
                 return true;
             }    
@@ -207,7 +199,6 @@ public class Vision extends SubsystemBase {
                     for(var target : results.get(results.size()-1).getTargets()){
                         if(target.getFiducialId() == id){
                             Targets.set(i,target);
-                            targetVisible = true;
                             return true;
                         }
                     }
@@ -225,7 +216,6 @@ public class Vision extends SubsystemBase {
                 for(var target : results.get(results.size()-1).getTargets()){
                     if(target.getFiducialId() == id){
                         Targets.set(camera.getId(),target);
-                        targetVisible = true;
                         return true;
                     }
                 }

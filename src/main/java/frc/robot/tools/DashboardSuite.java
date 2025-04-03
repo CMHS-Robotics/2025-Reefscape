@@ -73,7 +73,7 @@ public class DashboardSuite extends SubsystemBase{
         initialize();
     }
 
-    public void initialize(){
+    public final void initialize(){
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
         //elevator data
@@ -153,6 +153,7 @@ public class DashboardSuite extends SubsystemBase{
             Elevator.elevatorPID.setMinOutput(sElevatorPIDClampLower.get(-0.15));
         }
 
+        
         pElevatorHasReached.set(Elevator.hasReachedTarget());
         pElevatorLeftMotor.set(Elevator.ElevatorLeft.getPosition().getValueAsDouble());
         pElevatorRightMotor.set(Elevator.ElevatorRight.getPosition().getValueAsDouble());

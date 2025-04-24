@@ -22,19 +22,21 @@ public class DriveAugments extends SubsystemBase {
     {0.15,0.25,0.1,0.2,0.08,0.15}
     };
 
-    public DriveAugments(CommandXboxController bruh,Elevator e){
-        Driver = bruh;
+    public DriveAugments(CommandXboxController x,Elevator e){
+        Driver = x;
         elevator = e;
         elevatorStage = elevator.getStageLevel();
+
         Trigger leftTrigger = Driver.leftTrigger();
         Trigger rightTrigger = Driver.rightTrigger();
+
         speedMod = new ChangeSpeedMultiplierCommand(this);
 
-
+        //run the speedMod command with the paremeters based on the 2d array so it updates based on the stage of the elevator
         leftTrigger.whileTrue(speedMod.run(speedsAtLevels[elevatorStage][2],speedsAtLevels[elevatorStage][3]));
         rightTrigger.whileTrue(speedMod.run(speedsAtLevels[elevatorStage][4],speedsAtLevels[elevatorStage][5]));
 
-        this.setDefaultCommand(speedMod.run(speedsAtLevels[elevatorStage][0],speedsAtLevels[elevatorStage][1]));
+        setDefaultCommand(speedMod.run(speedsAtLevels[elevatorStage][0],speedsAtLevels[elevatorStage][1]));
     }   
 
     @Override

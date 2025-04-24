@@ -24,6 +24,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit(){
+    //allows elastic to access internal rio storage to load a layout
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
   }
 

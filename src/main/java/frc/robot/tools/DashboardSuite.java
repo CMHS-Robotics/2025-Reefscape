@@ -35,6 +35,8 @@ public class DashboardSuite extends SubsystemBase{
     Vision Vision;
 
     //subscribers
+        //subscribers will monitor data in a topic and can be used to update code based on inputs in elastic
+
         //elevator
     DoubleSubscriber sElevatorPIDBar;
     BooleanSubscriber sElevatorPIDManual;
@@ -47,6 +49,8 @@ public class DashboardSuite extends SubsystemBase{
 
 
     //publishers
+        //publishers will publish data to a topic and update the values in elastic
+
         //elevator
     DoublePublisher pElevatorLeftMotor;
     DoublePublisher pElevatorRightMotor;
@@ -129,6 +133,7 @@ public class DashboardSuite extends SubsystemBase{
         SmartDashboard.putNumber("Voltage",RobotController.getBatteryVoltage());
 
         //commands
+            //these commands can be activated from elastic
         SmartDashboard.putData("Elevator Bottom Command",new ElevatorSetStageCommand(Elevator,0).alongWith(new CoralWristSetTargetPositionCommand(CoralWrist, 0)));
         SmartDashboard.putData("Elevator Intake Stage Command",new ElevatorSetStageCommand(Elevator,1).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 1)));
         SmartDashboard.putData("Elevator L2 Command",new ElevatorSetStageCommand(Elevator,2).andThen(new CoralWristSetTargetPositionCommand(CoralWrist, 2)));
@@ -146,14 +151,17 @@ public class DashboardSuite extends SubsystemBase{
 
         //elevator
 
-        if(sElevatorPIDManual.get()){
+        if(sElevatorPIDManual.get(false)){
+
+            //set the elevator target and pid based on the values in the subscribers
             Elevator.setTargetPosition(sElevatorPIDBar.get());
             Elevator.elevatorPID.setPID(sElevatorPIDP.get(0.2),0,sElevatorPIDD.get(0.4));
             Elevator.elevatorPID.setMaxOutput(sElevatorPIDClampUpper.get(0.4));
             Elevator.elevatorPID.setMinOutput(sElevatorPIDClampLower.get(-0.15));
+
         }
 
-        
+        //update the publishers this values from the elevator
         pElevatorHasReached.set(Elevator.hasReachedTarget());
         pElevatorLeftMotor.set(Elevator.ElevatorLeft.getPosition().getValueAsDouble());
         pElevatorRightMotor.set(Elevator.ElevatorRight.getPosition().getValueAsDouble());

@@ -8,20 +8,15 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
@@ -62,69 +57,73 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
     public static CommandXboxController Driver = new CommandXboxController(0);
     public static CommandXboxController Manipulator = new CommandXboxController(1);
-    //subsystems
+    //define all the subsystems
     CoralSpinV2 CoralSpin = new CoralSpinV2(Manipulator);
     CoralWristV2 CoralWrist = new CoralWristV2(Manipulator);
     Elevator Elevator = new Elevator(Manipulator,CoralWrist);
     DriveAugments Augment = new DriveAugments(Driver,Elevator);
-    //AlgaeIntake AlgaeIntake = new AlgaeIntake(Manipulator);
 
-    //commands
+    //define all the commands that will be used in autonomous
     ElevatorSetStageCommand TopStage = new ElevatorSetStageCommand(Elevator,4);
     ElevatorSetStageCommand IntakeStage = new ElevatorSetStageCommand(Elevator,1);
     ElevatorSetStageCommand BottomStage = new ElevatorSetStageCommand(Elevator,0);
     CoralWristSetTargetPositionCommand TopCoral = new CoralWristSetTargetPositionCommand(CoralWrist,-5.78);
     CoralWristSetTargetPositionCommand IntakeCoral = new CoralWristSetTargetPositionCommand(CoralWrist,1);
     CoralWristSetTargetPositionCommand BottomCoral = new CoralWristSetTargetPositionCommand(CoralWrist,0);
-
-
     CoralSetSpinSpeedCommandV2 CoralIn = new CoralSetSpinSpeedCommandV2(CoralSpin,-0.3);
     CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
 
 
-    
+    //create drivetrain
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
-    //shuffleboard
+
+    //dashboard and vision subsystems
     Vision Vision = new Vision(drivetrain);
     DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
 
 
+    // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)
+    // Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));
 
-    Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));
-
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints = new PathConstraints(
-            3.0, 1.0,
-            Units.degreesToRadians(540), Units.degreesToRadians(720));
+    // // Create the constraints to use while pathfinding
+    // PathConstraints constraints = new PathConstraints(
+    //         3.0, 1.0,
+    //         Units.degreesToRadians(540), Units.degreesToRadians(720));
     
-    // Since AutoBuilder is configured, we can use it to build pathfinding commands
-    Command pathfindingCommand = AutoBuilder.pathfindToPose(
-            targetPose,
-            constraints,
-            0.0 // Goal end velocity in meters/sec
-    );
+    // // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    // Command pathfindingCommand = AutoBuilder.pathfindToPose(
+    //         targetPose,
+    //         constraints,
+    //         0.0 // Goal end velocity in meters/sec
+    // );
+
 
     public RobotContainer() {
+        //start cameras
         CameraServer.startAutomaticCapture();
 
+        //reset elevator position (just to be sure)
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);
 
         //auto commands and events
+            //set topstage command to run followed by topcoral when the command TopStage is called in pathplanner
         NamedCommands.registerCommand("TopStage", TopStage.andThen(TopCoral));
+            //set intake command to run at the same time as intakecoral when the command TopStage is called in pathplanner
         NamedCommands.registerCommand("IntakeStage", IntakeStage.alongWith(IntakeCoral));
         NamedCommands.registerCommand("BottomStage", BottomStage.alongWith(BottomCoral));
+            //set CoralIn command to run for three seconds when the CoralIn command is called in pathplanner
         NamedCommands.registerCommand("CoralIn", CoralIn.withTimeout(3));
         NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
 
-        new EventTrigger("Elevator").onTrue(Commands.print("Running Elevator"));
-
+        //create the autochooser and put it in smartdashboard
         autoChooser = AutoBuilder.buildAutoChooser();
 
         SmartDashboard.updateValues();
         SmartDashboard.putData("Auto Mode", autoChooser);
 
+        //create all the drivetrain commands
         configureBindings();
 
         //controls

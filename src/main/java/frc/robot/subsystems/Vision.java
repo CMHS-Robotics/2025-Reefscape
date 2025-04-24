@@ -26,6 +26,8 @@ public class Vision extends SubsystemBase {
     PhotonCamera Front = new PhotonCamera("FrontCamera");
     CommandSwerveDrivetrain swerve;
 
+    //create the pose estimators
+    //the transforms need to be accurate to exactly where the cameras are on the robot
     PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.0,0.0,Rotation3d.kZero));
     PhotonPoseEstimator RightPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.kCW_90deg)));
     PhotonPoseEstimator BackPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.k180deg)));
@@ -33,19 +35,23 @@ public class Vision extends SubsystemBase {
 
     public PhotonCamera[] Cameras = {Front,Right,Back,Left};
 
+    //create lists for targets and results for each of the cameras
     PhotonTrackedTarget FrontTarget;
     PhotonTrackedTarget RightTarget;
     PhotonTrackedTarget BackTarget;
     PhotonTrackedTarget LeftTarget;
-    List<PhotonTrackedTarget> Targets = new ArrayList<>(4);
+    List<PhotonTrackedTarget> TargetsList = new ArrayList<>(4);
     List<PhotonPipelineResult> FrontResults;
     List<PhotonPipelineResult> RightResults;
     List<PhotonPipelineResult> BackResults;
     List<PhotonPipelineResult> LeftResults;
     List<List<PhotonPipelineResult>> ResultsList = new ArrayList<>(4);
 
+    //pid for the turn locking command
     public PID turnTrackingPID;
 
+
+    //enum allows different cameras to just be defined by a word
     public enum CAMERA{
         FRONT(0),
         RIGHT(1),
@@ -65,19 +71,25 @@ public class Vision extends SubsystemBase {
     public Vision(CommandSwerveDrivetrain s){
         swerve = s;
         turnTrackingPID = new PID(0.5,0,0.1);
+        
         FrontResults = Front.getAllUnreadResults();
+        // RightResults = Right.getAllUnreadResults();
+        // BackResults = Back.getAllUnreadResults();
+        // LeftResults = Left.getAllUnreadResults();
         ResultsList.add(FrontResults);
         ResultsList.add(RightResults);
         ResultsList.add(BackResults);
         ResultsList.add(LeftResults);
-        Targets.add(FrontTarget);
-        Targets.add(RightTarget);
-        Targets.add(BackTarget);
-        Targets.add(LeftTarget);
+        TargetsList.add(FrontTarget);
+        TargetsList.add(RightTarget);
+        TargetsList.add(BackTarget);
+        TargetsList.add(LeftTarget);
     }
 
     @Override
     public void periodic(){
+
+        //update all the results list with new results
 
         var FrontVisionEst = estimatePose(CAMERA.FRONT);
 
@@ -115,6 +127,8 @@ public class Vision extends SubsystemBase {
         ResultsList.set(1, RightResults);
         ResultsList.set(2, BackResults);
         ResultsList.set(3, LeftResults);
+
+        //do all the vision estimates
 
         FrontVisionEst.ifPresent(
             est -> {
@@ -156,21 +170,26 @@ public class Vision extends SubsystemBase {
         return est;
     }
     
+    //getters for targets and results
     public PhotonTrackedTarget getTarget(CAMERA cam){
-        return Targets.get(cam.getId());
+        return TargetsList.get(cam.getId());
     }
     
     public List<PhotonPipelineResult> getResults(CAMERA cam){
          return ResultsList.get(cam.getId());
     }
 
+    //bunch of overloaded methods for different circumstances that check for targets
+        //if a camera isnt specified, it traverses the whole list of results
+        //if an id is specified, it will update the target list with the target with that id
+        //if an id is not specified, it will update the target list with getBestTarget
     public boolean hasTarget(){
         for (int i = 0; i<3; i ++){
             var results = ResultsList.get(i);
             if(!results.isEmpty()){
                 var result = results.get(results.size()-1);
                 if(result.hasTargets()){
-                    Targets.set(i,result.getBestTarget());
+                    TargetsList.set(i,result.getBestTarget());
                     return true;
                 }    
             }
@@ -183,7 +202,7 @@ public class Vision extends SubsystemBase {
         if(!results.isEmpty()){
             var result = results.get(results.size()-1);
             if(result.hasTargets()){
-                Targets.set(camera.getId(),result.getBestTarget());
+                TargetsList.set(camera.getId(),result.getBestTarget());
                 return true;
             }    
         }
@@ -198,7 +217,7 @@ public class Vision extends SubsystemBase {
                 if(result.hasTargets()){
                     for(var target : results.get(results.size()-1).getTargets()){
                         if(target.getFiducialId() == id){
-                            Targets.set(i,target);
+                            TargetsList.set(i,target);
                             return true;
                         }
                     }
@@ -215,7 +234,7 @@ public class Vision extends SubsystemBase {
             if(result.hasTargets()){
                 for(var target : results.get(results.size()-1).getTargets()){
                     if(target.getFiducialId() == id){
-                        Targets.set(camera.getId(),target);
+                        TargetsList.set(camera.getId(),target);
                         return true;
                     }
                 }

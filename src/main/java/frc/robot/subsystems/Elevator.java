@@ -22,9 +22,13 @@ import frc.robot.tools.PID;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class Elevator extends SubsystemBase {
+
+    //set motor ids
     private final int elevatorMotorLeftId = 13;
     private final int elevatorMotorRightId = 14;
 
+
+    //create variables
     private int stageLevel = 0;
 
     final private double[] stages = new double[5];
@@ -33,18 +37,26 @@ public class Elevator extends SubsystemBase {
 
     private boolean reachedTarget = false;
 
+    //create PID
     final public PID elevatorPID;
 
+    //create commands
     ElevatorFreeMoveCommand freeMoveCommand;
     ElevatorPIDTargetCommand targetPositionCommand;
 
+    //create and define motors
     public TalonFX ElevatorLeft = new TalonFX(elevatorMotorLeftId);   
     public TalonFX ElevatorRight = new TalonFX(elevatorMotorRightId);   
+
+    //create controller
     public CommandXboxController Manipulator;
 
+    //create wrist
     CoralWristV2 wrist;
 
-    public Elevator(CommandXboxController x,CoralWristV2 w){
+    public Elevator(CommandXboxController x, CoralWristV2 w){
+        
+        //define controller and wrist based on parameter
         Manipulator = x;
         wrist = w;
         //set PID
@@ -126,6 +138,7 @@ public class Elevator extends SubsystemBase {
         ElevatorLeft.setPosition(0,1);
     }
         
+    //this never got used but we were gonna make it so that we could put in a measurement in feet and it would output how much the motor had to turn
     public final double distanceToMotorRot(double distance){
                 double r2 = 0.289;
                 double r3 = 1.6;
@@ -142,6 +155,7 @@ public class Elevator extends SubsystemBase {
 
     }
 
+    //getters and setters for all the class variables
     public double getTargetPosition(){
         return targetPosition;
     }
@@ -158,12 +172,10 @@ public class Elevator extends SubsystemBase {
         stageLevel = s;
     }
 
+    //says the elevator has reached its target if the error is less than the configurated cutoff
     public boolean hasReachedTarget(){
         reachedTarget = (Math.abs(elevatorPID.getError()) < elevatorPID.getReachedTargetErrorThreshold());
         return reachedTarget;
-    }
-    public void setReachedTarget(boolean g){
-        reachedTarget = g;
     }
 
 

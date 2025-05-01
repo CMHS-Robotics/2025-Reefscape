@@ -36,16 +36,16 @@ public class Vision extends SubsystemBase {
     public PhotonCamera[] Cameras = {Front,Right,Back,Left};
 
     //create lists for targets and results for each of the cameras
-    PhotonTrackedTarget FrontTarget;
+    public PhotonTrackedTarget FrontTarget;
     PhotonTrackedTarget RightTarget;
     PhotonTrackedTarget BackTarget;
     PhotonTrackedTarget LeftTarget;
-    List<PhotonTrackedTarget> TargetsList = new ArrayList<>(4);
-    List<PhotonPipelineResult> FrontResults;
+    public List<PhotonTrackedTarget> TargetsList = new ArrayList<>(4);
+    public List<PhotonPipelineResult> FrontResults;
     List<PhotonPipelineResult> RightResults;
     List<PhotonPipelineResult> BackResults;
     List<PhotonPipelineResult> LeftResults;
-    List<List<PhotonPipelineResult>> ResultsList = new ArrayList<>(4);
+    public List<List<PhotonPipelineResult>> ResultsList = new ArrayList<>(4);
 
     //pid for the turn locking command
     public PID turnTrackingPID;

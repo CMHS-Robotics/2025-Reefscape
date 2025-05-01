@@ -4,6 +4,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotContainer;
@@ -24,6 +25,7 @@ public class LockOnAprilTagRotationCommand extends Command {
     boolean idTarget = false;
     PhotonTrackedTarget target;
     double targetYaw;
+    boolean skip = false;
 
     public LockOnAprilTagRotationCommand(CommandSwerveDrivetrain s, Vision v, CommandXboxController x){
         swerve = s;
@@ -50,27 +52,21 @@ public class LockOnAprilTagRotationCommand extends Command {
     @Override
     public void execute(){
 
-        if(idTarget){
-            if(!vision.hasTarget(CAMERA.FRONT,id)){
-                this.cancel();
-            }
+        skip = !vision.hasTarget(CAMERA.FRONT);
+
+        if(!skip){
             target = vision.getTarget(CAMERA.FRONT);
-        }else{
-            if(!vision.hasTarget(CAMERA.FRONT)){
-                this.cancel();
-            }
-            target = vision.getResults(CAMERA.FRONT).get(0).getBestTarget();
-        }      
+            targetYaw = target.getYaw();
+            vision.turnTrackingPID.setSetPoint(targetYaw);
 
-        targetYaw = target.getYaw();
-        vision.turnTrackingPID.setSetPoint(targetYaw);
+            SmartDashboard.putNumber("Target Yaw", targetYaw);
 
-        SpeedMultiplier = RobotContainer.SpeedMultiplier;
-        swerve.applyRequest(() -> new SwerveRequest.FieldCentric().withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier)
-        .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  )
-        .withRotationalRate(-1.0 * vision.turnTrackingPID.updatePID(0) * MaxAngularRate));
-    }
+            SpeedMultiplier = RobotContainer.SpeedMultiplier;
+            swerve.applyRequest(() -> new SwerveRequest.FieldCentric().withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier)
+            .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  )
+            .withRotationalRate(-1.0 * vision.turnTrackingPID.updatePID(0) * MaxAngularRate));
+        }
 
     
-
+    }
 }

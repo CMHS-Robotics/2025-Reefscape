@@ -214,8 +214,8 @@ public class RobotContainer {
         Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
         //Driver.back().onTrue(pathfindingCommand);
-
-        Driver.rightBumper().onTrue(new LockOnAprilTagRotationCommand(drivetrain, Vision, Driver));
+        var lockonCommand = new LockOnAprilTagRotationCommand(drivetrain, Vision, Driver);
+        Driver.rightBumper().whileTrue(lockonCommand);
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }

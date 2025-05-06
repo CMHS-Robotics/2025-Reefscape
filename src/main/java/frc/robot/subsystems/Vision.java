@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.GetTargetYawCommand;
 import frc.robot.tools.PID;
 
 public class Vision extends SubsystemBase {
@@ -84,6 +85,10 @@ public class Vision extends SubsystemBase {
         TargetsList.add(RightTarget);
         TargetsList.add(BackTarget);
         TargetsList.add(LeftTarget);
+
+        GetTargetYawCommand setPIDFromYaw = new GetTargetYawCommand(this);
+
+        setDefaultCommand(setPIDFromYaw);
     }
 
     @Override

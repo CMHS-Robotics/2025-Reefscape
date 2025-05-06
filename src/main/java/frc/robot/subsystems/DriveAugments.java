@@ -21,6 +21,7 @@ public class DriveAugments extends SubsystemBase {
     {0.25,0.35,0.15,0.25,0.09,0.18},
     {0.15,0.25,0.1,0.2,0.08,0.15}
     };
+    
 
     public DriveAugments(CommandXboxController x,Elevator e){
         Driver = x;
@@ -37,6 +38,8 @@ public class DriveAugments extends SubsystemBase {
         rightTrigger.whileTrue(speedMod.run(speedsAtLevels[elevatorStage][4],speedsAtLevels[elevatorStage][5]));
 
         setDefaultCommand(speedMod.run(speedsAtLevels[elevatorStage][0],speedsAtLevels[elevatorStage][1]));
+    
+    
     }   
 
     @Override

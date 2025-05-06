@@ -17,12 +17,13 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.LockOnAprilTagRotationCommand;
+import frc.robot.commands.GetTargetYawCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -175,6 +176,9 @@ public class RobotContainer {
 
 
     private void configureBindings() {
+        var lockonCommand = new GetTargetYawCommand(Vision);
+        Driver.rightBumper().whileTrue(lockonCommand);
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -186,6 +190,17 @@ public class RobotContainer {
             )
             
         );
+
+        Driver.rightBumper().whileTrue(
+
+            Commands.run(()->
+            drivetrain.applyRequest(()->                
+            drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
+                .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  ) // Drive left with negative X (left)
+                .withRotationalRate(-1.0 * Vision.turnTrackingPID.updatePID(0) * MaxAngularRate)) // Drive counterclockwise with negative X (left)
+   
+        ));
+
         //d pad precise positioning
         Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier  )));
@@ -214,9 +229,6 @@ public class RobotContainer {
         Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
         //Driver.back().onTrue(pathfindingCommand);
-        var lockonCommand = new LockOnAprilTagRotationCommand(drivetrain, Vision, Driver);
-        Driver.rightBumper().whileTrue(lockonCommand);
-        
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 

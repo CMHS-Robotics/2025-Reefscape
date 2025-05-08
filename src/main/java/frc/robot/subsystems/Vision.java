@@ -23,28 +23,28 @@ import frc.robot.tools.PID;
 public class Vision extends SubsystemBase {
     PhotonCamera Left = new PhotonCamera("LeftCamera");
     PhotonCamera Right = new PhotonCamera("RightCamera");
-    PhotonCamera Back = new PhotonCamera("BackCamera");
+    PhotonCamera Top = new PhotonCamera("TopCamera");
     PhotonCamera Front = new PhotonCamera("FrontCamera");
     CommandSwerveDrivetrain swerve;
 
     //create the pose estimators
     //the transforms need to be accurate to exactly where the cameras are on the robot
-    PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.0,0.0,Rotation3d.kZero));
-    PhotonPoseEstimator RightPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.kCW_90deg)));
-    PhotonPoseEstimator BackPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.k180deg)));
-    PhotonPoseEstimator LeftPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.0,new Rotation3d(Rotation2d.kCCW_90deg)));
+    PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.0,0.1,Rotation3d.kZero));
+    PhotonPoseEstimator RightPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,-0.1,0.1,new Rotation3d(Rotation2d.fromDegrees(30))));
+    PhotonPoseEstimator TopPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.5,new Rotation3d(Rotation2d.k180deg)));
+    PhotonPoseEstimator LeftPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.1,0.1,new Rotation3d(Rotation2d.fromDegrees(-30))));
 
-    public PhotonCamera[] Cameras = {Front,Right,Back,Left};
+    public PhotonCamera[] Cameras = {Front,Right,Top,Left};
 
     //create lists for targets and results for each of the cameras
     public PhotonTrackedTarget FrontTarget;
     PhotonTrackedTarget RightTarget;
-    PhotonTrackedTarget BackTarget;
+    PhotonTrackedTarget TopTarget;
     PhotonTrackedTarget LeftTarget;
     public List<PhotonTrackedTarget> TargetsList = new ArrayList<>(4);
     public List<PhotonPipelineResult> FrontResults;
     List<PhotonPipelineResult> RightResults;
-    List<PhotonPipelineResult> BackResults;
+    List<PhotonPipelineResult> TopResults;
     List<PhotonPipelineResult> LeftResults;
     public List<List<PhotonPipelineResult>> ResultsList = new ArrayList<>(4);
 
@@ -56,7 +56,7 @@ public class Vision extends SubsystemBase {
     public enum CAMERA{
         FRONT(0),
         RIGHT(1),
-        BACK(2),
+        TOP(2),
         LEFT(3);
             
         private int cameraId;
@@ -71,19 +71,19 @@ public class Vision extends SubsystemBase {
 
     public Vision(CommandSwerveDrivetrain s){
         swerve = s;
-        turnTrackingPID = new PID(0.5,0,0.1);
+        turnTrackingPID = new PID(0.03,0,0.01);
         
         FrontResults = Front.getAllUnreadResults();
-        // RightResults = Right.getAllUnreadResults();
-        // BackResults = Back.getAllUnreadResults();
-        // LeftResults = Left.getAllUnreadResults();
+        RightResults = Right.getAllUnreadResults();
+        // TopResults = Top.getAllUnreadResults();
+        LeftResults = Left.getAllUnreadResults();
         ResultsList.add(FrontResults);
         ResultsList.add(RightResults);
-        ResultsList.add(BackResults);
+        ResultsList.add(TopResults);
         ResultsList.add(LeftResults);
         TargetsList.add(FrontTarget);
         TargetsList.add(RightTarget);
-        TargetsList.add(BackTarget);
+        TargetsList.add(TopTarget);
         TargetsList.add(LeftTarget);
 
         GetTargetYawCommand setPIDFromYaw = new GetTargetYawCommand(this);
@@ -104,33 +104,33 @@ public class Vision extends SubsystemBase {
             FrontVisionEst = FrontPoseEstimator.update(fr.get(0));
         }
 
-        //var RightVisionEst = estimatePose(CAMERA.RIGHT);
+        var RightVisionEst = estimatePose(CAMERA.RIGHT);
         
         var rr = Right.getAllUnreadResults();
         if(!rr.isEmpty()){
             RightResults=rr;
-            //RightVisionEst = RightPoseEstimator.update(rr.get(0));
+            RightVisionEst = RightPoseEstimator.update(rr.get(0));
         }
 
-        //var BackVisionEst = estimatePose(CAMERA.BACK);
+        //var TopVisionEst = estimatePose(CAMERA.Top);
         
-        var br = Back.getAllUnreadResults();
+        var br = Top.getAllUnreadResults();
         if(!br.isEmpty()){
-            BackResults=br;
-            //BackVisionEst = BackPoseEstimator.update(br.get(0));
+            TopResults=br;
+            //TopVisionEst = TopPoseEstimator.update(br.get(0));
         }
 
-        //var LeftVisionEst = estimatePose(CAMERA.LEFT);
+        var LeftVisionEst = estimatePose(CAMERA.LEFT);
         
         var lr = Right.getAllUnreadResults();
         if(!lr.isEmpty()){
             LeftResults=lr;
-            //LeftVisionEst = LeftPoseEstimator.update(lr.get(0));
+            LeftVisionEst = LeftPoseEstimator.update(lr.get(0));
         }
 
         ResultsList.set(0, FrontResults);
         ResultsList.set(1, RightResults);
-        ResultsList.set(2, BackResults);
+        ResultsList.set(2, TopResults);
         ResultsList.set(3, LeftResults);
 
         //do all the vision estimates
@@ -149,7 +149,7 @@ public class Vision extends SubsystemBase {
         
         // });
 
-        // BackVisionEst.ifPresent(
+        // TopVisionEst.ifPresent(
         //     est -> {
         //     swerve.addVisionMeasurement(
         //             est.estimatedPose.toPose2d(), est.timestampSeconds);

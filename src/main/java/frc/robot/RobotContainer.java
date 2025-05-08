@@ -17,7 +17,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
@@ -186,20 +185,10 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
                     .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  ) // Drive left with negative X (left)
-                    .withRotationalRate(-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier  ) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate((Driver.rightBumper().getAsBoolean())?-1.0 * Vision.turnTrackingPID.updatePID(0) * MaxAngularRate :-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier  ) // Drive counterclockwise with negative X (left)
             )
             
         );
-
-        Driver.rightBumper().whileTrue(
-
-            Commands.run(()->
-            drivetrain.applyRequest(()->                
-            drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
-                .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  ) // Drive left with negative X (left)
-                .withRotationalRate(-1.0 * Vision.turnTrackingPID.updatePID(0) * MaxAngularRate)) // Drive counterclockwise with negative X (left)
-   
-        ));
 
         //d pad precise positioning
         Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier  )));

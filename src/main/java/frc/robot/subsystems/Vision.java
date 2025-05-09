@@ -11,6 +11,8 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,7 +22,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Telemetry;
+import frc.robot.commands.SetVisionPIDToTargetRotationAndCenterCommand;
 import frc.robot.commands.SetVisionPIDToTargetRotationCommand;
 import frc.robot.commands.SetVisionPIDToTargetYawCommand;
 import frc.robot.tools.PID;
@@ -60,6 +62,7 @@ public class Vision extends SubsystemBase {
 
     CommandXboxController driver;
 
+    public MODE currentMode = MODE.LOCKVECTOR;
 
     //enum allows different cameras to just be defined by a word
     public enum CAMERA{
@@ -100,9 +103,37 @@ public class Vision extends SubsystemBase {
 
         SetVisionPIDToTargetYawCommand setPIDFromYaw = new SetVisionPIDToTargetYawCommand(this);
         SetVisionPIDToTargetRotationCommand setPIDFromRot = new SetVisionPIDToTargetRotationCommand(this);
+        SetVisionPIDToTargetRotationAndCenterCommand setPIDFromRotAndCenter = new SetVisionPIDToTargetRotationAndCenterCommand(this);
 
-        driver.rightBumper().whileTrue(setPIDFromRot);
+        driver.rightBumper().and(() -> currentMode.equals(MODE.LOCKVECTOR)).whileTrue(setPIDFromRotAndCenter);
 
+        driver.rightBumper().and(() -> currentMode.equals(MODE.LOCKANGLE)).whileTrue(setPIDFromRot);
+
+        driver.rightBumper().and(() -> currentMode.equals(MODE.YAWTARGET)).whileTrue(setPIDFromYaw);
+
+    }
+
+    public enum MODE{
+        YAWTARGET(2),
+        LOCKANGLE(1),
+        LOCKVECTOR(0);
+
+        private int modeid;
+        MODE(int id){
+            modeid = id;
+        }
+        private int getId(){
+            return modeid;
+        }
+
+        static public MODE getModeOfId(int i){
+            return switch (i){
+            case 0 -> LOCKVECTOR;
+               case 1 -> LOCKANGLE;
+               case 2 -> YAWTARGET;
+               default-> YAWTARGET;
+            };
+        }
     }
 
     public Pose2d getRobotPose(){
@@ -113,11 +144,19 @@ public class Vision extends SubsystemBase {
         return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose;
     }
 
+    public MODE getCurrentMode(){
+        return currentMode;
+    }
+
+    public void setCurrentMode(MODE mode){
+        currentMode = mode;
+    }
+    public void setCurrentMode(int modeid){
+        currentMode = MODE.getModeOfId(modeid);
+    }
+
     @Override
     public void periodic(){
-
-        //turnTrackingPID.updatePID(swerve.getRotation3d().toRotation2d().getDegrees());
-        turnTrackingPID.updatePID(0);
 
         //update all the results list with new results
 

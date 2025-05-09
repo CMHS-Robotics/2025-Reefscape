@@ -1,8 +1,4 @@
 package frc.robot.commands;
-
-import java.util.Vector;
-
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -14,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
@@ -77,7 +72,7 @@ public class SetVisionPIDToTargetRotationAndCenterCommand extends Command {
             robotPose = vision.getRobotPose();
             
             //matrix: row 1 is target pos, row 2 is robot pos
-           Matrix<N2,N2> coeffmatrix = MatBuilder.fill(Nat.N2(),Nat.N2(),
+            Matrix<N2,N2> coeffmatrix = MatBuilder.fill(Nat.N2(),Nat.N2(),
            
            -targetSlope,1.0,
             -driveSlope,1.0
@@ -90,13 +85,13 @@ public class SetVisionPIDToTargetRotationAndCenterCommand extends Command {
            -driveSlope*robotPose.getX()+robotPose.getY()
            
            );
-
+           //solve for the inter
            Matrix<N2,N1> solmatrix = coeffmatrix.inv().times(ansmatrix);
 
            intersectX = solmatrix.get(0,0);
            intersectY = solmatrix.get(1,0);
 
-            vision.turnTrackingPID.setSetPoint(targetRot);
+            vision.turnTrackingPID.setSetPoint(targetRot - robotPose.getRotation().getDegrees());
             vision.xTranslatePID.setSetPoint(intersectX - robotPose.getX());
             vision.yTranslatePID.setSetPoint(intersectY - robotPose.getY());
 }

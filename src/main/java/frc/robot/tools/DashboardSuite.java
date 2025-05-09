@@ -45,7 +45,8 @@ public class DashboardSuite extends SubsystemBase{
     DoubleSubscriber sElevatorPIDClampUpper;
     DoubleSubscriber sElevatorPIDClampLower;
         //vision
-    IntegerSubscriber sVisionTarget;
+    IntegerSubscriber sVisionTargetId;
+    IntegerSubscriber sVisionTargetMode;
 
 
     //publishers
@@ -68,6 +69,7 @@ public class DashboardSuite extends SubsystemBase{
     BooleanPublisher pVisionHasDetected;
     IntegerPublisher pAprilTagDetected;
     BooleanPublisher pVisionHasTarget;
+    StringPublisher pVisionTargetMode;
     
     public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w,Vision v){
         Elevator = e;
@@ -124,8 +126,10 @@ public class DashboardSuite extends SubsystemBase{
         pAprilTagDetected = VisionData.getIntegerTopic("ID of April Tag Detected").publish();
         pVisionHasDetected = VisionData.getBooleanTopic("Vision Has Detected Target").publish();
         pVisionHasTarget = VisionData.getBooleanTopic("Vision Has Target").publish();
+        pVisionTargetMode = VisionData.getStringTopic("Vision Target Mode").publish();
 
-        sVisionTarget = VisionData.getIntegerTopic("Vision April Tag ID Target").subscribe(0);
+        sVisionTargetId = VisionData.getIntegerTopic("Vision April Tag ID Target").subscribe(0);
+        sVisionTargetMode = VisionData.getIntegerTopic("Vision Target Mode Set").subscribe(0);
 
 
         //other
@@ -179,10 +183,11 @@ public class DashboardSuite extends SubsystemBase{
 
 
         //vision
-        pVisionHasDetected.set(Vision.hasTarget(CAMERA.FRONT,(int)sVisionTarget.get()));
+        pVisionHasDetected.set(Vision.hasTarget(CAMERA.FRONT,(int)sVisionTargetId.get()));
         pVisionHasTarget.set(Vision.hasTarget(CAMERA.FRONT));
         pAprilTagDetected.set((Vision.hasTarget(CAMERA.FRONT))?Vision.getTarget(CAMERA.FRONT).getFiducialId():0);
-
+        pVisionTargetMode.set(Vision.getCurrentMode().toString());
+        Vision.setCurrentMode((int)sVisionTargetMode.get(0));
     
     }
 }

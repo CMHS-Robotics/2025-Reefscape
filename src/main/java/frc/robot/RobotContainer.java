@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.GetTargetYawCommand;
+import frc.robot.commands.SetVisionPIDToTargetYawCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -79,7 +79,7 @@ public class RobotContainer {
     
 
     //dashboard and vision subsystems
-    Vision Vision = new Vision(drivetrain);
+    Vision Vision = new Vision(drivetrain,Driver);
     DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
 
 
@@ -175,7 +175,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        var lockonCommand = new GetTargetYawCommand(Vision);
+        var lockonCommand = new SetVisionPIDToTargetYawCommand(Vision);
         Driver.rightBumper().whileTrue(lockonCommand);
         
         // Note that X is defined as forward according to WPILib convention,

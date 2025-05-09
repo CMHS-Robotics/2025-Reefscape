@@ -17,7 +17,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.GetTargetYawCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.SetVisionPIDToTargetRotationCommand;
+import frc.robot.commands.SetVisionPIDToTargetYawCommand;
 import frc.robot.tools.PID;
 
 public class Vision extends SubsystemBase {
@@ -51,6 +53,8 @@ public class Vision extends SubsystemBase {
     //pid for the turn locking command
     public PID turnTrackingPID;
 
+    CommandXboxController driver;
+
 
     //enum allows different cameras to just be defined by a word
     public enum CAMERA{
@@ -69,8 +73,9 @@ public class Vision extends SubsystemBase {
         }
     }
 
-    public Vision(CommandSwerveDrivetrain s){
+    public Vision(CommandSwerveDrivetrain s, CommandXboxController d){
         swerve = s;
+        driver = d;
         turnTrackingPID = new PID(0.03,0,0.01);
         
         FrontResults = Front.getAllUnreadResults();
@@ -86,13 +91,17 @@ public class Vision extends SubsystemBase {
         TargetsList.add(TopTarget);
         TargetsList.add(LeftTarget);
 
-        GetTargetYawCommand setPIDFromYaw = new GetTargetYawCommand(this);
+        SetVisionPIDToTargetYawCommand setPIDFromYaw = new SetVisionPIDToTargetYawCommand(this);
+        SetVisionPIDToTargetRotationCommand setPIDFromRot = new SetVisionPIDToTargetRotationCommand(this);
 
-        setDefaultCommand(setPIDFromYaw);
+        driver.rightBumper().whileTrue(setPIDFromRot);
+
     }
 
     @Override
     public void periodic(){
+
+        turnTrackingPID.updatePID(swerve.getRotation3d().toRotation2d().getDegrees());
 
         //update all the results list with new results
 

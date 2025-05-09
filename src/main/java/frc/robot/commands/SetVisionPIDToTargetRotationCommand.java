@@ -2,12 +2,13 @@ package frc.robot.commands;
 
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
-import org.photonvision.utils.*;
 
-public class GetTargetYawCommand extends Command {
+public class SetVisionPIDToTargetRotationCommand extends Command {
     
     Vision vision;
     int id;
@@ -16,13 +17,13 @@ public class GetTargetYawCommand extends Command {
     double targetYaw = 0;
     boolean skip = false;
 
-    public GetTargetYawCommand( Vision v){
+    public SetVisionPIDToTargetRotationCommand( Vision v){
         vision = v;
         idTarget = false;
         addRequirements(vision);
     }
     
-    public GetTargetYawCommand(Vision v, int id){
+    public SetVisionPIDToTargetRotationCommand(Vision v, int id){
         vision = v;
         idTarget = true;
         this.id = id;
@@ -47,14 +48,8 @@ public class GetTargetYawCommand extends Command {
             }
             else{
             target = vision.getTarget(CAMERA.FRONT);
-            targetYaw = target.getYaw();
            }
-           
-           vision.turnTrackingPID.setSetPoint(targetYaw);
+           vision.turnTrackingPID.setSetPoint(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose.getRotation().toRotation2d().getDegrees());
         }
-    }
-
-    public double getYaw(){
-        return targetYaw;
     }
 }

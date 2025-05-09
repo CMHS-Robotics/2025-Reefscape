@@ -39,6 +39,7 @@ import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
+import frc.robot.subsystems.Vision.MODE;
 import frc.robot.tools.DashboardSuite;
 ;
 
@@ -182,7 +183,7 @@ public class RobotContainer {
     }
 
     private double vectorDot(){
-        Vector<N2> controllerVector = VecBuilder.fill(-Driver.getLeftX(),-Driver.getLeftY());
+        Vector<N2> controllerVector = VecBuilder.fill(-Driver.getLeftY(),-Driver.getLeftX());
         Vector<N2> targetVector = VecBuilder.fill(Math.cos(targetRadians()),Math.sin(targetRadians()));
         
         return controllerVector.dot(targetVector);
@@ -192,16 +193,20 @@ public class RobotContainer {
         return Vision.getTargetPose(Vision.getTarget(CAMERA.FRONT)).getRotation().toRotation2d().getRadians();
     }
 
+    private double leftStickPolarity(boolean x){
+        return (x)?Driver.getLeftX()/Math.abs(Driver.getLeftX()):Driver.getLeftY()/Math.abs(Driver.getLeftY());
+    }
+
     private double getXStrafe(){
-        if(Driver.rightBumper().getAsBoolean()){
-            return Vision.xTranslatePID.updatePID(0) + (Math.cos(targetRadians())) * vectorDot();
+        if(Driver.rightBumper().getAsBoolean()&&Vision.getCurrentMode().equals(MODE.LOCKVECTOR)){
+            return Vision.xTranslatePID.updatePID(0) + (Math.cos(targetRadians())) * vectorDot() * -leftStickPolarity(false);
         }
         return -Driver.getLeftY() * MaxSpeed * SpeedMultiplier;
     }
 
     private double getYStrafe(){
-        if(Driver.rightBumper().getAsBoolean()){
-            return Vision.yTranslatePID.updatePID(0) + (Math.sin(targetRadians())) * vectorDot();
+        if(Driver.rightBumper().getAsBoolean()&&Vision.getCurrentMode().equals(MODE.LOCKVECTOR)){
+            return Vision.yTranslatePID.updatePID(0) + (Math.sin(targetRadians())) * vectorDot()* -leftStickPolarity(true);
         }
         return -Driver.getLeftX() * MaxSpeed * SpeedMultiplier;
     }

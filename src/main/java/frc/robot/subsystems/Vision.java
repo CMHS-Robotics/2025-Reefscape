@@ -13,11 +13,14 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Telemetry;
 import frc.robot.commands.SetVisionPIDToTargetRotationCommand;
 import frc.robot.commands.SetVisionPIDToTargetYawCommand;
 import frc.robot.tools.PID;
@@ -50,8 +53,10 @@ public class Vision extends SubsystemBase {
     List<PhotonPipelineResult> LeftResults;
     public List<List<PhotonPipelineResult>> ResultsList = new ArrayList<>(4);
 
-    //pid for the turn locking command
+    //pid for the turn locking and center locking
     public PID turnTrackingPID;
+    public PID xTranslatePID;
+    public PID yTranslatePID;
 
     CommandXboxController driver;
 
@@ -77,6 +82,8 @@ public class Vision extends SubsystemBase {
         swerve = s;
         driver = d;
         turnTrackingPID = new PID(0.03,0,0.01);
+        xTranslatePID = new PID(0.03,0,0.01);
+        yTranslatePID = new PID(0.03,0,0.01);
         
         FrontResults = Front.getAllUnreadResults();
         RightResults = Right.getAllUnreadResults();
@@ -98,10 +105,19 @@ public class Vision extends SubsystemBase {
 
     }
 
+    public Pose2d getRobotPose(){
+        return swerve.getState().Pose; 
+    }
+
+    public Pose3d getTargetPose(PhotonTrackedTarget target){
+        return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose;
+    }
+
     @Override
     public void periodic(){
 
-        turnTrackingPID.updatePID(swerve.getRotation3d().toRotation2d().getDegrees());
+        //turnTrackingPID.updatePID(swerve.getRotation3d().toRotation2d().getDegrees());
+        turnTrackingPID.updatePID(0);
 
         //update all the results list with new results
 

@@ -49,7 +49,9 @@ public class SetVisionPIDToTargetRotationCommand extends Command {
             else{
             target = vision.getTarget(CAMERA.FRONT);
            }
-           vision.turnTrackingPID.setSetPoint(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose.getRotation().toRotation2d().getDegrees());
+           vision.turnTrackingPID.setSetPoint(
+            target.getBestCameraToTarget().getRotation().toRotation2d().getDegrees());
+           //vision.turnTrackingPID.setSetPoint(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose.getRotation().toRotation2d().getDegrees());
         }
     }
 }

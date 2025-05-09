@@ -31,6 +31,7 @@ import frc.robot.subsystems.CoralWristV2;
 import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Vision.CAMERA;
 import frc.robot.tools.DashboardSuite;
 ;
 
@@ -173,18 +174,15 @@ public class RobotContainer {
         */
     }
 
-
     private void configureBindings() {
-        var lockonCommand = new SetVisionPIDToTargetYawCommand(Vision);
-        Driver.rightBumper().whileTrue(lockonCommand);
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  ) // Drive left with negative X (left)
+                drive.withVelocityX((Driver.rightBumper().getAsBoolean())?Vision.xTranslatePID.updatePID(0) + Math.sqrt(Math.pow(Driver.getLeftY(),2) + (Math.cos(Vision.getTargetPose(Vision.getTarget(CAMERA.FRONT)).getRotation().toRotation2d().getRadians())) * Math.pow(Driver.getLeftX(),2)) * (Math.cos(Math.abs(Vision.getTargetPose(Vision.getTarget(CAMERA.FRONT)).getRotation().toRotation2d().getRadians() - Math.atan(Driver.getLeftY()/Driver.getLeftX())))):-Driver.getLeftY() * MaxSpeed * SpeedMultiplier) // Drive forward with negative Y (forward)
+                    .withVelocityY((Driver.rightBumper().getAsBoolean())?Vision.yTranslatePID.updatePID(0):-Driver.getLeftX() * MaxSpeed * SpeedMultiplier  ) // Drive left with negative X (left)
                     .withRotationalRate((Driver.rightBumper().getAsBoolean())?-1.0 * Vision.turnTrackingPID.updatePID(0) * MaxAngularRate :-Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier  ) // Drive counterclockwise with negative X (left)
             )
             

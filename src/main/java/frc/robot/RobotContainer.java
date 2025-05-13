@@ -10,17 +10,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.numbers.N3;
-
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.SetVisionPIDToTargetYawCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -199,21 +194,24 @@ public class RobotContainer {
 
     private double getXStrafe(){
         if(Driver.rightBumper().getAsBoolean()&&Vision.getCurrentMode().equals(MODE.LOCKVECTOR)){
-            return Vision.xTranslatePID.updatePID(0) + (Math.cos(targetRadians())) * vectorDot() * -leftStickPolarity(false);
+            return (Vision.xTranslatePID.updatePID(Vision.getRobotPose().getX())/* + (Math.cos(targetRadians())) * vectorDot() * -leftStickPolarity(false)*/)  * SpeedMultiplier;
         }
         return -Driver.getLeftY() * MaxSpeed * SpeedMultiplier;
     }
 
     private double getYStrafe(){
         if(Driver.rightBumper().getAsBoolean()&&Vision.getCurrentMode().equals(MODE.LOCKVECTOR)){
-            return Vision.yTranslatePID.updatePID(0) + (Math.sin(targetRadians())) * vectorDot()* -leftStickPolarity(true);
+            return (Vision.yTranslatePID.updatePID(Vision.getRobotPose().getY())/* + (Math.sin(targetRadians())) * vectorDot()* -leftStickPolarity(true)*/)  * SpeedMultiplier;
         }
         return -Driver.getLeftX() * MaxSpeed * SpeedMultiplier;
     }
 
     private double getTurn(){
-        if(Driver.rightBumper().getAsBoolean()){
-            return -1.0 * Vision.turnTrackingPID.updatePID(0) * MaxAngularRate;
+        if(Driver.rightBumper().getAsBoolean()&&!Vision.getCurrentMode().equals(MODE.YAWTARGET)){
+            return Vision.turnTrackingPID.updatePID(Vision.getRobotPose().getRotation().getDegrees()) * MaxAngularRate * RotationSpeedMultiplier;
+        }
+        if(Driver.rightBumper().getAsBoolean()&&Vision.getCurrentMode().equals(MODE.YAWTARGET)){
+            return -Vision.turnTrackingPID.updatePID(0) * MaxAngularRate * RotationSpeedMultiplier;
         }
         return -Driver.getRightX() * MaxAngularRate * RotationSpeedMultiplier;
     }

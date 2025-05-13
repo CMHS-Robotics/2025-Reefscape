@@ -11,8 +11,6 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.SetVisionPIDToTargetRotationAndCenterCommand;
@@ -85,6 +84,8 @@ public class Vision extends SubsystemBase {
         swerve = s;
         driver = d;
         turnTrackingPID = new PID(0.03,0,0.01);
+        turnTrackingPID.setMinInput(-180);
+        turnTrackingPID.setMaxInput(180);
         xTranslatePID = new PID(0.03,0,0.01);
         yTranslatePID = new PID(0.03,0,0.01);
         
@@ -137,8 +138,9 @@ public class Vision extends SubsystemBase {
     }
 
     public Pose2d getRobotPose(){
-        return swerve.getState().Pose; 
-    }
+        SmartDashboard.putNumber("Robot Rotation",swerve.getState().Pose.getRotation().getDegrees());
+        return swerve.getState().Pose;
+        }
 
     public Pose3d getTargetPose(PhotonTrackedTarget target){
         return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose;

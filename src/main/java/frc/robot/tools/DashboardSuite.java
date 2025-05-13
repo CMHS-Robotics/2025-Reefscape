@@ -123,6 +123,7 @@ public class DashboardSuite extends SubsystemBase{
         NetworkTable VisionData = inst.getTable("Vision");
 
         VisionData.getIntegerTopic("Vision April Tag ID Target").publish().set(0);
+        VisionData.getIntegerTopic("Vision Target Mode Set").publish().set(0);
         pAprilTagDetected = VisionData.getIntegerTopic("ID of April Tag Detected").publish();
         pVisionHasDetected = VisionData.getBooleanTopic("Vision Has Detected Target").publish();
         pVisionHasTarget = VisionData.getBooleanTopic("Vision Has Target").publish();

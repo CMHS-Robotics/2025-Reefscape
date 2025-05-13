@@ -8,8 +8,10 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
@@ -20,9 +22,6 @@ public class SetVisionPIDToTargetRotationAndCenterCommand extends Command {
     int id;
     boolean idTarget = false;
     PhotonTrackedTarget target;
-    double targetX = 0;
-    double targetY = 0;
-    double targetRot = 0;
     double targetSlope = 0;
     double driveSlope = 0;
     Pose3d targetPose;
@@ -63,10 +62,11 @@ public class SetVisionPIDToTargetRotationAndCenterCommand extends Command {
             else{
             target = vision.getTarget(CAMERA.FRONT);
            }
-            targetRot = target.getBestCameraToTarget().getRotation().toRotation2d().getDegrees();
-            targetX = target.getBestCameraToTarget().getX();
-            targetY = target.getBestCameraToTarget().getY();
-            targetPose = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose;
+            
+            targetPose = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()-1).pose;
+            vision.turnTrackingPID.setSetPoint(targetPose.getRotation().toRotation2d().plus(Rotation2d.k180deg).getDegrees()); 
+            
+            
             targetSlope = Math.tan(targetPose.getRotation().toRotation2d().getRadians());
             driveSlope = -1/targetSlope;
             robotPose = vision.getRobotPose();
@@ -88,12 +88,13 @@ public class SetVisionPIDToTargetRotationAndCenterCommand extends Command {
            //solve for the inter
            Matrix<N2,N1> solmatrix = coeffmatrix.inv().times(ansmatrix);
 
+           SmartDashboard.putString("solmatrix",solmatrix.toString());
+
            intersectX = solmatrix.get(0,0);
            intersectY = solmatrix.get(1,0);
 
-            vision.turnTrackingPID.setSetPoint(targetRot - robotPose.getRotation().getDegrees());
-            vision.xTranslatePID.setSetPoint(intersectX - robotPose.getX());
-            vision.yTranslatePID.setSetPoint(intersectY - robotPose.getY());
+            // vision.xTranslatePID.setSetPoint(intersectX);
+            // vision.yTranslatePID.setSetPoint(intersectY);
 }
     }
 }

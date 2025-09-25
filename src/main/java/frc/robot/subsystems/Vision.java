@@ -1,13 +1,17 @@
 package frc.robot.subsystems;
 
+import java.lang.reflect.Array;
+
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -18,6 +22,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -35,10 +40,10 @@ public class Vision extends SubsystemBase {
 
     //create the pose estimators
     //the transforms need to be accurate to exactly where the cameras are on the robot
-    PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.0,0.1,Rotation3d.kZero));
-    PhotonPoseEstimator RightPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,-0.1,0.1,new Rotation3d(Rotation2d.fromDegrees(30))));
-    PhotonPoseEstimator TopPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.5,new Rotation3d(Rotation2d.k180deg)));
-    PhotonPoseEstimator LeftPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.1,0.1,new Rotation3d(Rotation2d.fromDegrees(-30))));
+    PhotonPoseEstimator FrontPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.0,0.1,Rotation3d.kZero));
+    PhotonPoseEstimator RightPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,-0.1,0.1,new Rotation3d(Rotation2d.fromDegrees(30))));
+    PhotonPoseEstimator TopPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.0,0.0,0.5,new Rotation3d(Rotation2d.k180deg)));
+    PhotonPoseEstimator LeftPoseEstimator = new PhotonPoseEstimator(AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded),PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, new Transform3d(0.2,0.1,0.1,new Rotation3d(Rotation2d.fromDegrees(-30))));
 
     public PhotonCamera[] Cameras = {Front,Right,Top,Left};
 
@@ -111,6 +116,18 @@ public class Vision extends SubsystemBase {
         driver.rightBumper().and(() -> currentMode.equals(MODE.LOCKANGLE)).whileTrue(setPIDFromRot);
 
         driver.rightBumper().and(() -> currentMode.equals(MODE.YAWTARGET)).whileTrue(setPIDFromYaw);
+        //Note:
+        //map the lock on function to another button:X
+        //create new or expand mode enum
+        //Get Coords When Locked, Tell It To Center There, May Need Offset
+        //Set State Upon Moved To ReadyLRAct
+        //Restrict All Movement
+        //When Mode=ReadyLRAct, Left Bumper, move offset to left, vice versa.
+        //Lock All Input Except X, Until Moved To Target, Set State: ReadyElv-unlock elevator input.
+        //May need to move back slightly... test to confirm
+        //Configure Coral Wrist For Better Angles, The Robot Needs To Be Flush On Surface For This:easier for driver if done manual
+        //Maybe use X to Enter And Exit Lock Mode, Auto Exit Upon Completion.
+        //Make Maximum Distance For Lock On, 5 meters:code will already grab best target.
 
     }
 
@@ -137,6 +154,35 @@ public class Vision extends SubsystemBase {
         }
     }
 
+    public enum CVState{
+        MOVETOTARG(4),//moving to target
+        ATTARG(3),//At Target
+        TARGL(2),//At Target Left
+        TARGR(1),//At Target Right
+        FREE(0);//Free State, Can Freely Move, Default State
+
+        private int cvid;
+        CVState(int id) {
+            cvid = id;
+        }
+        private int getId(){
+            return cvid;
+        }
+
+        static public CVState getStateOfId(int i){
+            return switch(i){
+                case 0 -> FREE;
+                case 1 -> TARGR;
+                case 2 -> TARGL;
+                case 3 -> ATTARG;
+                case 4 -> MOVETOTARG;
+                default -> FREE;
+            };
+        }
+        
+        
+    }
+
     public Pose2d getRobotPose(){
         SmartDashboard.putNumber("Robot Rotation",swerve.getState().Pose.getRotation().getDegrees());
         return swerve.getState().Pose;
@@ -155,6 +201,24 @@ public class Vision extends SubsystemBase {
     }
     public void setCurrentMode(int modeid){
         currentMode = MODE.getModeOfId(modeid);
+    }
+
+    public Rotation2d CalcRotation(PhotonTrackedTarget target){
+        Rotation2d robotHeading = swerve.getState().Pose.getRotation();
+        Rotation2d targHeading = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose.getRotation().toRotation2d();
+
+        Rotation2d RotError = targHeading.minus(robotHeading);
+
+        return RotError;
+    }
+
+    public Translation2d CalcTranslation(){
+        Pose2d robotpose = getRobotPose();
+        Pose3d targpose = getTargetPose(FrontTarget);
+        
+        Translation2d PoseError = targpose.getTranslation().toTranslation2d().minus(robotpose.getTranslation());
+
+        return PoseError;
     }
 
     @Override

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix.*;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -36,7 +37,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
 import frc.robot.subsystems.Vision.MODE;
 import frc.robot.tools.DashboardSuite;
-;
+import frc.robot.subsystems.Vision.CVState;
 
 public class RobotContainer {   
 
@@ -188,6 +189,18 @@ public class RobotContainer {
         return Vision.getTargetPose(Vision.getTarget(CAMERA.FRONT)).getRotation().toRotation2d().getRadians();
     }
 
+
+    //Note
+    //Use Above Functions, Get Robot Current Position
+    //Can use d pad.
+    //Running Take:
+    //Use x to enter/exit mode, set state to search for targ
+    //Search Target, If Not Found, Rotate Until, Execute Move To Targ.
+    //When At Targ, Allow LR selection.
+    //Make A Que For Actions, So Driver Enters Mode And Immediatly Presses Left D pad, store this and execute when ready. Allow Changing Upon Final State Or In Between 
+    //:Always Be Listening For LR Input
+
+
     private double leftStickPolarity(boolean x){
         return (x)?Driver.getLeftX()/Math.abs(Driver.getLeftX()):Driver.getLeftY()/Math.abs(Driver.getLeftY());
     }
@@ -230,11 +243,15 @@ public class RobotContainer {
             
         );
 
+
         //d pad precise positioning
         Driver.povDown().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povUp().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(1 * MaxSpeed * SpeedMultiplier  )));
         Driver.povRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityY(-1 * MaxSpeed * SpeedMultiplier  )));
+
+        //LockOnMechanism
+        
 
         Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(1/Math.sqrt(2)*MaxSpeed*SpeedMultiplier  )));
         Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));

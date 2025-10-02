@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
+import frc.robot.commands.MoveRobotToTarg;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -88,6 +89,8 @@ public class RobotContainer {
     DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
 
 
+    MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(Vision.getTarget(CAMERA.FRONT), drivetrain, Driver);
+
     // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)
     // Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));
 
@@ -121,6 +124,8 @@ public class RobotContainer {
             //set CoralIn command to run for three seconds when the CoralIn command is called in pathplanner
         NamedCommands.registerCommand("CoralIn", CoralIn.withTimeout(3));
         NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
+        NamedCommands.registerCommand("MoveRobotToTarg", moveRobotToTarg);
+
 
         //create the autochooser and put it in smartdashboard
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -129,6 +134,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         //create all the drivetrain commands
+        
         configureBindings();
 
         //controls
@@ -257,6 +263,8 @@ public class RobotContainer {
         Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
         Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
         Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
+
+        Driver.x().onTrue(moveRobotToTarg);
 
         Driver.b().whileTrue(drivetrain.applyRequest(() -> brake));
         Driver.y().whileTrue(drivetrain.applyRequest(() ->

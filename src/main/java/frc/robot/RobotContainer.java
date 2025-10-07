@@ -79,7 +79,6 @@ public class RobotContainer {
     CoralSetSpinSpeedCommandV2 CoralIn = new CoralSetSpinSpeedCommandV2(CoralSpin,-0.3);
     CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
 
-
     //create drivetrain
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
@@ -88,7 +87,7 @@ public class RobotContainer {
     Vision Vision = new Vision(drivetrain,Driver);
     DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
 
-
+    //define move to targ command
     MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(Vision.getTarget(CAMERA.FRONT), drivetrain, Driver);
 
     // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)
@@ -124,7 +123,7 @@ public class RobotContainer {
             //set CoralIn command to run for three seconds when the CoralIn command is called in pathplanner
         NamedCommands.registerCommand("CoralIn", CoralIn.withTimeout(3));
         NamedCommands.registerCommand("CoralOut", CoralOut.withTimeout(1));
-        NamedCommands.registerCommand("MoveRobotToTarg", moveRobotToTarg);
+        //NamedCommands.registerCommand("MoveRobotToTarg", moveRobotToTarg);
 
 
         //create the autochooser and put it in smartdashboard

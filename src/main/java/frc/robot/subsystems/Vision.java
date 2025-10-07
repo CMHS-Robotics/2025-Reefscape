@@ -180,9 +180,8 @@ public class Vision extends SubsystemBase {
             };
         }
         
-        
+    
     }
-
     public Pose2d getRobotPose(){
         SmartDashboard.putNumber("Robot Rotation",swerve.getState().Pose.getRotation().getDegrees());
         return swerve.getState().Pose;

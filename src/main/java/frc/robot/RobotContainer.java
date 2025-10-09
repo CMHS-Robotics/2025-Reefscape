@@ -88,7 +88,7 @@ public class RobotContainer {
     DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
 
     //define move to targ command
-    MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(Vision.getTarget(CAMERA.FRONT), drivetrain, Driver);
+    MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(Vision.getTarget(CAMERA.FRONT), drivetrain, Driver,Vision);
 
     // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)
     // Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));

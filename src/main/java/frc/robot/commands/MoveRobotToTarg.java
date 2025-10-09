@@ -22,7 +22,8 @@ public class MoveRobotToTarg extends Command {
     private final PIDController YController = new PIDController(1, 0, 0);
     private final PIDController turnController = new PIDController(2, 0, 0);
 
-    public MoveRobotToTarg(PhotonTrackedTarget target, CommandSwerveDrivetrain s, CommandXboxController d){
+    public MoveRobotToTarg(PhotonTrackedTarget target, CommandSwerveDrivetrain s, CommandXboxController d, Vision v){
+        Vision = v;
         double RotError = Vision.CalcRotation(target).getRadians();
         PoseError = Vision.CalcTranslation();
 

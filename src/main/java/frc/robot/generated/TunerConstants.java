@@ -43,7 +43,7 @@ public class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
 
-    public static final double KPSteer = 10;
+    public static final double KPSteer = 10;//10;
     public static final double KISteer = 0;
     public static final double KDSteer = 0.1;
     public static final double KPDrive = 0.1;

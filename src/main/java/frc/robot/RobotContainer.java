@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import java.awt.print.Printable;
+import java.io.Console;
+
+import javax.print.DocFlavor;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix.*;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -39,6 +45,7 @@ import frc.robot.subsystems.Vision.CAMERA;
 import frc.robot.subsystems.Vision.MODE;
 import frc.robot.tools.DashboardSuite;
 import frc.robot.subsystems.Vision.CVState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotContainer {   
 
@@ -47,10 +54,9 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
     public static double SpeedMultiplier = 1;
-    public static double RotationSpeedMultiplier = 1;
+    public static double RotationSpeedMultiplier = 5;//1;
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -82,14 +88,11 @@ public class RobotContainer {
     //create drivetrain
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
-
+    
     //dashboard and vision subsystems
     Vision Vision = new Vision(drivetrain,Driver);
-    DashboardSuite Dashboard = new DashboardSuite(Elevator, CoralSpin, CoralWrist, Vision);
-
-    //define move to targ command
-    MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(Vision.getTarget(CAMERA.FRONT), drivetrain, Driver,Vision);
-
+    //MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(drivetrain, Driver,Vision);
+    
     // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)
     // Pose2d targetPose = new Pose2d(7.568, 7.62, Rotation2d.fromDegrees(0));
 
@@ -257,14 +260,16 @@ public class RobotContainer {
 
         //LockOnMechanism
         
+        //Driver.rightStick().whileTrue(drivetrain.applyRequest(() -> drive.withRotationalRate(10)));
 
         Driver.povDownLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(1/Math.sqrt(2)*MaxSpeed*SpeedMultiplier  )));
         Driver.povUpRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
         Driver.povUpLeft().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
         Driver.povDownRight().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  ).withVelocityY(-1/Math.sqrt(2) * MaxSpeed * SpeedMultiplier  )));
 
-        Driver.x().onTrue(moveRobotToTarg);
-
+        //System.out.println("RC0");
+        //Driver.x().onTrue(moveRobotToTarg);
+        //System.out.println("RC1");
         Driver.b().whileTrue(drivetrain.applyRequest(() -> brake));
         Driver.y().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Driver.getLeftY(), -Driver.getLeftX()))

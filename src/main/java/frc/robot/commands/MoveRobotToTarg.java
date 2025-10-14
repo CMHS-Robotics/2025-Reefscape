@@ -6,11 +6,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Vision;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+
 import org.photonvision.targeting.PhotonTrackedTarget;
+
 import frc.robot.generated.TunerConstants;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import frc.robot.subsystems.Vision.CAMERA;
 import frc.robot.subsystems.Vision.CVState;
+import frc.robot.subsystems.Vision;
 
 
 public class MoveRobotToTarg extends Command {
@@ -22,22 +27,31 @@ public class MoveRobotToTarg extends Command {
     private final PIDController YController = new PIDController(1, 0, 0);
     private final PIDController turnController = new PIDController(2, 0, 0);
 
-    public MoveRobotToTarg(PhotonTrackedTarget target, CommandSwerveDrivetrain s, CommandXboxController d, Vision v){
+    public MoveRobotToTarg(CommandSwerveDrivetrain s, CommandXboxController d, Vision v){
         Vision = v;
-        double RotError = Vision.CalcRotation(target).getRadians();
-        PoseError = Vision.CalcTranslation();
-
-
-        double dx = PoseError.getX();
-        double dy = PoseError.getY();
-
-
-        double vx = XController.calculate(dx, 0);
-        double vy = YController.calculate(dy, 0);
-        double omega = turnController.calculate(RotError, 0);
-
-        SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric().withVelocityX(vx).withVelocityY(vy).withRotationalRate(omega);
-        
-        drivetrain.setControl(driveRequest);
+        //
+        System.out.print("MRTT Vision:");
+        System.out.println(Vision);
+        if(Vision.hasTarget(CAMERA.TOP)){
+            //
+            System.out.println("MRTT Has Target");
+            PhotonTrackedTarget target = Vision.getTarget(CAMERA.TOP);
+            double RotError = Vision.CalcRotation(target).getRadians();
+            PoseError = Vision.CalcTranslation();
+    
+    
+            double dx = PoseError.getX();
+            double dy = PoseError.getY();
+    
+    
+            double vx = XController.calculate(dx, 0);
+            double vy = YController.calculate(dy, 0);
+            double omega = turnController.calculate(RotError, 0);
+            SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric().withVelocityX(vx).withVelocityY(vy).withRotationalRate(omega);
+            //
+            System.out.println("MRTT Drive Request:");
+            System.out.println(driveRequest);
+            drivetrain.setControl(driveRequest);
+        }
     }
 }

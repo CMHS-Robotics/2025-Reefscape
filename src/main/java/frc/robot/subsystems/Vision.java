@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 
 import static edu.wpi.first.units.Units.Rotation;
@@ -203,20 +204,24 @@ public class Vision extends SubsystemBase {
     }
 
     public Rotation2d CalcRotation(PhotonTrackedTarget target){
+        //
+        System.out.println("V Calc Rot:");
         Rotation2d robotHeading = swerve.getState().Pose.getRotation();
         Rotation2d targHeading = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose.getRotation().toRotation2d();
 
         Rotation2d RotError = targHeading.minus(robotHeading);
-
+        //
+        System.out.println(RotError);
         return RotError;
     }
 
     public Translation2d CalcTranslation(){
+        System.out.println("V Calc Pose:");
         Pose2d robotpose = getRobotPose();
         Pose3d targpose = getTargetPose(FrontTarget);
         
         Translation2d PoseError = targpose.getTranslation().toTranslation2d().minus(robotpose.getTranslation());
-
+        System.out.println(PoseError);
         return PoseError;
     }
 
@@ -333,6 +338,9 @@ public class Vision extends SubsystemBase {
     
     public boolean hasTarget(CAMERA camera){
         var results = ResultsList.get(camera.getId());
+        if(results==null){
+            return false;
+        }else
         if(!results.isEmpty()){
             var result = results.get(results.size()-1);
             if(result.hasTargets()){

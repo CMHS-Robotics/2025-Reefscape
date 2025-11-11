@@ -1,5 +1,7 @@
 package frc.robot.tools;
 
+import com.revrobotics.spark.config.SmartMotionConfig;
+
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -23,6 +25,8 @@ import frc.robot.subsystems.DriveAugments;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
+import frc.robot.subsystems.VisionV2.*;
+import frc.robot.subsystems.VisionV2;
 
 public class DashboardSuite extends SubsystemBase{
     
@@ -33,6 +37,7 @@ public class DashboardSuite extends SubsystemBase{
     DriveAugments DriveAugments;
     CommandSwerveDrivetrain Swerve;
     Vision Vision;
+    VisionV2 VisionV2;
 
     //subscribers
         //subscribers will monitor data in a topic and can be used to update code based on inputs in elastic
@@ -70,12 +75,16 @@ public class DashboardSuite extends SubsystemBase{
     IntegerPublisher pAprilTagDetected;
     BooleanPublisher pVisionHasTarget;
     StringPublisher pVisionTargetMode;
+        //visionv2
+    IntegerPublisher pSameTargetID;
+    BooleanPublisher pHasSameTarget;
     
-    public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w,Vision v){
+    public DashboardSuite(Elevator e, CoralSpinV2 s, CoralWristV2 w,Vision v,VisionV2 v2){
         Elevator = e;
         CoralSpin = s;
         CoralWrist = w;
         Vision = v;
+        VisionV2 = v2;
         initialize();
     }
 
@@ -131,7 +140,13 @@ public class DashboardSuite extends SubsystemBase{
 
         sVisionTargetId = VisionData.getIntegerTopic("Vision April Tag ID Target").subscribe(0);
         sVisionTargetMode = VisionData.getIntegerTopic("Vision Target Mode Set").subscribe(0);
+        //vision v2
 
+        NetworkTable VisionV2Data = inst.getTable("VisionV2"); 
+        VisionV2Data.getIntegerTopic("SameTargetId").publish().set(-1);
+        VisionV2Data.getBooleanTopic("HasSameTargetId").publish().set(false);
+        pSameTargetID = VisionV2Data.getIntegerTopic("SameTargetId").publish();
+        pHasSameTarget = VisionV2Data.getBooleanTopic("HasSameTargetId").publish();
 
         //other
         SmartDashboard.putNumber("Match Time",DriverStation.getMatchTime());
@@ -189,6 +204,8 @@ public class DashboardSuite extends SubsystemBase{
         pAprilTagDetected.set((Vision.hasTarget(CAMERA.FRONT))?Vision.getTarget(CAMERA.FRONT).getFiducialId():0);
         pVisionTargetMode.set(Vision.getCurrentMode().toString());
         Vision.setCurrentMode((int)sVisionTargetMode.get(0));
+
+        //vision v2
     
     }
 }

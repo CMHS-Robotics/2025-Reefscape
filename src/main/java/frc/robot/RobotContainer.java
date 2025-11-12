@@ -46,6 +46,7 @@ import frc.robot.subsystems.Vision.MODE;
 import frc.robot.tools.DashboardSuite;
 import frc.robot.subsystems.Vision.CVState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.VisionV2;
 
 public class RobotContainer {   
 
@@ -91,6 +92,7 @@ public class RobotContainer {
     
     //dashboard and vision subsystems
     Vision Vision = new Vision(drivetrain,Driver);
+    public final VisionV2 VisionV2 = new VisionV2(drivetrain,Driver);
     //MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(drivetrain, Driver,Vision);
     
     // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)

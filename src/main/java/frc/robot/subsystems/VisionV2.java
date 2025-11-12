@@ -3,9 +3,15 @@ package frc.robot.subsystems;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class VisionV2 extends SubsystemBase {
 
@@ -56,6 +62,14 @@ public class VisionV2 extends SubsystemBase {
 
         return targetIDL;
     }
+    public Rotation2d CalcRotation(PhotonTrackedTarget target){
+        Rotation2d robotHeading = swerve.getState().Pose.getRotation();
+        Rotation2d targHeading = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags().get(target.getFiducialId()).pose.getRotation().toRotation2d();
+
+        Rotation2d RotError = targHeading.minus(robotHeading);
+        return RotError;
+    }
+
 
     @Override
     public void periodic() {
@@ -65,5 +79,7 @@ public class VisionV2 extends SubsystemBase {
         SmartDashboard.putNumber("LeftTargetID", targetIDL);
         SmartDashboard.putNumber("RightTargetID", targetIDR);
         SmartDashboard.putNumber("VerifiedTargetID", targetsMatch ? targetIDL : -1);
+        SmartDashboard.putNumber("LROTERROR", CalcRotation(targetL).getRadians());
+
     }
 }

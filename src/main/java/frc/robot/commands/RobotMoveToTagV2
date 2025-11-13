@@ -1,0 +1,72 @@
+package frc.robot.commands;
+
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.VisionV2;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.controller.PIDController;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import frc.robot.generated.TunerConstants;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import frc.robot.subsystems.Vision.CAMERA;
+import frc.robot.subsystems.Vision.CVState;
+import frc.robot.subsystems.Vision;
+
+
+public class MoveToTagCommand extends Command {
+    private final CommandSwerveDrivetrain swerve;
+    private final VisionV2 vision;
+
+
+    private final PIDController KPForward = new PIDController(1, 0, 0);
+    private final PIDController KPSideways = new PIDController(1, 0, 0);
+    private final PIDController KPRotation = new PIDController(2, 0, 0);
+
+    public MoveToTagCommand(CommandSwerveDrivetrain swerve, VisionV2 vision) {
+        this.swerve = swerve;
+        this.vision = vision;
+        addRequirements(swerve);
+    }
+
+    @Override
+    public void execute() {
+        Transform3d transform = vision.getTagTransform();
+        if (transform == null) {
+            // No tag in view — stop the robot
+            swerve.drive(0, 0, 0);
+            return;
+        }
+
+        // Extract relative position
+        double forwardError = transform.getX();
+       
+        double sidewaysError = transform.getY();
+        
+        double yawError = transform.getRotation().toRotation2d().getRadians();
+
+        // PID outputs
+        double vx = KPForward.calculate(forwardError, 0);
+        double vy = KPSideways.calculate(sidewaysError, 0);
+        double omega = KPRotation.calculate(yawError, 0);
+
+        // Drive the swerve based on these PID outputs
+        SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric().withVelocityX(vx).withVelocityY(vy).withRotationalRate(omega);
+    }
+
+    @Override
+    public boolean isFinished() {
+        Transform3d transform = vision.getTagTransform();
+        if (transform == null) return false;
+
+        // Stop when close enough
+        return Math.abs(transform.getX()) < 0.2 && Math.abs(transform.getY()) < 0.1;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        swerve.drive(0, 0, 0);
+    }
+}

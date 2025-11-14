@@ -45,7 +45,7 @@ public class VisionV2 extends SubsystemBase {
 
     public int GetCameraTarget() {
         var resultL = FrontLeftCamera.getLatestResult();
-        var resultR = FrontRightCamera.getLatestResult();
+        var resultR = FrontRightCamera. ();
 
         if (resultL.hasTargets()) {
             targetL = resultL.getBestTarget();

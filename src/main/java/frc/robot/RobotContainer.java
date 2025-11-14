@@ -47,6 +47,7 @@ import frc.robot.tools.DashboardSuite;
 import frc.robot.subsystems.Vision.CVState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.VisionV2;
+import frc.robot.commands.MoveToTagCommand;
 
 public class RobotContainer {   
 
@@ -85,14 +86,21 @@ public class RobotContainer {
     CoralWristSetTargetPositionCommand BottomCoral = new CoralWristSetTargetPositionCommand(CoralWrist,0);
     CoralSetSpinSpeedCommandV2 CoralIn = new CoralSetSpinSpeedCommandV2(CoralSpin,-0.3);
     CoralSetSpinSpeedCommandV2 CoralOut = new CoralSetSpinSpeedCommandV2(CoralSpin,0.3);
+    
 
     //create drivetrain
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
     
     //dashboard and vision subsystems
-    Vision Vision = new Vision(drivetrain,Driver);
-    public final VisionV2 VisionV2 = new VisionV2(drivetrain,Driver);
+    //Vision Vision = new Vision(drivetrain,Driver);
+    public final VisionV2 visionV2 = new VisionV2(drivetrain,Driver);
+
+    MoveToTagCommand moveToTag = new MoveToTagCommand(drivetrain, visionV2);
+
+
+
+
     //MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(drivetrain, Driver,Vision);
     
     // //target pose for a pathfinding command (i used this to return to the starting point when we were testing autonomous)
@@ -114,6 +122,8 @@ public class RobotContainer {
     public RobotContainer() {
         //start cameras
         CameraServer.startAutomaticCapture();
+
+
 
         //reset elevator position (just to be sure)
         Elevator.ElevatorRight.setPosition(0);
@@ -286,7 +296,8 @@ public class RobotContainer {
         Driver.start().and(Driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+       //Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+       Driver.x().toggleOnTrue(new MoveToTagCommand(drivetrain, visionV2)); 
         
         //Driver.back().onTrue(pathfindingCommand);
         drivetrain.registerTelemetry(logger::telemeterize);

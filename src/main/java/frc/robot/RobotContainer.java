@@ -4,14 +4,7 @@
 
 package frc.robot;
 
-import java.awt.print.Printable;
-import java.io.Console;
-
-import javax.print.DocFlavor;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix.*;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -32,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralSetSpinSpeedCommandV2;
 import frc.robot.commands.CoralWristSetTargetPositionCommand;
 import frc.robot.commands.ElevatorSetStageCommand;
-import frc.robot.commands.MoveRobotToTarg;
+import frc.robot.commands.MoveToTagCommand;
 import frc.robot.commands.ZeroTalonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -43,11 +36,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CAMERA;
 import frc.robot.subsystems.Vision.MODE;
-import frc.robot.tools.DashboardSuite;
-import frc.robot.subsystems.Vision.CVState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.VisionV2;
-import frc.robot.commands.MoveToTagCommand;
 
 public class RobotContainer {   
 
@@ -93,13 +82,10 @@ public class RobotContainer {
     
     
     //dashboard and vision subsystems
-    //Vision Vision = new Vision(drivetrain,Driver);
-    public final VisionV2 visionV2 = new VisionV2(drivetrain,Driver);
-
-    MoveToTagCommand moveToTag = new MoveToTagCommand(drivetrain, visionV2);
-
-
-
+    Vision Vision = new Vision(drivetrain,Driver);
+    public final VisionV2 VisionV2 = new VisionV2(drivetrain,Driver);
+    
+    public final MoveToTagCommand MoveToTagCommand = new MoveToTagCommand(drivetrain,VisionV2);
 
     //MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(drivetrain, Driver,Vision);
     
@@ -122,8 +108,6 @@ public class RobotContainer {
     public RobotContainer() {
         //start cameras
         CameraServer.startAutomaticCapture();
-
-
 
         //reset elevator position (just to be sure)
         Elevator.ElevatorRight.setPosition(0);
@@ -295,9 +279,10 @@ public class RobotContainer {
         Driver.start().and(Driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         Driver.start().and(Driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+        Driver.x().toggleOnTrue(MoveToTagCommand);
+
         // reset the field-centric heading on left bumper press
-       //Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-       Driver.x().toggleOnTrue(new MoveToTagCommand(drivetrain, visionV2)); 
+        Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
         //Driver.back().onTrue(pathfindingCommand);
         drivetrain.registerTelemetry(logger::telemeterize);

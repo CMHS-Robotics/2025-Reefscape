@@ -1,11 +1,12 @@
 package frc.robot.commands;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionV2;
-import edu.wpi.first.math.controller.PIDController;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 
 public class MoveToTagCommand extends Command {
 
@@ -18,9 +19,9 @@ public class MoveToTagCommand extends Command {
             .withRotationalRate(0);
 
     // PID controllers
-    private final PIDController KPForward = new PIDController(0.8, 0.0, 0.05);
-    private final PIDController KPSideways = new PIDController(0.6, 0.0, 0.05);
-    private final PIDController KPRotation = new PIDController(3.0, 0.0, 0.1);
+    private final PIDController KPForward = new PIDController(0.3, 0.0, 0.00);
+    private final PIDController KPSideways = new PIDController(0.3, 0.0, 0.00);
+    private final PIDController KPRotation = new PIDController(0.3, 0.0, 0.0);
 
     // Tag dropout protection
     private int framesWithoutTag = 0;
@@ -54,10 +55,12 @@ public class MoveToTagCommand extends Command {
         // Tag is visible → reset counter
         framesWithoutTag = 0;
 
+        double OffSetConstant = (Math.PI/180)*20;
+
         // Robot position relative to tag
-        double forwardError = transform.getX();
-        double sidewaysError = transform.getY();
-        double yawError = transform.getRotation().toRotation2d().getRadians();
+        double forwardError = -transform.getX();
+        double sidewaysError = -transform.getY();
+        double yawError = -(transform.getRotation().toRotation2d().getRadians())+OffSetConstant;
 
         // Calculate PID outputs
         double vx = KPForward.calculate(forwardError, 0);

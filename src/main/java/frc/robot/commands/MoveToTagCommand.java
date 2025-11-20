@@ -60,12 +60,12 @@ public class MoveToTagCommand extends Command {
         // Robot position relative to tag
         double forwardError = -transform.getX();
         double sidewaysError = -transform.getY();
-        double yawError = -(transform.getRotation().toRotation2d().getRadians())+OffSetConstant;
+        double yawError = -(transform.getRotation().toRotation2d().getRadians()); // +OffSetConstant;
 
         // Calculate PID outputs
         double vx = KPForward.calculate(forwardError, 0);
         double vy = KPSideways.calculate(sidewaysError, 0);
-        double omega = KPRotation.calculate(yawError, 0);
+        double omega = KPRotation.calculate(yawError, OffSetConstant);
 
         SwerveRequest.FieldCentric request = new SwerveRequest.FieldCentric()
                 .withVelocityX(vx)
@@ -82,8 +82,8 @@ public class MoveToTagCommand extends Command {
 
         // Physical closeness check
         boolean closeEnough =
-            Math.abs(transform.getX()) < 0.2 &&   // within 20 cm forward
-            Math.abs(transform.getY()) < 0.1;     // within 10 cm sideways
+            Math.abs(transform.getX()) < 0.1 &&   // within 10 cm forward
+            Math.abs(transform.getY()) < 0.05;     // within 5 cm sideways
 
         // PID stability check
         boolean pidSettled =

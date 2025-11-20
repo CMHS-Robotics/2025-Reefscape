@@ -33,9 +33,9 @@ public class MoveToTagCommand extends Command {
         addRequirements(swerve);
 
         // Configure PID tolerances
-        KPForward.setTolerance(0.1);     // 5 cm
-        KPSideways.setTolerance(0.1);    // 5 cm
-        KPRotation.setTolerance(0.1);    // rad (~3 deg)
+        KPForward.setTolerance(0.05);     // 5 cm
+        KPSideways.setTolerance(0.05);    // 5 cm
+        KPRotation.setTolerance(0.05);    // rad (~3 deg)
     }
 
     @Override

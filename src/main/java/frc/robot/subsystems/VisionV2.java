@@ -99,6 +99,56 @@ public class VisionV2 extends SubsystemBase {
         return rotationError;
     }
 
+    public Transform3d getBestTransform() {
+        var resultL = FrontLeftCamera.getLatestResult();
+        var resultR = FrontRightCamera.getLatestResult();
+    
+        // --- Case 1: Both Cameras See Targets ---
+        if (resultL.hasTargets() && resultR.hasTargets()) {
+            PhotonTrackedTarget targetL = resultL.getBestTarget();
+            PhotonTrackedTarget targetR = resultR.getBestTarget();
+    
+            // Get the transform for each camera
+            Transform3d transformL = targetL.getBestCameraToTarget();
+            Transform3d transformR = targetR.getBestCameraToTarget();
+    
+            // Calculate a simple 'error average' for comparison
+            // NOTE: Summing distance and angle directly is mathematically questionable,
+            // but works as a simple heuristic for 'least overall error' in your current logic.
+            double forwardErrorL = transformL.getX();
+            double sidewaysErrorL = transformL.getY();
+            double rotErrorL = transformL.getRotation().toRotation2d().getRadians();
+            double averageL = (Math.abs(forwardErrorL) + Math.abs(sidewaysErrorL) + Math.abs(rotErrorL)) / 3.0; // Use Math.abs for error
+    
+            double forwardErrorR = transformR.getX();
+            double sidewaysErrorR = transformR.getY();
+            double rotErrorR = transformR.getRotation().toRotation2d().getRadians();
+            double averageR = (Math.abs(forwardErrorR) + Math.abs(sidewaysErrorR) + Math.abs(rotErrorR)) / 3.0; // Use Math.abs for error
+    
+            // 💡 Return the transform with the *smaller* average error (smaller average = better)
+            if (averageL < averageR) { // Note: changed > to < since a smaller average is better
+                return transformL;
+            } else {
+                return transformR;
+            }
+        }
+        
+        // --- Case 2: Only Left Camera Sees Targets ---
+        else if (resultL.hasTargets()) {
+            return resultL.getBestTarget().getBestCameraToTarget();
+        }
+        
+        // --- Case 3: Only Right Camera Sees Targets ---
+        else if (resultR.hasTargets()) {
+            return resultR.getBestTarget().getBestCameraToTarget();
+        }
+    
+        // --- Case 4: Neither Camera Sees Targets ---
+        else {
+            return null; // Return null if no tags are visible
+        }
+    }
+
 
 
     public Transform3d getTagTransform() {

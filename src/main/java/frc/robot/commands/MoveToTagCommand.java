@@ -40,7 +40,7 @@ public class MoveToTagCommand extends Command {
 
     @Override
     public void execute() {
-        Transform3d transform = vision.getTagTransform();
+        Transform3d transform = vision.getBestTransform();
 
         if (transform == null) {
             framesWithoutTag++;

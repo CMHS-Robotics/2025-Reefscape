@@ -20,8 +20,8 @@ public class MoveToTagCommand extends Command {
 
     // PID controllers
     private final PIDController KPForward = new PIDController(0.3, 0.0, 0.00);
-    private final PIDController KPSideways = new PIDController(0.3, 0.0, 0.00);
-    private final PIDController KPRotation = new PIDController(0.3, 0.0, 0.0);
+    private final PIDController KPSideways = new PIDController(0.7, 0.0, 0.00);
+    private final PIDController KPRotation = new PIDController(0.7, 0.0, 0.0);
 
     // Tag dropout protection
     private int framesWithoutTag = 0;
@@ -55,17 +55,18 @@ public class MoveToTagCommand extends Command {
         // Tag is visible → reset counter
         framesWithoutTag = 0;
 
-        double OffSetConstant = (Math.PI/180)*20;
+        double yawOffset = (Math.PI/180)*160;
+        double forwardOffset = .05;
 
         // Robot position relative to tag
         double forwardError = -transform.getX();
         double sidewaysError = -transform.getY();
-        double yawError = -(transform.getRotation().toRotation2d().getRadians()); // +OffSetConstant;
+        double yawError = -(transform.getRotation().toRotation2d().getRadians());
 
         // Calculate PID outputs
         double vx = KPForward.calculate(forwardError, 0);
-        double vy = KPSideways.calculate(sidewaysError, 0);
-        double omega = KPRotation.calculate(yawError, OffSetConstant);
+        double vy = KPSideways.calculate(sidewaysError, forwardOffset);
+        double omega = KPRotation.calculate(yawError, yawOffset);
 
         SwerveRequest.FieldCentric request = new SwerveRequest.FieldCentric()
                 .withVelocityX(vx)

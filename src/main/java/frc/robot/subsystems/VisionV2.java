@@ -28,10 +28,10 @@ public class VisionV2 extends SubsystemBase {
 
     // *** Robot-relative camera positions *** need to add values for rotation - probably just need yaw
     private static final Transform3d kLeftCameraToRobot =
-        new Transform3d(0.25,  0.20, 0.10, new Rotation3d(0, 0, Math.toRadians(15)));
+        new Transform3d(0.3625,  0.22, 0.12, new Rotation3d(0, 0, Math.toRadians(15)));
 
     private static final Transform3d kRightCameraToRobot =
-        new Transform3d(0.25, -0.20, 0.10, new Rotation3d(0, 0, Math.toRadians(-15)));
+        new Transform3d(0.3625, -0.22, 0.12, new Rotation3d(0, 0, Math.toRadians(-15)));
 
     private final CommandSwerveDrivetrain swerve;
     private final CommandXboxController driver;
@@ -84,7 +84,7 @@ public class VisionV2 extends SubsystemBase {
     // Add any other tags we have printed (e.g., Tag 3, Tag 4)
 
     // Create the test field layout (adjust field dimensions if needed)
-    this.fieldLayout = new AprilTagFieldLayout(testTags, 8.0, 4.0); // 8.0m x 4.0m test space
+    this.fieldLayout = new AprilTagFieldLayout(testTags, 5.0, 5.0); // 8.0m x 4.0m test space
 
     // --- END: CUSTOM TEST FIELD LAYOUT DEFINITION ---
 

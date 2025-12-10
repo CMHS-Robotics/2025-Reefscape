@@ -48,6 +48,7 @@ public class RobotContainer {
     public static double RotationSpeedMultiplier = 5;//1;
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private final SendableChooser<Integer> tagChooser = new SendableChooser<>();
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -85,7 +86,11 @@ public class RobotContainer {
     Vision Vision = new Vision(drivetrain,Driver);
     public final VisionV2 VisionV2 = new VisionV2(drivetrain,Driver);
     
-    public final MoveToTagCommand MoveToTagCommand = new MoveToTagCommand(drivetrain,VisionV2);
+    MoveToTagCommand moveToTag = new MoveToTagCommand(
+        drivetrain, 
+        VisionV2, 
+        tagChooser // Pass the actual chooser object
+);
 
     //MoveRobotToTarg moveRobotToTarg = new MoveRobotToTarg(drivetrain, Driver,Vision);
     
@@ -112,6 +117,16 @@ public class RobotContainer {
         //reset elevator position (just to be sure)
         Elevator.ElevatorRight.setPosition(0);
         Elevator.ElevatorLeft.setPosition(0);
+
+        // 1. Populate the Chooser with available tag options
+    tagChooser.setDefaultOption("No Specific Tag", -1); // Use -1 for "Best Available" mode
+    tagChooser.addOption("Tag 1", 1);
+    tagChooser.addOption("Tag 2", 2);
+    tagChooser.addOption("Tag 3", 3);
+    // Add more tags as needed for your test layout
+
+    // 2. Push the Chooser to the SmartDashboard/Shuffleboard
+    SmartDashboard.putData("Target Tag Selection", tagChooser);
 
         //auto commands and events
             //set topstage command to run followed by topcoral when the command TopStage is called in pathplanner
@@ -279,7 +294,7 @@ public class RobotContainer {
         Driver.start().and(Driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         Driver.start().and(Driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        Driver.x().toggleOnTrue(MoveToTagCommand);
+        Driver.x().toggleOnTrue(moveToTag);
 
         // reset the field-centric heading on left bumper press
         Driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

@@ -1,176 +1,195 @@
 package frc.robot.subsystems;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.estimation.PhotonPoseEstimator;
+import org.photonvision.estimation.PhotonPoseEstimator.PoseStrategy;
 
-
-// added this??
-import edu.wpi.first.math.geometry.Transform3d;
-
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class VisionV2 extends SubsystemBase {
 
-    // Cameras
-    private PhotonCamera FrontLeftCamera = new PhotonCamera("FrontLeftCamera");
-    private PhotonCamera FrontRightCamera = new PhotonCamera("FrontRightCamera");
+    private PhotonCamera camLeft = new PhotonCamera("FrontLeftCamera");
+    private PhotonCamera camRight = new PhotonCamera("FrontRightCamera");
 
-    // Stored results
-    private PhotonTrackedTarget targetL;
-    private PhotonTrackedTarget targetR;
-    private int targetIDL = -1;
-    private int targetIDR = -1;
-    private boolean targetsMatch = false;
+    // *** Robot-relative camera positions *** need to add values for rotation - probably just need yaw
+    private static final Transform3d kLeftCameraToRobot =
+        new Transform3d(0.25,  0.20, 0.10, new Rotation3d(0, 0, Math.toRadians(15)));
 
-    private final AprilTagFieldLayout fieldLayout;
+    private static final Transform3d kRightCameraToRobot =
+        new Transform3d(0.25, -0.20, 0.10, new Rotation3d(0, 0, Math.toRadians(-15)));
 
-    // Swerve + Driver (kept in case you need later)
     private final CommandSwerveDrivetrain swerve;
     private final CommandXboxController driver;
 
+    // private final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    // This is the actual feild ^ but were using a custom test feild 
+    private final AprilTagFieldLayout fieldLayout; // this is the test feild that I made
+    
+    private final PhotonPoseEstimator leftEstimator;
+    private final PhotonPoseEstimator rightEstimator;
+
+    
+
+    private Pose2d latestFieldPose = new Pose2d();
+    private int selectedDestinationTag = -1;
+
     public VisionV2(CommandSwerveDrivetrain s, CommandXboxController d) {
-        this.swerve = s;
-        this.driver = d;
+    this.swerve = s;
+    this.driver = d;
 
-        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    // --- START: CUSTOM TEST FIELD LAYOUT DEFINITION ---
+    List<AprilTag> testTags = new ArrayList<>();
+
+    // Tag 1: Placed at (X=1.0m, Y=0.0m, Z=0.5m), facing 0 degrees yaw
+    testTags.add(new AprilTag(
+        1, 
+        new Pose3d(
+            1.0, 0.0, 0.5, 
+            new Rotation3d(0, 0, Math.toRadians(0))
+        )
+    ));
+
+    //Tag 2: Placed at (X=1.0m, Y=1.0m, Z=0.5m), facing 0 degrees yaw
+    testTags.add(new AprilTag(
+        2, 
+        new Pose3d(
+            1.0, 1.0, 0.5, 
+            new Rotation3d(0, 0, Math.toRadians(0))
+        )
+    ));
+    
+    // Add any other tags we have printed (e.g., Tag 3, Tag 4)
+
+    // Create the test field layout (adjust field dimensions if needed)
+    this.fieldLayout = new AprilTagFieldLayout(testTags, 8.0, 4.0); // 8.0m x 4.0m test space
+
+    // --- END: CUSTOM TEST FIELD LAYOUT DEFINITION ---
+
+    leftEstimator = new PhotonPoseEstimator(
+        fieldLayout, // *** USE THE NEW CUSTOM LAYOUT HERE ***
+        PoseStrategy.MULTI_TAG_PNP,
+        camLeft,
+        kLeftCameraToRobot
+    );
+
+    rightEstimator = new PhotonPoseEstimator(
+        fieldLayout, // *** USE THE NEW CUSTOM LAYOUT HERE ***
+        PoseStrategy.MULTI_TAG_PNP,
+        camRight,
+        kRightCameraToRobot
+    );
+}
+
+    public void setDestinationTag(int id) {
+        selectedDestinationTag = id;
     }
 
-    public int GetCameraTarget() {
-        var resultL = FrontLeftCamera.getLatestResult();
-        var resultR = FrontRightCamera.getLatestResult();
-
-        if (resultL.hasTargets()) {
-            targetL = resultL.getBestTarget();
-            targetIDL = targetL.getFiducialId();
-        } else {
-            targetIDL = -1;
-        }
-
-        if (resultR.hasTargets()) {
-            targetR = resultR.getBestTarget();
-            targetIDR = targetR.getFiducialId();
-        } else {
-            targetIDR = -1;
-        }
-
-        // Match check
-        if (targetIDL != -1 && targetIDL == targetIDR) {
-            targetsMatch = true;
-        } else {
-            targetsMatch = false;
-        }
-
-        return targetIDL;
+    public int getDestinationTag() {
+        return selectedDestinationTag;
     }
 
-    // this causes code to have a fatal error :(
+    // Finds the target we want to move toward.
+    private Optional<PhotonTrackedTarget> getChosenTarget() {
 
-    public Rotation2d CalcRotation(PhotonTrackedTarget target) {
-        // If there’s no target passed in, just return 0° rotation error
-        if (target == null) {
-            return Rotation2d.fromDegrees(0);
-        }
+        int destTag = selectedDestinationTag;
 
-        AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-    
-        int seenTagId = target.getFiducialId();
-    
-        var tagMap = fieldLayout.getTags();
-    
-        var tagDefinition = tagMap.get(seenTagId);
+        var left = camLeft.getLatestResult();
+        var right = camRight.getLatestResult();
 
-        if (tagDefinition == null) {
-            return Rotation2d.fromDegrees(0);
-        }
-        Rotation2d robotHeading = swerve.getState().Pose.getRotation();
+        // --- PRIORITY 1: Selected destination tag ---
+        if (destTag != -1) {
+            if (left.hasTargets()) {
+                for (var t : left.getTargets()) {
+                    if (t.getFiducialId() == destTag)
+                        return Optional.of(t);
+                }
+            }
 
-        Rotation2d tagHeading = tagDefinition.pose.getRotation().toRotation2d();
-
-        Rotation2d rotationError = tagHeading.minus(robotHeading);
-    
-        return rotationError;
-    }
-
-    public Transform3d getBestTransform() {
-        var resultL = FrontLeftCamera.getLatestResult();
-        var resultR = FrontRightCamera.getLatestResult();
-    
-        // --- Case 1: Both Cameras See Targets ---
-        if (resultL.hasTargets() && resultR.hasTargets()) {
-            PhotonTrackedTarget targetL = resultL.getBestTarget();
-            PhotonTrackedTarget targetR = resultR.getBestTarget();
-    
-            // Get the transform for each camera
-            Transform3d transformL = targetL.getBestCameraToTarget();
-            Transform3d transformR = targetR.getBestCameraToTarget();
-    
-            // Calculate a simple 'error average' for comparison
-            // NOTE: Summing distance and angle directly is mathematically questionable,
-            // but works as a simple heuristic for 'least overall error' in your current logic.
-            double forwardErrorL = transformL.getX();
-            double sidewaysErrorL = transformL.getY();
-            double rotErrorL = transformL.getRotation().toRotation2d().getRadians();
-            double averageL = (Math.abs(forwardErrorL) + Math.abs(sidewaysErrorL) + Math.abs(rotErrorL)) / 3.0; // Use Math.abs for error
-    
-            double forwardErrorR = transformR.getX();
-            double sidewaysErrorR = transformR.getY();
-            double rotErrorR = transformR.getRotation().toRotation2d().getRadians();
-            double averageR = (Math.abs(forwardErrorR) + Math.abs(sidewaysErrorR) + Math.abs(rotErrorR)) / 3.0; // Use Math.abs for error
-    
-            // 💡 Return the transform with the *smaller* average error (smaller average = better)
-            if (averageL < averageR) { // Note: changed > to < since a smaller average is better
-                return transformL;
-            } else {
-                return transformR;
+            if (right.hasTargets()) {
+                for (var t : right.getTargets()) {
+                    if (t.getFiducialId() == destTag)
+                        return Optional.of(t);
+                }
             }
         }
-        
-        // --- Case 2: Only Left Camera Sees Targets ---
-        else if (resultL.hasTargets()) {
-            return resultL.getBestTarget().getBestCameraToTarget();
-        }
-        
-        // --- Case 3: Only Right Camera Sees Targets ---
-        else if (resultR.hasTargets()) {
-            return resultR.getBestTarget().getBestCameraToTarget();
-        }
-    
-        // --- Case 4: Neither Camera Sees Targets ---
-        else {
-            return null; // Return null if no tags are visible
-        }
+
+        // --- PRIORITY 2: Best available target ---
+        if (left.hasTargets())
+            return Optional.of(left.getBestTarget());
+
+        if (right.hasTargets())
+            return Optional.of(right.getBestTarget());
+
+        return Optional.empty();
     }
 
+    // *** Returns ROBOT → TAG transform ***
+    public Optional<Transform3d> getBestTransform() {
 
+        Optional<PhotonTrackedTarget> chosen = getChosenTarget();
+        if (chosen.isEmpty()) return Optional.empty();
 
-    public Transform3d getTagTransform() {
-        var result = FrontLeftCamera.getLatestResult();
-        if (!result.hasTargets()) return null;
-    
-        PhotonTrackedTarget target = result.getBestTarget();
-        return target.getBestCameraToTarget();
+        PhotonTrackedTarget target = chosen.get();
+
+        // Which camera saw it?
+        boolean seenLeft =
+            camLeft.getLatestResult().getTargets().contains(target);
+
+        Transform3d cameraToTag = target.getBestCameraToTarget();
+        Transform3d robotToTag;
+
+        if (seenLeft) {
+            robotToTag = kLeftCameraToRobot.plus(cameraToTag);
+        } else {
+            robotToTag = kRightCameraToRobot.plus(cameraToTag);
+        }
+
+        return Optional.of(robotToTag);
     }
 
-//bruh
-
+    public Pose2d getFieldPose() {
+        return latestFieldPose;
+    }
 
     @Override
     public void periodic() {
-        GetCameraTarget();
 
-        SmartDashboard.putBoolean("HasSameTargetId", targetsMatch);
-        SmartDashboard.putNumber("LeftTargetID", targetIDL);
-        SmartDashboard.putNumber("RightTargetID", targetIDR);
-        SmartDashboard.putNumber("VerifiedTargetID", targetsMatch ? targetIDL : -1);
-        SmartDashboard.putNumber("LROTERROR", CalcRotation(targetL).getRadians());
+        leftEstimator.setReferencePose(swerve.getState().Pose);
+        rightEstimator.setReferencePose(swerve.getState().Pose);
 
+        Optional<EstimatedRobotPose> leftPose = leftEstimator.update();
+        Optional<EstimatedRobotPose> rightPose = rightEstimator.update();
+        fieldVisualizer.setRobotPose(latestFieldPose);
+
+        if (leftPose.isPresent()) {
+            latestFieldPose = leftPose.get().estimatedPose.toPose2d();
+        }
+        else if (rightPose.isPresent()) {
+            latestFieldPose = rightPose.get().estimatedPose.toPose2d();
+        }
+
+        
+
+        SmartDashboard.putData("Field View", fieldVisualizer);
+
+        SmartDashboard.putNumber("FieldPoseX", latestFieldPose.getX());
+        SmartDashboard.putNumber("FieldPoseY", latestFieldPose.getY());
+        SmartDashboard.putNumber("FieldPoseHeading", latestFieldPose.getRotation().getDegrees());
+        SmartDashboard.putNumber("DestinationTag", selectedDestinationTag);
     }
 }

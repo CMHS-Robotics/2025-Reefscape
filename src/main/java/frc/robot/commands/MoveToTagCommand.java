@@ -7,6 +7,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionV2;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+
+import java.util.Optional;
 
 public class MoveToTagCommand extends Command {
 
@@ -18,55 +21,69 @@ public class MoveToTagCommand extends Command {
             .withVelocityY(0)
             .withRotationalRate(0);
 
-    // PID controllers
     private final PIDController KPForward = new PIDController(0.3, 0.0, 0.00);
     private final PIDController KPSideways = new PIDController(0.7, 0.0, 0.00);
     private final PIDController KPRotation = new PIDController(0.7, 0.0, 0.0);
 
-    // Tag dropout protection
     private int framesWithoutTag = 0;
-    private static final int MAX_FRAME_LOSS = 5;   // tolerate ~5 frames of dropout
+    private static final int MAX_FRAME_LOSS = 5;
 
-    public MoveToTagCommand(CommandSwerveDrivetrain swerve, VisionV2 vision) {
+    private final SendableChooser<Integer> tagChooser;
+
+    public MoveToTagCommand(
+            CommandSwerveDrivetrain swerve, 
+            VisionV2 vision,
+            SendableChooser<Integer> tagChooser
+    ) {
         this.swerve = swerve;
         this.vision = vision;
+        this.tagChooser = tagChooser;
+
         addRequirements(swerve);
 
-        // Configure PID tolerances
-        KPForward.setTolerance(0.05);     // 5 cm
-        KPSideways.setTolerance(0.05);    // 5 cm
-        KPRotation.setTolerance(0.05);    // rad (~3 deg)
+        // Tell the vision system which tag we want to navigate to
+
+        // PID tolerances
+        KPForward.setTolerance(0.05);
+        KPSideways.setTolerance(0.05);
+        KPRotation.setTolerance(0.05);
     }
 
     @Override
+    public void initialize() {
+    // 1. Get the selected tag ID from the chooser
+    int selectedTag = tagChooser.getSelected();
+    
+    // 2. Pass that selected ID to the vision subsystem
+    vision.setDestinationTag(selectedTag);
+
+    // Reset PIDs and frame loss
+    KPForward.reset();
+    KPSideways.reset();
+    KPRotation.reset();
+    framesWithoutTag = 0;
+}
+
+    @Override
     public void execute() {
-        Transform3d transform = vision.getBestTransform();
+        Optional<Transform3d> transformOpt = vision.getBestTransform();
 
-        if (transform == null) {
+        if (transformOpt.isEmpty()) {
             framesWithoutTag++;
-
-            // Stop ONLY if tag is fully lost for too long
-            if (framesWithoutTag >= MAX_FRAME_LOSS) {
-                swerve.setControl(zero);
-            }
+            if (framesWithoutTag >= MAX_FRAME_LOSS) swerve.setControl(zero);
             return;
         }
 
-        // Tag is visible → reset counter
         framesWithoutTag = 0;
+        Transform3d transform = transformOpt.get();
 
-        double yawOffset = (Math.PI/180)*160;
-        double forwardOffset = .05;
-
-        // Robot position relative to tag
         double forwardError = -transform.getX();
         double sidewaysError = -transform.getY();
         double yawError = -(transform.getRotation().toRotation2d().getRadians());
 
-        // Calculate PID outputs
         double vx = KPForward.calculate(forwardError, 0);
-        double vy = KPSideways.calculate(sidewaysError, forwardOffset);
-        double omega = KPRotation.calculate(yawError, yawOffset);
+        double vy = KPSideways.calculate(sidewaysError, 0);
+        double omega = KPRotation.calculate(yawError, 0);
 
         SwerveRequest.FieldCentric request = new SwerveRequest.FieldCentric()
                 .withVelocityX(vx)
@@ -78,26 +95,25 @@ public class MoveToTagCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        Transform3d transform = vision.getTagTransform();
-        if (transform == null) return false;  // dropout → keep running
+        Optional<Transform3d> transformOpt = vision.getBestTransform();
+        if (transformOpt.isEmpty()) return false;
 
-        // Physical closeness check
+        Transform3d t = transformOpt.get();
+
         boolean closeEnough =
-            Math.abs(transform.getX()) < 0.1 &&   // within 10 cm forward
-            Math.abs(transform.getY()) < 0.05;     // within 5 cm sideways
+                Math.abs(t.getX()) < 0.1 &&
+                Math.abs(t.getY()) < 0.05;
 
-        // PID stability check
         boolean pidSettled =
-            KPForward.atSetpoint() &&
-            KPSideways.atSetpoint() &&
-            KPRotation.atSetpoint();
+                KPForward.atSetpoint() &&
+                KPSideways.atSetpoint() &&
+                KPRotation.atSetpoint();
 
         return closeEnough && pidSettled;
     }
 
     @Override
     public void end(boolean interrupted) {
-        // Stop the robot fully
         swerve.setControl(zero);
     }
 }

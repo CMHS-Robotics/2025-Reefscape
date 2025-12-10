@@ -59,7 +59,7 @@ public class VisionV2 extends SubsystemBase {
     testTags.add(new AprilTag(
         1, 
         new Pose3d(
-            1.0, 0.0, 0.5, 
+            4.0, -1.0, 0.508, 
             new Rotation3d(0, 0, Math.toRadians(0))
         )
     ));
@@ -68,7 +68,15 @@ public class VisionV2 extends SubsystemBase {
     testTags.add(new AprilTag(
         2, 
         new Pose3d(
-            1.0, 1.0, 0.5, 
+            2.0, -4.0, 0.508, 
+            new Rotation3d(0, 0, Math.toRadians(90))
+        )
+    ));
+
+    testTags.add(new AprilTag(
+        3, 
+        new Pose3d(
+            4.0, -3.0, 0.508, 
             new Rotation3d(0, 0, Math.toRadians(0))
         )
     ));

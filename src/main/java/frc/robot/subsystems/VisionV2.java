@@ -36,7 +36,7 @@ public class VisionV2 extends SubsystemBase {
         new Transform3d(0.3625, -0.22, 0.12, new Rotation3d(0, 0, Math.toRadians(-15)));
 
     private final CommandSwerveDrivetrain swerve;
-    private final CommandXboxController driver;
+   // private final CommandXboxController driver;
 
     // private final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     // This is the actual feild ^ but were using a custom test feild 
@@ -55,7 +55,7 @@ public class VisionV2 extends SubsystemBase {
 
     public VisionV2(CommandSwerveDrivetrain s, CommandXboxController d) {
     this.swerve = s;
-    this.driver = d;
+   // this.driver = d;
 
     // --- START: CUSTOM TEST FIELD LAYOUT DEFINITION ---
     List<AprilTag> testTags = new ArrayList<>();
@@ -95,15 +95,13 @@ public class VisionV2 extends SubsystemBase {
 
     leftEstimator = new PhotonPoseEstimator(
         fieldLayout, // *** USE THE NEW CUSTOM LAYOUT HERE ***
-        PoseStrategy.MULTI_TAG_PNP,
-        camLeft,
+        PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
         kLeftCameraToRobot
     );
 
     rightEstimator = new PhotonPoseEstimator(
         fieldLayout, // *** USE THE NEW CUSTOM LAYOUT HERE ***
-        PoseStrategy.MULTI_TAG_PNP,
-        camRight,
+        PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
         kRightCameraToRobot
     );
 }
@@ -182,11 +180,14 @@ public class VisionV2 extends SubsystemBase {
     @Override
     public void periodic() {
 
+        var leftResult = camLeft.getLatestResult();
+        var rightResult = camRight.getLatestResult();
+
         leftEstimator.setReferencePose(swerve.getState().Pose);
         rightEstimator.setReferencePose(swerve.getState().Pose);
 
-        Optional<EstimatedRobotPose> leftPose = leftEstimator.update();
-        Optional<EstimatedRobotPose> rightPose = rightEstimator.update();
+        Optional<EstimatedRobotPose> leftPose = leftEstimator.update(leftResult);
+        Optional<EstimatedRobotPose> rightPose = rightEstimator.update(rightResult);
         fieldVisualizer.setRobotPose(latestFieldPose);
 
         if (leftPose.isPresent()) {

@@ -2,6 +2,8 @@ import org.gradle.internal.os.OperatingSystem
 
 pluginManagement {
     repositories {
+
+         maven { url 'https://maven.photonvision.org/repository/internal' } //added this line for photonvision
         mavenLocal()
         gradlePluginPortal()
         String frcYear = '2025'
@@ -23,6 +25,17 @@ pluginManagement {
             name 'frcHome'
             url frcHomeMaven
         }
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+    // *** MOVE PHOTONVISION TO THE TOP HERE ***
+        maven { url 'https://maven.photonvision.org/repository/internal' }
+        // ------------------------------------------
+
+        // WPILib should be below the PhotonVision source
+        maven { url 'https://maven.wpi.edu/unofficial-maven-3.1/' }
     }
 }
 

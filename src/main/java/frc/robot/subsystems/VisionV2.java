@@ -45,6 +45,9 @@ public class VisionV2 extends SubsystemBase {
     private final PhotonPoseEstimator leftEstimator;
     private final PhotonPoseEstimator rightEstimator;
 
+    private final edu.wpi.first.wpilibj.smartdashboard.Field2d fieldVisualizer = new edu.wpi.first.wpilibj.smartdashboard.Field2d();
+
+
     
 
     private Pose2d latestFieldPose = new Pose2d();
